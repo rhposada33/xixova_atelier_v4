@@ -1,0 +1,367 @@
+schema: 1
+id: xixova
+version: 1.0-demo
+unidades: m
+fuentes:
+- archivo: ../../atelier_base.py
+  descripcion: 'shell(): geometría histórica aproximada, sin plano del inmueble'
+cota_referencia:
+  valor_m: 11.5
+  descripcion: Ancho del modelo histórico; referencia sintética, no medición del inmueble
+  fiable: true
+dudas:
+- Geometría aproximada; pendiente contrastar con plano real.
+- Acceso conserva la distribución del lavabo histórico.
+- Cierre sur del baño principal añadido por inferencia para cerrar el volumen; verificar
+  con plano.
+espacios:
+- id: social
+  contorno:
+  - - 0
+    - 1.7
+  - - 4.4
+    - 1.7
+  - - 4.4
+    - 6
+  - - 0
+    - 6
+  altura: 2.7
+- id: sala
+  contorno:
+  - - 4.4
+    - 3.7
+  - - 7.5
+    - 3.7
+  - - 7.5
+    - 6
+  - - 4.4
+    - 6
+  altura: 2.7
+- id: circulacion
+  contorno:
+  - - 7.5
+    - 3.5
+  - - 8.95
+    - 3.5
+  - - 8.95
+    - 4.6
+  - - 7.5
+    - 4.6
+  altura: 2.7
+- id: acceso
+  contorno:
+  - - 7.5
+    - 4.6
+  - - 8.95
+    - 4.6
+  - - 8.95
+    - 6
+  - - 7.5
+    - 6
+  altura: 2.7
+- id: suite_principal
+  contorno:
+  - - 4.4
+    - 1.08
+  - - 7.5
+    - 1.08
+  - - 7.5
+    - 3.7
+  - - 4.4
+    - 3.7
+  altura: 2.7
+- id: bano_principal
+  contorno:
+  - - 7.5
+    - 1.08
+  - - 8.95
+    - 1.08
+  - - 8.95
+    - 3.5
+  - - 7.5
+    - 3.5
+  altura: 2.7
+- id: suite_secundaria
+  contorno:
+  - - 8.95
+    - 1.08
+  - - 11.5
+    - 1.08
+  - - 11.5
+    - 4.6
+  - - 8.95
+    - 4.6
+  altura: 2.7
+- id: bano_secundario
+  contorno:
+  - - 8.95
+    - 4.6
+  - - 11.5
+    - 4.6
+  - - 11.5
+    - 6
+  - - 8.95
+    - 6
+  altura: 2.7
+- id: terraza
+  contorno:
+  - - 0
+    - 0
+  - - 7.5
+    - 0
+  - - 7.5
+    - 1.08
+  - - 4.4
+    - 1.08
+  - - 4.4
+    - 1.7
+  - - 0
+    - 1.7
+  altura: 2.7
+paredes:
+- id: fondo
+  a:
+  - 0
+  - 6
+  b:
+  - 11.5
+  - 6
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: lateral_cocina
+  a:
+  - 0
+  - 1.7
+  b:
+  - 0
+  - 6
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: lateral_suite
+  a:
+  - 11.5
+  - 1.08
+  b:
+  - 11.5
+  - 6
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: suite_lateral
+  a:
+  - 4.4
+  - 1.7
+  b:
+  - 4.4
+  - 3.7
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: tv_suite
+  a:
+  - 4.4
+  - 3.7
+  b:
+  - 7.5
+  - 3.7
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_suite
+    tipo: puerta
+    distancia: 2.24
+    ancho: 0.86
+    alto: 2.2
+    antepecho: 0
+- id: division_bano
+  a:
+  - 7.5
+  - 1.08
+  b:
+  - 7.5
+  - 3.5
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano
+    tipo: puerta
+    distancia: 1.54
+    ancho: 0.88
+    alto: 2.2
+    antepecho: 0
+- id: bano_frente
+  a:
+  - 7.5
+  - 3.5
+  b:
+  - 8.95
+  - 3.5
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: division_secundaria
+  a:
+  - 8.95
+  - 1.08
+  b:
+  - 8.95
+  - 4.6
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_secundaria
+    tipo: puerta
+    distancia: 2.64
+    ancho: 0.88
+    alto: 2.2
+    antepecho: 0
+- id: division_lavabo
+  a:
+  - 7.5
+  - 4.6
+  b:
+  - 7.5
+  - 6
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: lavabo_frente
+  a:
+  - 7.5
+  - 4.6
+  b:
+  - 8.95
+  - 4.6
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_lavabo
+    tipo: puerta
+    distancia: 0.35
+    ancho: 0.8
+    alto: 2.2
+    antepecho: 0
+- id: lavabo_lateral
+  a:
+  - 8.95
+  - 4.6
+  b:
+  - 8.95
+  - 6
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: bano_sec_frente
+  a:
+  - 8.95
+  - 4.6
+  b:
+  - 11.5
+  - 4.6
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano_sec
+    tipo: puerta
+    distancia: 1.53
+    ancho: 0.88
+    alto: 2.2
+    antepecho: 0
+- id: ventana_principal
+  a:
+  - 4.4
+  - 1.08
+  b:
+  - 7.5
+  - 1.08
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_1
+    tipo: ventana
+    distancia: 0.08
+    ancho: 2.94
+    alto: 1.62
+    antepecho: 0.82
+- id: ventana_secundaria
+  a:
+  - 8.95
+  - 1.08
+  b:
+  - 11.5
+  - 1.08
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_2
+    tipo: ventana
+    distancia: 0.08
+    ancho: 2.39
+    alto: 1.62
+    antepecho: 0.82
+- id: terraza_corredera
+  a:
+  - 1.8
+  - 1.7
+  b:
+  - 4.4
+  - 1.7
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: corredera
+    tipo: puerta
+    distancia: 0.04
+    ancho: 2.52
+    alto: 2.4
+    antepecho: 0
+- id: lateral_parrilla
+  a:
+  - 0
+  - 0
+  b:
+  - 0
+  - 1.7
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: terraza_tecnico
+  a:
+  - 7.5
+  - 0
+  b:
+  - 7.5
+  - 1.08
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: baranda
+  a:
+  - 0
+  - 0
+  b:
+  - 7.5
+  - 0
+  espesor: 0.03
+  altura: 1.1
+  aberturas: []
+- id: bano_sur
+  a:
+  - 7.5
+  - 1.08
+  b:
+  - 8.95
+  - 1.08
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+pilares: []
+instalaciones:
+- id: agua_cocina
+  tipo: agua
+  posicion:
+  - 0.12
+  - 3.5
+  - 0.55

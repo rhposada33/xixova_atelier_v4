@@ -1,0 +1,152 @@
+schema: 1
+id: calida
+arquitectura:
+  id: xixova
+  version: 1.0-demo
+  hash: 5add50f429b26e84bb9f3e111908d3f6700c060947b1deb8025b3b6a90f8e0ea
+materiales:
+  pared:
+    color:
+    - 0.68
+    - 0.61
+    - 0.49
+    rugosidad: 0.72
+  piso:
+    color:
+    - 0.3
+    - 0.16
+    - 0.075
+    rugosidad: 0.4
+  techo:
+    color:
+    - 0.78
+    - 0.76
+    - 0.7
+    rugosidad: 0.8
+acabados:
+  fondo: pared
+  lateral_cocina: pared
+  lateral_suite: pared
+  suite_lateral: pared
+  tv_suite: pared
+  division_bano: pared
+  bano_frente: pared
+  division_secundaria: pared
+  division_lavabo: pared
+  lavabo_frente: pared
+  lavabo_lateral: pared
+  bano_sec_frente: pared
+  ventana_principal: pared
+  ventana_secundaria: pared
+  terraza_corredera: pared
+  lateral_parrilla: pared
+  terraza_tecnico: pared
+  baranda: pared
+  social:piso: piso
+  social:techo: techo
+  sala:piso: piso
+  sala:techo: techo
+  circulacion:piso: piso
+  circulacion:techo: techo
+  acceso:piso: piso
+  acceso:techo: techo
+  suite_principal:piso: piso
+  suite_principal:techo: techo
+  bano_principal:piso: piso
+  bano_principal:techo: techo
+  suite_secundaria:piso: piso
+  suite_secundaria:techo: techo
+  bano_secundario:piso: piso
+  bano_secundario:techo: techo
+  terraza:piso: piso
+  terraza:techo: techo
+  bano_sur: pared
+elementos:
+- id: cocina
+  activo: XVA3_Cocina_premium
+  espacio: social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 0.47
+    - 3.85
+    - 0
+    rotacion: -90
+  escala: 1
+- id: comedor
+  activo: comedor
+  espacio: social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 2.9
+    - 4.8
+    - 0
+    rotacion: 90
+  escala: 1
+- id: sofa
+  activo: sofa_recto
+  espacio: sala
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.65
+    - 5.45
+    - 0
+    rotacion: 180
+  escala: 1
+- id: mesa
+  activo: mesa_centro
+  espacio: sala
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.55
+    - 4.55
+    - 0
+    rotacion: 0
+  escala: 1
+- id: cama_principal
+  activo: XVA3_Cama_king
+  espacio: suite_principal
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.49
+    - 2.31
+    - 0
+    rotacion: 0
+  escala: 1
+- id: cama_secundaria
+  activo: XVA3_Cama_doble
+  espacio: suite_secundaria
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 10.2
+    - 2.3
+    - 0
+    rotacion: 0
+  escala: 1
+- id: bano
+  activo: XVA3_Bano_principal
+  espacio: bano_principal
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.23
+    - 1.91
+    - 0
+    rotacion: 0
+  escala: 0.88
+- id: bano_sec
+  activo: XVA3_Bano_principal
+  espacio: bano_secundario
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 9.75
+    - 5.3
+    - 0
+    rotacion: -90
+  escala: 0.85

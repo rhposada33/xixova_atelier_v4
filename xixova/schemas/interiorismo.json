@@ -1,0 +1,236 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/interiorismo.json",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "arquitectura": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hash": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "hash"
+      ],
+      "additionalProperties": false
+    },
+    "materiales": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "rugosidad": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "metalico": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "color",
+          "rugosidad"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "acabados": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "elementos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "activo": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "espacio": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "colocacion": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "const": "explicita"
+                  },
+                  "posicion": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "rotacion": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "posicion"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "const": "espacio"
+                  },
+                  "desplazamiento": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "rotacion": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "tipo"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "const": "objeto"
+                  },
+                  "referencia": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9_-]+$"
+                  },
+                  "desplazamiento": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "rotacion": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "referencia",
+                  "desplazamiento"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "tipo": {
+                    "const": "pared"
+                  },
+                  "referencia": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9_-]+$"
+                  },
+                  "lado": {
+                    "enum": [
+                      1,
+                      -1
+                    ]
+                  },
+                  "distancia": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "separacion": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "tipo",
+                  "referencia",
+                  "lado",
+                  "distancia",
+                  "separacion"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "escala": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "material": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "activo",
+          "espacio",
+          "colocacion"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "arquitectura",
+    "materiales",
+    "acabados",
+    "elementos"
+  ],
+  "additionalProperties": false
+}

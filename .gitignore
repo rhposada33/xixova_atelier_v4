@@ -61,3 +61,9 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Revisiones locales del framework (vinculadas al contenido y al equipo)
+/proyectos/*/.revisiones/
+# Dependencias reproducibles de los lanzadores uv
+!xixova_cli.py.lock
+!scripts/informe_framework.py.lock

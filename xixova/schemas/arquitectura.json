@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/arquitectura.json",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unidades": {
+      "const": "m"
+    },
+    "fuentes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "archivo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "descripcion": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "archivo",
+          "descripcion"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "cota_referencia": {
+      "type": "object",
+      "properties": {
+        "valor_m": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "descripcion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fiable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "valor_m",
+        "descripcion",
+        "fiable"
+      ],
+      "additionalProperties": false
+    },
+    "dudas": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "espacios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "contorno": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 3
+          },
+          "altura": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "contorno",
+          "altura"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "paredes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "a": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "b": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "espesor": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "altura": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "aberturas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]+$"
+                },
+                "tipo": {
+                  "enum": [
+                    "puerta",
+                    "ventana"
+                  ]
+                },
+                "distancia": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "ancho": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "alto": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "antepecho": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "id",
+                "tipo",
+                "distancia",
+                "ancho",
+                "alto",
+                "antepecho"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0
+          }
+        },
+        "required": [
+          "id",
+          "a",
+          "b",
+          "espesor",
+          "altura",
+          "aberturas"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "pilares": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "contorno": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minItems": 3
+          },
+          "altura": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "contorno",
+          "altura"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "instalaciones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "tipo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "posicion": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "id",
+          "tipo",
+          "posicion"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "version",
+    "unidades",
+    "fuentes",
+    "cota_referencia",
+    "dudas",
+    "espacios",
+    "paredes",
+    "pilares",
+    "instalaciones"
+  ],
+  "additionalProperties": false
+}

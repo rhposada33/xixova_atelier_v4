@@ -1,3 +1,5 @@
+> **Framework declarativo nuevo:** consulta [xixova/README.md](xixova/README.md) para crear apartamentos desde datos, separar arquitectura e interiorismo y generar recorridos. El contenido siguiente documenta el pipeline histórico.
+
 # Ajuste Atelier 4.0.2
 
 Reemplaza SOLO atelier.py dentro de ~/RenderCasa/xixova_atelier_v4 con el de este paquete. Conserva recursos, caché y demás scripts.

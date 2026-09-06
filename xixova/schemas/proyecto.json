@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/proyecto.json",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "arquitectura": {
+      "type": "string",
+      "minLength": 1
+    },
+    "variantes": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "presentacion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "produccion": {
+      "type": "object",
+      "properties": {
+        "catalogo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blender": {
+          "type": "string",
+          "minLength": 1
+        },
+        "salidas": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fps": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "gpu_vram_gb": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "ram_gb": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "licencias_permitidas": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "perfiles": {
+          "type": "object",
+          "properties": {
+            "previa": {
+              "type": "object",
+              "properties": {
+                "resolucion": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "multipleOf": 2
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "muestras": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "resolucion",
+                "muestras"
+              ],
+              "additionalProperties": false
+            },
+            "animatica": {
+              "type": "object",
+              "properties": {
+                "resolucion": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "multipleOf": 2
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "muestras": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "resolucion",
+                "muestras"
+              ],
+              "additionalProperties": false
+            },
+            "final": {
+              "type": "object",
+              "properties": {
+                "resolucion": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "multipleOf": 2
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "muestras": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "resolucion",
+                "muestras"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "previa",
+            "animatica",
+            "final"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "catalogo",
+        "blender",
+        "salidas",
+        "fps",
+        "gpu_vram_gb",
+        "ram_gb",
+        "licencias_permitidas",
+        "perfiles"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema",
+    "id",
+    "arquitectura",
+    "variantes",
+    "presentacion",
+    "produccion"
+  ],
+  "additionalProperties": false
+}

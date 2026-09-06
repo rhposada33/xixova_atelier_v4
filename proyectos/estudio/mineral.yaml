@@ -1,0 +1,78 @@
+schema: 1
+id: mineral
+arquitectura:
+  id: estudio
+  version: 1.0-demo
+  hash: b954becc5b8441569c7808c2ebf08c0a5aa2bb4366b903497f077650d58e97a4
+materiales:
+  pared:
+    color:
+    - 0.6
+    - 0.66
+    - 0.68
+    rugosidad: 0.72
+  piso:
+    color:
+    - 0.35
+    - 0.38
+    - 0.37
+    rugosidad: 0.4
+  techo:
+    color:
+    - 0.78
+    - 0.76
+    - 0.7
+    rugosidad: 0.8
+acabados:
+  sur: pared
+  este: pared
+  oblicua: pared
+  norte: pared
+  oeste: pared
+  estudio:piso: piso
+  estudio:techo: techo
+elementos:
+- id: cama
+  activo: XVA3_Cama_doble
+  espacio: estudio
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 4.7
+    - 1.5
+    - 0
+    rotacion: 0
+  escala: 1
+- id: sofa
+  activo: sofa_recto
+  espacio: estudio
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 1.5
+    - 1.5
+    - 0
+    rotacion: 0
+  escala: 1
+- id: mesa
+  activo: mesa_centro
+  espacio: estudio
+  colocacion:
+    tipo: objeto
+    referencia: sofa
+    desplazamiento:
+    - 0.12
+    - 0.9
+    - 0
+  escala: 1
+- id: comedor
+  activo: comedor
+  espacio: estudio
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 3.8
+    - 3.75
+    - 0
+    rotacion: 90
+  escala: 1

@@ -1,0 +1,103 @@
+schema: 1
+id: estudio
+version: 1.0-demo
+unidades: m
+fuentes:
+- archivo: arquitectura.yaml
+  descripcion: Ejemplo sintético acotado de 6 × 5 m con esquina oblicua
+cota_referencia:
+  valor_m: 6
+  descripcion: Dimensión sintética definida para este ejemplo
+  fiable: true
+dudas:
+- Ejemplo sintético; no corresponde a una vivienda real.
+espacios:
+- id: estudio
+  contorno:
+  - - 0
+    - 0
+  - - 6
+    - 0
+  - - 6
+    - 4
+  - - 5
+    - 5
+  - - 0
+    - 5
+  altura: 2.7
+paredes:
+- id: sur
+  a:
+  - 0
+  - 0
+  b:
+  - 6
+  - 0
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventanal
+    tipo: ventana
+    distancia: 1
+    ancho: 3
+    alto: 1.6
+    antepecho: 0.8
+- id: este
+  a:
+  - 6
+  - 0
+  b:
+  - 6
+  - 4
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: oblicua
+  a:
+  - 6
+  - 4
+  b:
+  - 5
+  - 5
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: norte
+  a:
+  - 5
+  - 5
+  b:
+  - 0
+  - 5
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: entrada
+    tipo: puerta
+    distancia: 3.8
+    ancho: 0.9
+    alto: 2.2
+    antepecho: 0
+- id: oeste
+  a:
+  - 0
+  - 5
+  b:
+  - 0
+  - 0
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+pilares:
+- id: pilar
+  contorno:
+  - - 0.08
+    - 0.08
+  - - 0.35
+    - 0.08
+  - - 0.35
+    - 0.35
+  - - 0.08
+    - 0.35
+  altura: 2.7
+instalaciones: []

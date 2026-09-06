@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/catalogo.json",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "activos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "archivo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "coleccion": {
+            "type": "string",
+            "minLength": 1
+          },
+          "categoria": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dimensiones": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "origen": {
+            "const": "CENTER_XY_BASE_Z"
+          },
+          "frente": {
+            "const": "+Y"
+          },
+          "apoyo": {
+            "const": "suelo"
+          },
+          "holgura": {
+            "type": "number",
+            "minimum": 0
+          },
+          "licencia": {
+            "type": "string",
+            "minLength": 1
+          },
+          "autor": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "id",
+          "archivo",
+          "coleccion",
+          "categoria",
+          "dimensiones",
+          "origen",
+          "frente",
+          "apoyo",
+          "holgura",
+          "licencia",
+          "autor",
+          "sha256"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema",
+    "activos"
+  ],
+  "additionalProperties": false
+}
