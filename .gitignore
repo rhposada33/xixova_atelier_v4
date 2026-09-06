@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Blender: escenas, copias de seguridad y autosaves
+*.blend
+*.blend[0-9]*
+*.blend@
+*.blend~
+*.autosave
+
+# Recursos descargados y cachés
+/cache/
+/produccion/originales/
+/produccion/trabajo/
+
+# Resultados generados
+/resultados/
+/produccion/salidas/
+
+# Imágenes, vídeo y audio generados o externos
+*.png
+*.jpg
+*.jpeg
+*.exr
+*.hdr
+*.tif
+*.tiff
+*.webp
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.wav
+*.mp3
+
+# Modelos y paquetes binarios externos
+*.glb
+*.gltf
+*.bin
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Logs y temporales
+*.log
+*.jsonl
+*.tmp
+*.lock
+*~
+.DS_Store
+Thumbs.db
+
+# Configuración local de editores
+.idea/
+.vscode/
+*.swp
+*.swo

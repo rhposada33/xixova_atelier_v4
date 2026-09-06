@@ -1,0 +1,23 @@
+Correccion Atelier 4.0.1
+
+Reemplaza solamente atelier.py en ~/RenderCasa/xixova_atelier_v4/ por el de este ZIP.
+Conserva los demas scripts, cache, recursos y resultados.
+No es necesario volver a exportar el sofa para probar esta correccion.
+
+Ejecuta:
+cd "$HOME/RenderCasa/xixova_atelier_v4"
+bash ejecutar.sh --modo previa --toma sala
+
+Cambios:
+- Mide vertices evaluados en lugar de cajas de piezas rotadas.
+- Alinea el eje horizontal mas largo del modelo con el ancho disponible.
+- Mantiene escala uniforme y los limites originales de espacio.
+- Un ancho menor de 1.75 m produce aviso, no rechazo injustificado.
+- Imprime dimensiones originales, finales y escala; las guarda en informe_atelier.json.
+
+El mensaje anterior no probaba que la seleccion estuviera mal. El ajuste
+simultaneo a 2.18 m de ancho, 0.95 m de fondo y 1.12 m de alto puede reducir
+el ancho por debajo de 1.75 m incluso con un sofa correctamente exportado.
+
+Sintaxis comprobada. No se ha ejecutado Blender aqui ni se ha inspeccionado
+tu sofa.blend. Comparte la imagen y el informe para confirmar escala y orientacion.
