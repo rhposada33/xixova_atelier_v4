@@ -44,3 +44,7 @@ Se rechazan referencias ausentes y ciclos. No se resuelven automáticamente layo
 Los diagnósticos JSON contienen `codigo`, `gravedad`, `elemento` y `explicacion`. Los comandos fallidos salen con código distinto de cero. No omitir errores para conseguir un render. No mover paredes para encajar muebles dentro de una variante decorativa.
 
 La versión 1 admite una planta, paredes rectas oblicuas u ortogonales y huecos rectangulares. No importa CAD/BIM, no resuelve escaleras ni muros curvos, ni certifica normativa constructiva. Las puertas se representan mediante huecos abiertos; no se simulan hojas, herrajes ni mecanismos. La luz exterior inicial es un mundo uniforme; un entorno real requiere ampliar el contrato de presentación. Los materiales PBR empacados de los activos se conservan.
+
+## Ajustes desde Blender MCP
+
+Para conservar cambios hechos sobre una escena abierta, seguir [Blender MCP → YAML](BLENDER_MCP.md). Usar los IDs y objetos raíz etiquetados, guardar una copia, capturar, validar la diferencia y sincronizar. No cambiar la arquitectura para encajar muebles y no saltarse conflictos de versiones. Después de publicar, reconstruir y continuar sobre la nueva escena.

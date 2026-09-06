@@ -76,14 +76,24 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado'])
+    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar'])
     parser.add_argument('-p','--proyecto',type=Path,required=True); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
+    parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
     args=parser.parse_args(argv)
     try:
+        if args.accion=='sincronizar':
+            if not args.captura: raise ValueError('Falta --captura JSON exportado desde Blender.')
+            from .sync import synchronize
+            report=synchronize(args.proyecto,args.variante,json.loads(args.captura.read_text()),args.aplicar)
+            print(json.dumps(report,indent=2,ensure_ascii=False)); return 0 if report['ok'] else 1
         b,errors=load(args.proyecto,args.variante)
         if b is None: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
         root=output(b); resolved,issues=resolve(b)
         b['resueltos']=resolved; b['fotogramas']=[dict(toma=s,numero=f,posicion=p,objetivo=t) for s,f,p,t in camera_frames(b['presentacion'])]
+        if args.accion=='capturar':
+            if not args.captura or not args.escena: raise ValueError('Indica --escena BLEND guardado y --captura JSON de salida. Para cambios sin guardar usa capturar() mediante MCP.')
+            run_blender(b,'blender_sync.py',['--salida',args.captura.resolve()],args.escena.resolve())
+            print(args.captura.resolve()); return 0
         if args.accion=='catalogo':
             assets=[v for v in b['catalogo']['activos'] if (not args.categoria or v['categoria']==args.categoria) and (args.ancho_max is None or v['dimensiones'][0]<=args.ancho_max)]
             print(json.dumps({'activos':[{**v,'disponible':Path(v['archivo']).is_file()} for v in assets]},ensure_ascii=False)); return 0

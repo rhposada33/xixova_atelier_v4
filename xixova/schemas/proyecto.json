@@ -160,6 +160,17 @@
         "perfiles"
       ],
       "additionalProperties": false
+    },
+    "presentaciones": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   },
   "required": [

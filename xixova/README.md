@@ -83,3 +83,22 @@ La auditoría de integración se puede ejecutar con Blender sobre una escena gen
 ```
 
 `xixova/tests/probar_reanudacion.py` comprueba una interrupción real sobre una animática ya generada: conserva todos salvo el último fotograma, interrumpe su propio proceso y verifica que al reanudar se regeneró el pendiente sin tocar los anteriores. Usar únicamente sobre salidas de prueba.
+
+## Ajustes con Blender MCP → YAML
+
+Las escenas nuevas incluyen una referencia de sincronización. Ahora pueden conservarse cambios de muebles, materiales simples, luces, cámaras y exposición realizados en Blender. El modo seguro de MCP usa una copia `.blend` guardada, seguida de `capturar` y `sincronizar`; no requiere importar módulos externos dentro de MCP.
+
+```bash
+uv run xixova_cli.py capturar -p proyectos/estudio/proyecto.yaml --variante calida \
+  --escena /ruta/ajustes_mcp.blend --captura cache/ajustes.json
+uv run xixova_cli.py sincronizar -p proyectos/estudio/proyecto.yaml --variante calida \
+  --captura cache/ajustes.json
+# Publicar los cambios validados:
+uv run xixova_cli.py sincronizar -p proyectos/estudio/proyecto.yaml --variante calida \
+  --captura cache/ajustes.json --aplicar
+uv run xixova_cli.py componer -p proyectos/estudio/proyecto.yaml --variante calida
+```
+
+Se publican nuevos YAML y se actualiza el manifiesto al final. Las otras variantes y la arquitectura permanecen intactas. Se rechazan capturas desactualizadas, colisiones y cambios que el contrato no puede representar. Las escenas antiguas deben reconstruirse antes de iniciar una edición sincronizable.
+
+Consulta el [flujo completo de Blender MCP](../docs/agentes/BLENDER_MCP.md), incluidas las claves de cámara y la conservación de anclajes.

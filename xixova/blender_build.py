@@ -48,6 +48,7 @@ def build(data,out,architecture_only=False):
     arch=collection('ARQUITECTURA'); decor=collection('INTERIORISMO'); presentation=collection('PRESENTACION')
     neutral=material('Neutro',{'color':[.72,.72,.69],'rugosidad':.65})
     mats={k:material(interior['id']+'/'+k,v) for k,v in interior['materiales'].items()}
+    for key, mat in mats.items(): mat['xixova_material_id']=key
     def finish(id): return neutral if architecture_only else mats.get(interior['acabados'].get(id),neutral)
     for r in a['espacios']:
         slab(arch,r['id']+':piso',r['contorno'],0,.12,finish(r['id']+':piso'))
@@ -88,14 +89,16 @@ def build(data,out,architecture_only=False):
                 if item.get('material') and o.type=='MESH':
                     o.data=o.data.copy(); o.data.materials.clear(); o.data.materials.append(mats[item['material']])
             parent.location=item['posicion']; parent.rotation_euler.z=math.radians(item['rotacion']); parent.scale=(item.get('escala',1),)*3
+            parent['xixova_sync_role']='elemento'
     p=data['presentacion']; world=bpy.data.worlds.new('Entorno'); scene.world=world; world.use_nodes=True
     bg=world.node_tree.nodes.get('Background'); bg.inputs[0].default_value=(*p['entorno']['color'],1); bg.inputs[1].default_value=p['entorno']['intensidad']
     for light in p['luces']:
         ld=bpy.data.lights.new(light['id'],'AREA'); ld.energy=light['potencia']; ld.shape='DISK'; ld.size=light['tamano']; ld.color=light['color']
-        o=bpy.data.objects.new(light['id'],ld); presentation.objects.link(o); o.location=light['posicion']; aim(o,light['objetivo']); o['xixova_capa']='PRESENTACION'
+        o=bpy.data.objects.new(light['id'],ld); presentation.objects.link(o); o.location=light['posicion']; aim(o,light['objetivo']); o['xixova_capa']='PRESENTACION'; o['xixova_id']=light['id']; o['xixova_sync_role']='luz'
     offset=0
     for shot in p['tomas']:
         cam=bpy.data.cameras.new(shot['id']); cam.lens=shot['lente']; o=bpy.data.objects.new(shot['id'],cam); presentation.objects.link(o); o['xixova_capa']='PRESENTACION'
+        o['xixova_id']=shot['id']; o['xixova_sync_role']='camara'
         # Bake exactly the positions validated by core, one key per frame.
         for frame in data['fotogramas']:
             if frame['toma']!=shot['id']:continue
@@ -120,6 +123,11 @@ def build(data,out,architecture_only=False):
     for o in sorted(arch.all_objects,key=lambda o:o['xixova_id']):
         geometry.append([o['xixova_id'],list(o.location),list(o.rotation_euler),list(o.scale), [list(v.co) for v in o.data.vertices] if o.type=='MESH' else []])
     report={'arquitectura_hash':data['arquitectura_hash'],'geometria_hash':hashlib.sha256(json.dumps(geometry,sort_keys=True).encode()).hexdigest(),'objetos_arquitectura':len(arch.all_objects),'objetos_interiorismo':len(decor.all_objects),'fotogramas':offset,'dispositivo':scene.cycles.device}
+    if not architecture_only:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from blender_sync import bind
+        scene.frame_set(scene.frame_start)
+        bind(data)
     out.parent.mkdir(parents=True,exist_ok=True)
     bpy.ops.wm.save_as_mainfile(filepath=str(out)); out.with_suffix('.informe.json').write_text(json.dumps(report,indent=2))
 

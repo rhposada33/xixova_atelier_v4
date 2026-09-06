@@ -44,7 +44,9 @@ def load(path, variant=None):
     base = path.parent
     a = read(base / p['arquitectura'])
     i = read(base / p['variantes'][variant or next(iter(p['variantes']))])
-    s = read(base / p['presentacion'])
+    selected = variant or next(iter(p['variantes']))
+    presentation_path = p.get('presentaciones', {}).get(selected, p['presentacion'])
+    s = read(base / presentation_path)
     c = read(base / p['produccion']['catalogo'])
     for obj, kind in [(a, 'arquitectura'), (i, 'interiorismo'), (s, 'presentacion'), (c, 'catalogo')]:
         errors += contract(obj, kind)
@@ -54,6 +56,10 @@ def load(path, variant=None):
         asset['archivo'] = str((base / os.path.expanduser(os.path.expandvars(asset['archivo']))).resolve())
     bundle = dict(proyecto=p, arquitectura=a, interiorismo=i, presentacion=s, catalogo=c,
                   archivo=str(path), arquitectura_hash=digest(a))
+    paths = [path, base / p['arquitectura'], base / p['variantes'][selected],
+             base / presentation_path, base / p['produccion']['catalogo']]
+    bundle['sincronizacion'] = dict(proyecto=str(path), variante=selected,
+        archivos={str(f.resolve()): hashlib.sha256(f.read_bytes()).hexdigest() for f in paths})
     return bundle, validate(bundle)
 
 def wall_polygon(w):
