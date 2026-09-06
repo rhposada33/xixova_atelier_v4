@@ -1,0 +1,20 @@
+{
+  "schema": 2,
+  "criterios": ["gratis", "validated", "realistic", "UV", "PBR", "Cycles"],
+  "destino": "trabajo/xixova_recorrido_fotorrealista_v2.blend",
+  "activos": [
+    {"rol":"cama_suite_principal","id":"f0938871-4743-4d86-8329-39a3652f183f","url":"https://www.blenderkit.com/asset-gallery-detail/f0938871-4743-4d86-8329-39a3652f183f/","nombre":"Modern King Bed","autor":"Harrison Costa","licencia":"royalty_free","caras_render":196156,"textura_max":4096,"dimensiones_m":[2.1749,2.3155,1.0734],"instancias":[{"nombre":"Modern King Bed","posicion":[5.849748,2.242885,0.0],"rotacion":[0,0,0],"escala_uniforme":0.828},{"nombre":"Modern King Bed - secundaria","posicion":[10.179793,2.351645,0.0],"rotacion":[0,0,0],"escala_uniforme":0.68}]},
+    {"rol":"sanitario_banos","id":"4f662f3f-9c41-4f4a-9de2-6d590a70fd88","url":"https://www.blenderkit.com/asset-gallery-detail/4f662f3f-9c41-4f4a-9de2-6d590a70fd88/","nombre":"Toilet geberit selnova","autor":"Bruno Bassani","licencia":"cc_zero","caras_render":243872,"textura_max":4096,"instancias":2},
+    {"rol":"griferia_banos","id":"4515d107-4657-43ff-b056-2b2f4a745ae2","url":"https://www.blenderkit.com/asset-gallery-detail/4515d107-4657-43ff-b056-2b2f4a745ae2/","nombre":"Modern Black Bathroom Faucet","autor":"Mostafa Heikal","licencia":"royalty_free","caras_render":11232,"textura_max":4096,"instancias":2},
+    {"rol":"fregadero_cocina","id":"c0bcd9bb-6c68-4578-8296-cf4f24216998","url":"https://www.blenderkit.com/asset-gallery-detail/c0bcd9bb-6c68-4578-8296-cf4f24216998/","nombre":"Kitchen sink with faucet","autor":"Mesk911","licencia":"royalty_free","caras_render":92128,"textura_max":0,"instancias":1},
+    {"rol":"horno_cocina","id":"027f1132-c084-424d-b333-29bc5b154316","url":"https://www.blenderkit.com/asset-gallery-detail/027f1132-c084-424d-b333-29bc5b154316/","nombre":"Electric oven","autor":"Mesk911","licencia":"royalty_free","caras_render":11129,"textura_max":0,"instancias":[{"nombre":"Electric oven","posicion":[0.6618,3.080001,0.45304],"rotacion":[1.570796,0,1.570796],"escala_uniforme":1.0}],"validacion":"corregido y aprobado en controles 601/660/720"},
+    {"rol":"frigorifico_cocina","id":"04f25b8e-e7eb-49e8-9148-5f2019e5db73","url":"https://www.blenderkit.com/asset-gallery-detail/04f25b8e-e7eb-49e8-9148-5f2019e5db73/","nombre":"Refrigerator Consul CRM44","autor":"Luan Rodrigues","licencia":"royalty_free","caras_render":356692,"textura_max":2048,"instancias":1}
+  ],
+  "validacion": {
+    "escena":"trabajo/xixova_recorrido_fotorrealista_v2.blend",
+    "pilotos_cycles_32":"salidas/recorrido_v3/19d4a7dbbb64a533/piloto/frames",
+    "controles_cycles_16":"salidas/recorrido_v3/19d4a7dbbb64a533/iluminacion/frames",
+    "resumen":"6 pilotos y 21 controles renderizados sin errores; pico observado 2.93 GB. La toma de baño requiere reencuadre para mostrar los nuevos sanitarios.",
+    "redistribucion":"Los activos royalty_free permanecen sujetos a la licencia BlenderKit y no deben redistribuirse como biblioteca independiente."
+  }
+}
