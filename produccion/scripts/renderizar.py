@@ -20,16 +20,16 @@ def cli():
     return p.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
 
 
-def frame_list(spec):
+def frame_list(spec, frame_start, frame_end):
     if not spec:
-        return list(range(1, 481))
+        return list(range(frame_start, frame_end + 1))
     result = set()
     for part in spec.split(','):
         if '-' in part:
             a, b = map(int, part.split('-', 1)); result.update(range(a, b + 1))
         else:
             result.add(int(part))
-    return sorted(x for x in result if 1 <= x <= 480)
+    return sorted(x for x in result if frame_start <= x <= frame_end)
 
 
 def valid_png(path, width, height):
@@ -84,7 +84,7 @@ def main():
         scene.display.shading.cavity_type = 'WORLD'
         scene.display.shading.color_type = 'MATERIAL'
         devices = ['Workbench']
-    requested = frame_list(a.frames)
+    requested = frame_list(a.frames, scene.frame_start, scene.frame_end)
     done = skipped = failed = 0; started = time.time()
     for frame in requested:
         target = out/f'frame_{frame:04d}.png'

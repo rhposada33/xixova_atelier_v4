@@ -1,0 +1,258 @@
+{
+  "schema": 1,
+  "biblioteca": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+  "activos": [
+    {
+      "id": "XVA_Armario_principal",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.423,
+        1.556,
+        2.4
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "b6660247793507f87638ca3ae743f7b28488334f899c8ba19613eccbe41dc985"
+    },
+    {
+      "id": "XVA_Armario_secundario",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.423,
+        1.656,
+        2.4
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "3648815dd19c1999de89757d9a1a3ca35c7b070188bacdfc334172119986c671"
+    },
+    {
+      "id": "XVA_Bano_principal",
+      "version": "1.0.0",
+      "categoria": "Baño",
+      "dimensiones_m": [
+        1.34,
+        1.567,
+        1.98
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "d16a6d235ff31749af547a445cc97fcf828173227ce78321343bbd4ab26a931f"
+    },
+    {
+      "id": "XVA_Bano_secundario",
+      "version": "1.0.0",
+      "categoria": "Baño",
+      "dimensiones_m": [
+        1.34,
+        1.567,
+        1.98
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "93a2dc61fb1927d3241ecf0be965f64a24c7d4cc13fc03d5115e56ca7dfc9972"
+    },
+    {
+      "id": "XVA_Cama_doble",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        1.64,
+        2.0,
+        1.515
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "6dab9e87b5617b9bd458f54397f6f84570f9ac5abe512117f169979cd1bca018"
+    },
+    {
+      "id": "XVA_Cama_king",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        1.96,
+        2.0,
+        1.515
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "a69aa9cf0cc1dc3edb419da71c8f117baf83dcb6faa7b7aad89b7835f50b3368"
+    },
+    {
+      "id": "XVA_Cocina_modular",
+      "version": "1.0.0",
+      "categoria": "Cocina",
+      "dimensiones_m": [
+        0.723,
+        4.02,
+        2.43
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "515e63387a0497790ca8968a11115c6c0653fc5e2aa0b7af0d3ae7cc5ff531b2"
+    },
+    {
+      "id": "XVA_Consola_acceso",
+      "version": "1.0.0",
+      "categoria": "Decoración",
+      "dimensiones_m": [
+        0.76,
+        0.372,
+        1.995
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "e5710c80f8aa05628d985f7f22f3b67b2acb10fd9372d1bfd754b8fdf10e61ef"
+    },
+    {
+      "id": "XVA_Escritorio_secundario",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        1.05,
+        0.48,
+        0.772
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "16262f36fb766865a1d509e434c1f93e81b9521239a1c498219281b63f746409"
+    },
+    {
+      "id": "XVA_Luz_acceso",
+      "version": "1.0.0",
+      "categoria": "Iluminación",
+      "dimensiones_m": [
+        0.28,
+        0.28,
+        0.055
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "dba12d4815022827b7dda682c7076decd09783d3ec674071c821a9878b1061cc"
+    },
+    {
+      "id": "XVA_Luz_bano_principal",
+      "version": "1.0.0",
+      "categoria": "Iluminación",
+      "dimensiones_m": [
+        0.286,
+        0.286,
+        0.055
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "725f8e93fcc8a54f7a5faba6143fc529f363e83c753e95c224303528599df7f6"
+    },
+    {
+      "id": "XVA_Luz_bano_secundario",
+      "version": "1.0.0",
+      "categoria": "Iluminación",
+      "dimensiones_m": [
+        0.286,
+        0.286,
+        0.055
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "cd539c23cfb8bcd211a30f62514a9f9ec1ac638f7e05cf445ec0f89ca125c043"
+    },
+    {
+      "id": "XVA_Luz_cocina",
+      "version": "1.0.0",
+      "categoria": "Iluminación",
+      "dimensiones_m": [
+        0.484,
+        0.484,
+        0.055
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "b7dc527b04b64d7245e86b75efc90824502636de35890c29de3159e0880d5c2f"
+    },
+    {
+      "id": "XVA_Luz_suite_principal",
+      "version": "1.0.0",
+      "categoria": "Iluminación",
+      "dimensiones_m": [
+        0.44,
+        0.44,
+        0.055
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "17170a3e8a2a25a0c37e000b5abb07a2a4cb86e06670b377da0fd77dd24c1836"
+    },
+    {
+      "id": "XVA_Luz_suite_secundaria",
+      "version": "1.0.0",
+      "categoria": "Iluminación",
+      "dimensiones_m": [
+        0.44,
+        0.44,
+        0.055
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "d871a749606bca975d5dbb83297a5fc54bda0bde7ff170aae27e03d7cc363372"
+    },
+    {
+      "id": "XVA_Mesita_der",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.42,
+        0.36,
+        1.023
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "dc5d6619d553971cb06459553148da18b579bb3519eef030fe063ff0804286cf"
+    },
+    {
+      "id": "XVA_Mesita_izq",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.42,
+        0.36,
+        1.023
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "f8e039333e7d6ec4a12e042b45bcbad83c4922325c7bf1882c05f604c2a7b862"
+    },
+    {
+      "id": "XVA_Mesita_secundaria",
+      "version": "1.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.42,
+        0.36,
+        1.023
+      ],
+      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "dependencias": [],
+      "hash_receta_sha256": "a26303a2d44de499925f67f5f5517c779f5918b7ebc95466408d148db368a4fb"
+    }
+  ]
+}

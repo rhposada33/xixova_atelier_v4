@@ -39,6 +39,15 @@ bash produccion/xixova.sh animatica-realismo
 bash produccion/xixova.sh mp4-animatica-realismo
 bash produccion/xixova.sh final-realismo # solo después de aprobación
 bash produccion/xixova.sh mp4-final-realismo
+bash produccion/xixova.sh copia-recorrido       # copia independiente; no sobrescribe
+bash produccion/xixova.sh completar-recorrido  # mobiliario + biblioteca reusable
+bash produccion/xixova.sh previews-biblioteca  # miniaturas del Asset Browser
+bash produccion/xixova.sh configurar-recorrido # 7 tomas / 840 frames / 35 s
+bash produccion/xixova.sh revisar-recorrido     # 21 controles Cycles
+bash produccion/xixova.sh animatica-recorrido   # tras terminar zonas privadas
+bash produccion/xixova.sh mp4-animatica-recorrido
+bash produccion/xixova.sh final-recorrido       # solo después de aprobación
+bash produccion/xixova.sh mp4-final-recorrido
 bash produccion/xixova.sh revisar     # 12 previas Cycles: inicio/medio/final
 bash produccion/xixova.sh animatica   # 480 PNG económicos y recuperables
 bash produccion/xixova.sh mp4-animatica
@@ -85,3 +94,25 @@ sofá recto de Sketchfab queda registrado en `CREDITOS.md` y en las propiedades
 personalizadas del objeto; el chaise longue se conserva oculto del render. La
 animática vigente se genera en `salidas/fotorrealismo/animatica_con_sofa/` para
 conservar sin sobrescribir la revisión anterior.
+
+## Recorrido completo (en preparación)
+
+`trabajo/xixova_recorrido_completo.blend` es una copia independiente de la
+versión fotorrealista. Conserva las cámaras anteriores como objetos, pero usa
+siete marcadores propios y 840 fotogramas (35 segundos). La auditoría Cycles de
+inicio, medio y final está en `salidas/recorrido/auditoria_v2/`.
+
+La planta llega a cocina, circulación, suite principal, dos baños y suite
+secundaria. Esas zonas se completan mediante
+`scripts/completar_zonas_y_biblioteca.py`, que también genera 18 colecciones y
+12 materiales reutilizables en
+`/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend`. El
+catálogo versionable está en `catalogo_activos.json`; la biblioteca binaria no
+entra en Git. Sus 30 activos poseen miniatura.
+
+Tras las dos rondas automáticas, el usuario autorizó un ajuste manual adicional
+de cámara. Los 21 controles Cycles de `salidas/recorrido/aprobacion_manual/`
+quedaron sin oclusiones negras. La animática vigente está en
+`salidas/recorrido/animatica/xixova_recorrido_animatica.mp4`: H.264, 640×360,
+24 fps, 840 fotogramas y 35 segundos. El render final permanece pendiente de la
+revisión del usuario.
