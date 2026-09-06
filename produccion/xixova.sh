@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 PROD_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+if [[ "${1:-}" == "pipeline" ]]; then
+  shift
+  exec uv run "$PROD_DIR/pipeline.py" "$@"
+fi
 BLENDER_BIN="${BLENDER_BIN:-$HOME/Aplicaciones/blender-4.5/blender}"
 BLEND="$PROD_DIR/trabajo/xixova_produccion.blend"
 PHOTO_BLEND="$PROD_DIR/trabajo/xixova_fotorrealista.blend"

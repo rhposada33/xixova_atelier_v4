@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "unidades": "METERS",
+  "regla_escala": "uniforme",
+  "colocaciones": [
+    {"activo": "XVA_Cocina_modular", "estancia": "cocina", "posicion": [0.36,3.95,0], "rotacion_grados": [0,0,0], "escala": 1.0, "variante_material": "calida"},
+    {"activo": "XVA_Cama_king", "estancia": "suite_principal", "posicion": [5.85,2.18,0], "rotacion_grados": [0,0,0], "escala": 1.0, "variante_material": "lino_oliva"},
+    {"activo": "XVA_Cama_doble", "estancia": "suite_secundaria", "posicion": [10.18,2.30,0], "rotacion_grados": [0,0,0], "escala": 1.0, "variante_material": "lino_oliva"},
+    {"activo": "XVA_Bano_principal", "estancia": "bano_principal", "posicion": [8.20,2.40,0], "rotacion_grados": [0,0,0], "escala": 1.0, "variante_material": "roble_piedra"},
+    {"activo": "XVA_Bano_secundario", "estancia": "bano_secundario", "posicion": [9.65,4.94,0], "rotacion_grados": [0,0,0], "escala": 1.0, "variante_material": "roble_piedra"},
+    {"activo": "XVA_Consola_acceso", "estancia": "acceso", "posicion": [8.55,5.73,0], "rotacion_grados": [0,0,0], "escala": 1.0, "variante_material": "roble"}
+  ]
+}

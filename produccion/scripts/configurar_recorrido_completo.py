@@ -1,9 +1,12 @@
 """Crea siete tomas de auditoría/recorrido sin reconstruir la escena base."""
 import math
+import sys
 from pathlib import Path
 
 import bpy
 from mathutils import Vector
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pipeline_common import load_config
 
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = 'xixova_recorrido_completo.blend'
@@ -26,6 +29,8 @@ def point_camera(cam, target):
 
 def main():
     scene = bpy.context.scene
+    config_path = Path(sys.argv[sys.argv.index('--config')+1]) if '--config' in sys.argv else None
+    config = load_config(config_path) if config_path else None
     if not bpy.data.filepath.endswith(EXPECTED):
         raise RuntimeError(f'Abre una copia llamada {EXPECTED}')
     col = bpy.data.collections.get('PRODUCCION / RECORRIDO')
@@ -38,13 +43,14 @@ def main():
         scene.timeline_markers.remove(marker)
     for old in [o for o in col.objects if o.type == 'CAMERA' or o.name.startswith('FOCO_R0')]:
         bpy.data.objects.remove(old, do_unlink=True)
-    for index, (name, start, target, drift) in enumerate(SHOTS):
-        first = index * 120 + 1
+    shots = [(s['id'],s['posicion'],s['objetivo'],s['desplazamiento']) for s in config['tomas']] if config else SHOTS
+    for index, (name, start, target, drift) in enumerate(shots):
+        first = int(config['tomas'][index]['inicio']) if config else index * 120 + 1
         cam_data = bpy.data.cameras.new(name)
         cam = bpy.data.objects.new(name, cam_data)
         col.objects.link(cam)
         cam.location = start
-        cam.data.lens = 25 if index in (0, 2) else 28
+        cam.data.lens = float(config['tomas'][index]['lente']) if config else (25 if index in (0, 2) else 28)
         cam.data.sensor_width = 36
         focus=bpy.data.objects.new('FOCO_'+name,None); col.objects.link(focus); focus.location=target; focus.hide_render=True
         cam.data.dof.use_dof=True; cam.data.dof.focus_object=focus; cam.data.dof.aperture_fstop=7.1
@@ -63,9 +69,10 @@ def main():
             for kp in fc.keyframe_points:
                 kp.interpolation = 'BEZIER'; kp.handle_left_type = 'AUTO_CLAMPED'; kp.handle_right_type = 'AUTO_CLAMPED'
         scene.timeline_markers.new(name, frame=first).camera = cam
-    scene.frame_start, scene.frame_end = 1, 840
-    scene.render.fps = 24
-    scene.render.resolution_x, scene.render.resolution_y = 746, 420
+    scene.frame_start = int(config['video']['inicio']) if config else 1
+    scene.frame_end = int(config['video']['fin']) if config else 840
+    scene.render.fps = int(config['video']['fps']) if config else 24
+    scene.render.resolution_x, scene.render.resolution_y = config['video']['resolucion_final'] if config else (746, 420)
     if hasattr(scene.render,'use_motion_blur'): scene.render.use_motion_blur=True
     scene['xixova_recorrido'] = '1.1-amueblado-7x5s'
     scene['xixova_exterior'] = 'Conceptual; no representa la vista real del inmueble.'

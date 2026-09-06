@@ -5,7 +5,12 @@ from pathlib import Path
 
 import bpy
 
-library = Path(sys.argv[sys.argv.index('--') + 1]) if '--' in sys.argv else Path('/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend')
+if '--biblioteca' in sys.argv:
+    library = Path(sys.argv[sys.argv.index('--biblioteca') + 1])
+elif '--' in sys.argv and len(sys.argv) > sys.argv.index('--') + 1:
+    library = Path(sys.argv[sys.argv.index('--') + 1])
+else:
+    library = Path('/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend')
 if Path(bpy.data.filepath) != library:
     bpy.ops.wm.open_mainfile(filepath=str(library), load_ui=False, use_scripts=False)
 assets = [*filter(lambda x: x.asset_data, bpy.data.collections), *filter(lambda x: x.asset_data, bpy.data.materials)]

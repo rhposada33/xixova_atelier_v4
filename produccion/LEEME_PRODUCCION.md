@@ -1,5 +1,29 @@
 # XIXOVÁ — producción de video (Blender 4.5 LTS)
 
+## Pipeline v2 declarativo
+
+`proyecto.yaml` es la fuente única para rutas, siete tomas, perfiles y límites
+de hardware. El lanzador usa `uv` para resolver YAML y entrega JSON sin
+dependencias a Blender:
+
+```bash
+bash produccion/xixova.sh pipeline validar
+bash produccion/xixova.sh pipeline estado
+bash produccion/xixova.sh pipeline preparar
+bash produccion/xixova.sh pipeline construir
+bash produccion/xixova.sh pipeline camaras
+bash produccion/xixova.sh pipeline revisar
+bash produccion/xixova.sh pipeline animatica
+bash produccion/xixova.sh pipeline render
+bash produccion/xixova.sh pipeline montar
+bash produccion/xixova.sh pipeline biblioteca
+```
+
+Cada salida v2 vive bajo un hash de configuración y escena. Antes de ejecutar
+Blender se comprueban versión 4.5, CUDA, rango, cámaras y recursos ausentes; una
+escena abierta por otro proceso queda bloqueada. `estado` informa progreso y ETA.
+Los comandos históricos continúan disponibles durante la migración.
+
 La escena de trabajo es `trabajo/xixova_produccion.blend`. Es una copia de la
 escena Atelier ya construida, no una reconstrucción. Los archivos recibidos se
 conservan en `originales/` y las copias de seguridad automáticas usan `.blend1`.
@@ -108,11 +132,12 @@ secundaria. Esas zonas se completan mediante
 12 materiales reutilizables en
 `/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend`. El
 catálogo versionable está en `catalogo_activos.json`; la biblioteca binaria no
-entra en Git. Sus 30 activos poseen miniatura.
+entra en Git. Sus 18 colecciones y 12 materiales (30 activos) poseen miniatura.
 
 Tras las dos rondas automáticas, el usuario autorizó un ajuste manual adicional
 de cámara. Los 21 controles Cycles de `salidas/recorrido/aprobacion_manual/`
 quedaron sin oclusiones negras. La animática vigente está en
 `salidas/recorrido/animatica/xixova_recorrido_animatica.mp4`: H.264, 640×360,
-24 fps, 840 fotogramas y 35 segundos. El render final permanece pendiente de la
-revisión del usuario.
+24 fps, 840 fotogramas y 35 segundos. La secuencia final histórica completó sus
+840 PNG; puede montarse con `mp4-final-recorrido`. Las ejecuciones nuevas del
+pipeline v2 se aíslan por hash y no reutilizan silenciosamente esa secuencia.

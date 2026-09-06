@@ -7,16 +7,19 @@ import time
 import traceback
 from pathlib import Path
 import bpy
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pipeline_common import load_config
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def cli():
     p = argparse.ArgumentParser()
-    p.add_argument('--modo', choices=('previa', 'animatica', 'final'), required=True)
+    p.add_argument('--modo', choices=('previa', 'animatica', 'final', 'composicion', 'iluminacion'), required=True)
     p.add_argument('--frames', default='')
     p.add_argument('--salida', type=Path)
     p.add_argument('--samples', type=int)
+    p.add_argument('--config', type=Path)
     return p.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
 
 
@@ -49,16 +52,21 @@ def log(path, payload):
 
 def main():
     a = cli(); scene = bpy.context.scene
+    config = load_config(a.config) if a.config else None
     defaults = {
         'previa': (480, 270, 16, 'CYCLES', ROOT/'salidas/previas'),
         'animatica': (640, 360, 1, 'BLENDER_WORKBENCH', ROOT/'salidas/animatica/frames'),
         # Perfil ligero aprobado para GTX 1060 6 GB. 746x420 conserva 16:9
         # prácticamente exacto y ambas dimensiones son pares para H.264.
         'final': (746, 420, 32, 'CYCLES', ROOT/'salidas/final_frames'),
+        'composicion': (640, 360, 1, 'BLENDER_WORKBENCH', ROOT/'salidas/composicion/frames'),
+        'iluminacion': (480, 270, 16, 'CYCLES', ROOT/'salidas/iluminacion/frames'),
     }
     width, height, samples, engine, default_out = defaults[a.modo]
+    if config:
+        profile=config['perfiles'][a.modo]; width,height=profile['resolucion']; samples=int(profile['muestras']); engine=profile['motor']
     out = (a.salida or default_out).resolve(); out.mkdir(parents=True, exist_ok=True)
-    logfile = ROOT/'salidas/logs'/f'{a.modo}.jsonl'; logfile.parent.mkdir(parents=True, exist_ok=True)
+    logfile = out.parent/'logs'/f'{a.modo}.jsonl'; logfile.parent.mkdir(parents=True, exist_ok=True)
     scene.render.engine = engine
     scene.render.resolution_x, scene.render.resolution_y = width, height
     scene.render.resolution_percentage = 100
@@ -73,7 +81,7 @@ def main():
             if d.use: devices.append(d.name)
         if not devices: raise RuntimeError('CUDA no disponible')
         scene.cycles.device = 'GPU'; scene.cycles.samples = a.samples or samples
-        scene.cycles.use_adaptive_sampling = True; scene.cycles.use_denoising = True
+        scene.cycles.use_adaptive_sampling = True; scene.cycles.use_denoising = bool(config['perfiles'][a.modo]['denoise']) if config else True
         scene.cycles.adaptive_threshold = .02 if a.modo == 'final' else .03
         scene.render.use_persistent_data = a.modo == 'final'
     else:
@@ -105,7 +113,7 @@ def main():
               'samples': a.samples or samples, 'dispositivos': devices, 'solicitados': len(requested),
               'renderizados': done, 'omitidos': skipped, 'errores': failed,
               'segundos_total': round(time.time()-started, 3), 'salida': str(out)}
-    (ROOT/'salidas'/f'estado_{a.modo}.json').write_text(json.dumps(status, indent=2, ensure_ascii=False), encoding='utf-8')
+    (out.parent/f'estado_{a.modo}.json').write_text(json.dumps(status, indent=2, ensure_ascii=False), encoding='utf-8')
     print(json.dumps(status, ensure_ascii=False), flush=True)
     if failed: raise RuntimeError(f'{failed} fotogramas fallaron; consulta {logfile}')
 

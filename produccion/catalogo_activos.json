@@ -1,6 +1,6 @@
 {
-  "schema": 1,
-  "biblioteca": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+  "schema": 2,
+  "biblioteca": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
   "activos": [
     {
       "id": "XVA_Armario_principal",
@@ -11,9 +11,19 @@
         1.556,
         2.4
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 24,
+      "memoria_estimada_mb": 0.001,
+      "materiales": [
+        "XVA_Grafito",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "b6660247793507f87638ca3ae743f7b28488334f899c8ba19613eccbe41dc985"
     },
     {
@@ -25,9 +35,19 @@
         1.656,
         2.4
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 24,
+      "memoria_estimada_mb": 0.001,
+      "materiales": [
+        "XVA_Grafito",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "3648815dd19c1999de89757d9a1a3ca35c7b070188bacdfc334172119986c671"
     },
     {
@@ -39,9 +59,23 @@
         1.567,
         1.98
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 300,
+      "memoria_estimada_mb": 0.006,
+      "materiales": [
+        "XVA_Ceramica",
+        "XVA_Espejo",
+        "XVA_Laton",
+        "XVA_Piedra",
+        "XVA_Roble",
+        "XVA_Vidrio"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "d16a6d235ff31749af547a445cc97fcf828173227ce78321343bbd4ab26a931f"
     },
     {
@@ -53,9 +87,23 @@
         1.567,
         1.98
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 300,
+      "memoria_estimada_mb": 0.006,
+      "materiales": [
+        "XVA_Ceramica",
+        "XVA_Espejo",
+        "XVA_Laton",
+        "XVA_Piedra",
+        "XVA_Roble",
+        "XVA_Vidrio"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "93a2dc61fb1927d3241ecf0be965f64a24c7d4cc13fc03d5115e56ca7dfc9972"
     },
     {
@@ -67,9 +115,20 @@
         2.0,
         1.515
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 72,
+      "memoria_estimada_mb": 0.002,
+      "materiales": [
+        "XVA_Lino",
+        "XVA_Oliva",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "6dab9e87b5617b9bd458f54397f6f84570f9ac5abe512117f169979cd1bca018"
     },
     {
@@ -81,9 +140,20 @@
         2.0,
         1.515
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 72,
+      "memoria_estimada_mb": 0.002,
+      "materiales": [
+        "XVA_Lino",
+        "XVA_Oliva",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "a69aa9cf0cc1dc3edb419da71c8f117baf83dcb6faa7b7aad89b7835f50b3368"
     },
     {
@@ -95,9 +165,23 @@
         4.02,
         2.43
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 248,
+      "memoria_estimada_mb": 0.005,
+      "materiales": [
+        "XVA_Acero",
+        "XVA_Grafito",
+        "XVA_Laton",
+        "XVA_Marfil",
+        "XVA_Piedra",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "515e63387a0497790ca8968a11115c6c0653fc5e2aa0b7af0d3ae7cc5ff531b2"
     },
     {
@@ -109,9 +193,21 @@
         0.372,
         1.995
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 204,
+      "memoria_estimada_mb": 0.004,
+      "materiales": [
+        "XVA_Espejo",
+        "XVA_Grafito",
+        "XVA_Roble",
+        "XVA_Terracota"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "e5710c80f8aa05628d985f7f22f3b67b2acb10fd9372d1bfd754b8fdf10e61ef"
     },
     {
@@ -123,9 +219,19 @@
         0.48,
         0.772
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 60,
+      "memoria_estimada_mb": 0.001,
+      "materiales": [
+        "XVA_Grafito",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "16262f36fb766865a1d509e434c1f93e81b9521239a1c498219281b63f746409"
     },
     {
@@ -137,9 +243,18 @@
         0.28,
         0.055
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 188,
+      "memoria_estimada_mb": 0.003,
+      "materiales": [
+        "XVA_Marfil"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "dba12d4815022827b7dda682c7076decd09783d3ec674071c821a9878b1061cc"
     },
     {
@@ -151,9 +266,18 @@
         0.286,
         0.055
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 188,
+      "memoria_estimada_mb": 0.003,
+      "materiales": [
+        "XVA_Marfil"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "725f8e93fcc8a54f7a5faba6143fc529f363e83c753e95c224303528599df7f6"
     },
     {
@@ -165,9 +289,18 @@
         0.286,
         0.055
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 188,
+      "memoria_estimada_mb": 0.003,
+      "materiales": [
+        "XVA_Marfil"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "cd539c23cfb8bcd211a30f62514a9f9ec1ac638f7e05cf445ec0f89ca125c043"
     },
     {
@@ -179,9 +312,18 @@
         0.484,
         0.055
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 188,
+      "memoria_estimada_mb": 0.003,
+      "materiales": [
+        "XVA_Marfil"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "b7dc527b04b64d7245e86b75efc90824502636de35890c29de3159e0880d5c2f"
     },
     {
@@ -193,9 +335,18 @@
         0.44,
         0.055
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 188,
+      "memoria_estimada_mb": 0.003,
+      "materiales": [
+        "XVA_Marfil"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "17170a3e8a2a25a0c37e000b5abb07a2a4cb86e06670b377da0fd77dd24c1836"
     },
     {
@@ -207,9 +358,18 @@
         0.44,
         0.055
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 188,
+      "memoria_estimada_mb": 0.003,
+      "materiales": [
+        "XVA_Marfil"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "d871a749606bca975d5dbb83297a5fc54bda0bde7ff170aae27e03d7cc363372"
     },
     {
@@ -221,9 +381,20 @@
         0.36,
         1.023
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 292,
+      "memoria_estimada_mb": 0.005,
+      "materiales": [
+        "XVA_Laton",
+        "XVA_Lino",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "dc5d6619d553971cb06459553148da18b579bb3519eef030fe063ff0804286cf"
     },
     {
@@ -235,9 +406,20 @@
         0.36,
         1.023
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 292,
+      "memoria_estimada_mb": 0.005,
+      "materiales": [
+        "XVA_Laton",
+        "XVA_Lino",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "f8e039333e7d6ec4a12e042b45bcbad83c4922325c7bf1882c05f604c2a7b862"
     },
     {
@@ -249,10 +431,249 @@
         0.36,
         1.023
       ],
-      "archivo": "/home/rafa/RenderCasa/biblioteca_blender/xixova_interiores_v1.blend",
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
       "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
       "dependencias": [],
+      "triangulos": 292,
+      "memoria_estimada_mb": 0.005,
+      "materiales": [
+        "XVA_Laton",
+        "XVA_Lino",
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
       "hash_receta_sha256": "a26303a2d44de499925f67f5f5517c779f5918b7ebc95466408d148db368a4fb"
+    },
+    {
+      "id": "XVA_Acero",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Acero"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "f660e35a0a2b4c75caad047f3e700adce3828e9a04e8b8adfb805f7bac5255a3"
+    },
+    {
+      "id": "XVA_Ceramica",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Ceramica"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "87202b60cabe1ebddb05903a3af8b670592a1d23697377035ebef6a22778cc0f"
+    },
+    {
+      "id": "XVA_Espejo",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Espejo"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "40033e3571e24b75fc2d63d8c2df708db79ffe19da38f739c4179bc443cb04f9"
+    },
+    {
+      "id": "XVA_Grafito",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Grafito"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "26adbef90a6239b4a091ced9ea23341931abe795856a24fc1a5380b9f4c260dd"
+    },
+    {
+      "id": "XVA_Laton",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Laton"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "3b75ad26200cf3644214fe95da46c481014266c0aefd2411dfd366bd4cfdf8ca"
+    },
+    {
+      "id": "XVA_Lino",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Lino"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "84c692dea72d3b29f669c2f89a6ba4e13b5b67fd655c4a914adfcbae88fbadb5"
+    },
+    {
+      "id": "XVA_Marfil",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Marfil"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "d928c8aa07ca1021fe5406c6d5e85a1999fb7cda114a84f890d5d7b90ed275d4"
+    },
+    {
+      "id": "XVA_Oliva",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Oliva"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "c5791c6a2eccb3095ccb80890cc7ed84a1d6fbccb38d9d9c404431557b633ec7"
+    },
+    {
+      "id": "XVA_Piedra",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Piedra"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "43e1f59da63f99c9c052b5e006c1204975a05983208401b80eeae923a84fb451"
+    },
+    {
+      "id": "XVA_Roble",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Roble"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "d05210288f11f3fbe9bb41c62c0ca52e72bb2f28da68e95a615a7e8fb1fc78f4"
+    },
+    {
+      "id": "XVA_Terracota",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Terracota"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "17367aead021ee9027058d7ac919e929d2d57e04122ecb5f7b6e8b1616bc45c1"
+    },
+    {
+      "id": "XVA_Vidrio",
+      "version": "1.0.0",
+      "categoria": "Materiales",
+      "dimensiones_m": [],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend",
+      "licencia": "CC0 / geometría procedural propia",
+      "autor": "XIXOVÁ procedural library",
+      "dependencias": [],
+      "triangulos": 0,
+      "memoria_estimada_mb": 0,
+      "materiales": [
+        "XVA_Vidrio"
+      ],
+      "texturas": [],
+      "miniatura": true,
+      "validado": true,
+      "hash_receta_sha256": "16796ad5de80c6bfd3329cee1339ec7545c5f4cbad2e15ad2a7263b400bccf8f"
     }
   ]
 }

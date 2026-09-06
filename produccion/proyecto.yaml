@@ -1,0 +1,40 @@
+schema: 2
+proyecto: xixova_recorrido
+blender:
+  version: "4.5"
+  ejecutable: "${BLENDER_BIN:-~/Aplicaciones/blender-4.5/blender}"
+  dispositivo: CUDA
+herramientas:
+  ffmpeg: "${FFMPEG_BIN:-ffmpeg}"
+  ffprobe: "${FFPROBE_BIN:-ffprobe}"
+rutas:
+  original: originales/xixova_atelier.blend
+  base: trabajo/xixova_fotorrealista.blend
+  escena: trabajo/xixova_recorrido_completo.blend
+  biblioteca: "${XIXOVA_LIBRARY_DIR:-~/RenderCasa/biblioteca_blender}/xixova_interiores_v1.blend"
+  salidas: "${XIXOVA_OUTPUT_DIR:-salidas/recorrido_v2}"
+video:
+  fps: 24
+  inicio: 1
+  fin: 840
+  resolucion_final: [746, 420]
+perfiles:
+  composicion: {motor: BLENDER_WORKBENCH, resolucion: [640, 360], muestras: 1, denoise: false}
+  iluminacion: {motor: CYCLES, resolucion: [480, 270], muestras: 16, denoise: true}
+  final: {motor: CYCLES, resolucion: [746, 420], muestras: 32, denoise: true}
+restricciones:
+  gpu_vram_gb: 6
+  ram_gb: 16
+  licencias_permitidas: [CC0, CC Attribution, propia]
+  empacar_recursos: true
+tomas:
+  - {id: R01_ACCESO_CIRCULACION, inicio: 1, fin: 120, lente: 25, posicion: [7.78, 4.88, 1.55], objetivo: [8.52, 5.68, 1.18], desplazamiento: [0.06, 0.02, 0.01]}
+  - {id: R02_SUITE_SECUNDARIA, inicio: 121, fin: 240, lente: 28, posicion: [9.20, 1.52, 1.50], objetivo: [10.10, 2.58, 0.88], desplazamiento: [0.06, 0.08, 0.01]}
+  - {id: R03_BANO_CIRCULACION, inicio: 241, fin: 360, lente: 25, posicion: [7.63, 3.10, 1.52], objetivo: [8.38, 2.08, 0.98], desplazamiento: [0.06, 0.05, 0.01]}
+  - {id: R04_SUITE_PRINCIPAL, inicio: 361, fin: 480, lente: 28, posicion: [4.72, 1.50, 1.50], objetivo: [5.83, 2.42, 0.88], desplazamiento: [0.12, 0.06, 0.01]}
+  - {id: R05_SALA, inicio: 481, fin: 600, lente: 28, posicion: [7.05, 4.28, 1.45], objetivo: [5.48, 5.22, 1.05], desplazamiento: [0.28, -0.20, 0.02]}
+  - {id: R06_COMEDOR_COCINA, inicio: 601, fin: 720, lente: 28, posicion: [4.15, 4.82, 1.48], objetivo: [2.05, 3.65, 1.12], desplazamiento: [-0.30, -0.16, 0.02]}
+  - {id: R07_TERRAZA, inicio: 721, fin: 840, lente: 28, posicion: [3.55, 2.55, 1.44], objetivo: [2.75, 0.92, 1.12], desplazamiento: [0.24, -0.16, 0.02]}
+activos:
+  catalogo: catalogo_activos.json
+  recetas: recetas_colocacion.json

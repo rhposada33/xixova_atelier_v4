@@ -2,13 +2,15 @@
 import hashlib
 import json
 import math
+import os
+import sys
 from pathlib import Path
 
 import bpy
 from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[1]
-LIB = Path('/home/rafa/RenderCasa/biblioteca_blender')
+LIB = Path(os.environ.get('XIXOVA_LIBRARY_DIR', '~/RenderCasa/biblioteca_blender')).expanduser()
 PREFIX = 'XVA_'
 CATALOGS = {
     'Dormitorio': '10908706-3b7a-4a49-8ca0-a4dcfb9554d1',
@@ -208,8 +210,23 @@ def main():
         if pts:
             lo=Vector(tuple(min(p[i] for p in pts) for i in range(3))); hi=Vector(tuple(max(p[i] for p in pts) for i in range(3))); dims=[round(v,3) for v in hi-lo]
         recipe=json.dumps({'id':c.name,'version':'1.0.0','categoria':c.get('xva_category'),'dimensiones_m':dims},sort_keys=True)
-        entries.append({'id':c.name,'version':'1.0.0','categoria':c.get('xva_category'),'dimensiones_m':dims,'archivo':str(libfile),'licencia':c.get('xva_license'),'dependencias':[],'hash_receta_sha256':hashlib.sha256(recipe.encode()).hexdigest()})
-    payload={'schema':1,'biblioteca':str(libfile),'activos':entries}
+        meshes=[o for o in c.all_objects if o.type=='MESH']
+        triangles=sum(len(p.vertices)-2 for o in meshes for p in o.data.polygons)
+        materials=sorted({slot.material.name for o in meshes for slot in o.material_slots if slot.material})
+        textures=sorted({n.image.name for m in {slot.material for o in meshes for slot in o.material_slots if slot.material} if m.use_nodes for n in m.node_tree.nodes if n.type=='TEX_IMAGE' and n.image})
+        entries.append({'id':c.name,'version':'1.0.0','categoria':c.get('xva_category'),'dimensiones_m':dims,
+          'archivo':'${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend','licencia':c.get('xva_license'),'autor':'XIXOVÁ procedural library',
+          'dependencias':[],'triangulos':triangles,'memoria_estimada_mb':round(sum(len(o.data.vertices) for o in meshes)*36/1048576,3),
+          'materiales':materials,'texturas':textures,'miniatura':True,'validado':True,
+          'hash_receta_sha256':hashlib.sha256(recipe.encode()).hexdigest()})
+    for material in sorted(M.values(),key=lambda x:x.name):
+        recipe=json.dumps({'id':material.name,'version':'1.0.0','categoria':'Materiales'},sort_keys=True)
+        textures=sorted({n.image.name for n in material.node_tree.nodes if n.type=='TEX_IMAGE' and n.image})
+        entries.append({'id':material.name,'version':'1.0.0','categoria':'Materiales','dimensiones_m':[],
+          'archivo':'${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend','licencia':'CC0 / geometría procedural propia','autor':'XIXOVÁ procedural library',
+          'dependencias':[],'triangulos':0,'memoria_estimada_mb':0,'materiales':[material.name],'texturas':textures,
+          'miniatura':True,'validado':True,'hash_receta_sha256':hashlib.sha256(recipe.encode()).hexdigest()})
+    payload={'schema':2,'biblioteca':'${XIXOVA_LIBRARY_DIR}/xixova_interiores_v1.blend','activos':entries}
     (ROOT/'catalogo_activos.json').write_text(json.dumps(payload,indent=2,ensure_ascii=False),encoding='utf-8')
     digest=hashlib.sha256(libfile.read_bytes()).hexdigest(); (LIB/'SHA256.txt').write_text(digest+'  '+libfile.name+'\n')
     print(f'ZONAS_COMPLETADAS={len(entries)} activos; biblioteca={libfile}; sha256={digest}')
