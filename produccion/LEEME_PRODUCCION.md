@@ -13,11 +13,9 @@ conservan en `originales/` y las copias de seguridad automáticas usan `.blend1`
   secuencia final.
 - Recursos empacados: 48/48 imágenes; no se encontraron rutas ausentes.
 - Exterior: se conserva la corrección con coordenadas `Generated` y giro de 250°.
-- Sofá: el único recurso local es el chaise longue ya rechazado. Ajustado
-  uniformemente mide 1,658 × 0,950 × 0,478 m. No se deformó, no se redujo de
-  nuevo y las tomas aprobadas no dependen de él. Para resolver la sala hace falta
-  un sofá recto de 2,0–2,2 m de ancho, 0,80–0,95 m de fondo y 0,75–0,95 m de alto,
-  con licencia y texturas empacadas.
+- Sofá: se importó desde Sketchfab `Modern three-seater sofa (Free)`, de
+  `mk.ldeclaros`, con licencia CC Attribution. Se aplicó solo escala uniforme y
+  mide 2,10 × 0,791 × 0,801 m. El chaise longue rechazado se conserva oculto.
 
 ## Pipeline separado
 
@@ -35,6 +33,12 @@ Desde la raíz del proyecto:
 ```bash
 bash produccion/xixova.sh copia       # solo si no existe la copia; nunca sobrescribe
 bash produccion/xixova.sh configurar  # ajustes/cámaras sobre el .blend existente
+bash produccion/xixova.sh mejorar     # realismo sobre xixova_fotorrealista.blend
+bash produccion/xixova.sh revisar-realismo # 12 previas Cycles comparables
+bash produccion/xixova.sh animatica-realismo
+bash produccion/xixova.sh mp4-animatica-realismo
+bash produccion/xixova.sh final-realismo # solo después de aprobación
+bash produccion/xixova.sh mp4-final-realismo
 bash produccion/xixova.sh revisar     # 12 previas Cycles: inicio/medio/final
 bash produccion/xixova.sh animatica   # 480 PNG económicos y recuperables
 bash produccion/xixova.sh mp4-animatica
@@ -67,3 +71,17 @@ Las trayectorias usan tres claves con Bézier Auto Clamped. La comprobación de
 volúmenes en inicio, medio y final no encontró cámaras dentro de paredes o
 muebles. Las previas Cycles se inspeccionaron visualmente; se hizo una ronda de
 corrección en T04 para centrar biblioteca y relieves.
+
+## Versión fotorrealista 1.1
+
+`trabajo/xixova_fotorrealista.blend` conserva la escena anterior y añade
+microbiseles selectivos, microvariación de rugosidad, vidrio calibrado, mapas de
+datos en Non-Color y profundidad de campo discreta. El HDRI permanece a 250° y
+la vista continúa marcada como conceptual. Dos luces auxiliares ensayadas se
+descartaron al detectar sus reflejos en el vidrio durante las previas.
+
+Se validaron 12 fotogramas Cycles y una animática completa de 480 fotogramas. El
+sofá recto de Sketchfab queda registrado en `CREDITOS.md` y en las propiedades
+personalizadas del objeto; el chaise longue se conserva oculto del render. La
+animática vigente se genera en `salidas/fotorrealismo/animatica_con_sofa/` para
+conservar sin sobrescribir la revisión anterior.
