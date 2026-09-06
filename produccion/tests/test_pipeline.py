@@ -39,14 +39,17 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(args[args.index('-crf')+1],'18')
 
     def test_catalog_has_unique_ids_and_licenses(self):
-        data=json.loads((Path(__file__).parents[1]/'catalogo_activos.json').read_text())
+        data=json.loads((Path(__file__).parents[1]/'catalogo_activos_v3.json').read_text())
         ids=[x['id'] for x in data['activos']]
         self.assertEqual(len(ids),len(set(ids)))
         self.assertTrue(all(x.get('licencia') for x in data['activos']))
-        self.assertEqual(data['schema'],2)
+        self.assertEqual(data['schema'],3)
         self.assertTrue(all(x['archivo'].startswith('${XIXOVA_LIBRARY_DIR}') for x in data['activos']))
         required={'triangulos','memoria_estimada_mb','miniatura','validado','hash_receta_sha256'}
         self.assertTrue(all(required.issubset(x) for x in data['activos']))
+        quality={'quality_tier','lod_variants','mapas_pbr','densidad_texel_px_m','uv_validado','normales_validadas','estado_visual','tomas'}
+        self.assertTrue(all(quality.issubset(x) for x in data['activos']))
+        self.assertGreater(sum(x['triangulos'] for x in data['activos']),40000)
 
 
 if __name__=='__main__': unittest.main()

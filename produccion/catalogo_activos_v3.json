@@ -1,0 +1,533 @@
+{
+  "schema": 3,
+  "biblioteca": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+  "activos": [
+    {
+      "id": "XVA3_Armario_principal",
+      "version": "2.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.565,
+        1.55,
+        2.4
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 324,
+      "memoria_estimada_mb": 1.61,
+      "materiales": [
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Roble_premium.001"
+      ],
+      "texturas": [
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "bc61820415d403aaf866396954912d064fd64d2a00c7f210a21b7f79211e074b",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        361,
+        420,
+        480
+      ]
+    },
+    {
+      "id": "XVA3_Armario_sec",
+      "version": "2.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.565,
+        1.65,
+        2.4
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 324,
+      "memoria_estimada_mb": 1.61,
+      "materiales": [
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Roble_premium.001"
+      ],
+      "texturas": [
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "5f50dfc1a9b860bd04aac22e526370e72149ca34159f7ec8761a3ab0272779ed",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        121,
+        180,
+        240
+      ]
+    },
+    {
+      "id": "XVA3_Bano_principal",
+      "version": "2.0.0",
+      "categoria": "Baño",
+      "dimensiones_m": [
+        1.375,
+        1.572,
+        2.05
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 12948,
+      "memoria_estimada_mb": 2.31,
+      "materiales": [
+        "XVA3_Espejo.001",
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Piedra_crema.001",
+        "XVA3_Porcelana.001",
+        "XVA3_Roble_premium.001",
+        "XVA3_Vidrio.001"
+      ],
+      "texturas": [
+        "marble_01_base_color_1k.jpg",
+        "marble_01_normal_1k.jpg",
+        "marble_01_roughness_1k.jpg",
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "3a5e52994f9c21dc8b6c5e4fe25ba6d73d95b8596bc20b12389b990a54e78f1d",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        241,
+        300,
+        360
+      ]
+    },
+    {
+      "id": "XVA3_Bano_secundario",
+      "version": "2.0.0",
+      "categoria": "Baño",
+      "dimensiones_m": [
+        1.375,
+        1.572,
+        2.05
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 12948,
+      "memoria_estimada_mb": 2.31,
+      "materiales": [
+        "XVA3_Espejo.001",
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Piedra_crema.001",
+        "XVA3_Porcelana.001",
+        "XVA3_Roble_premium.001",
+        "XVA3_Vidrio.001"
+      ],
+      "texturas": [
+        "marble_01_base_color_1k.jpg",
+        "marble_01_normal_1k.jpg",
+        "marble_01_roughness_1k.jpg",
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "b524252ffc31034e3acd7830036a2cd7ba78ef775fa3054f6ce14818b8e2091f",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        1,
+        60,
+        120
+      ]
+    },
+    {
+      "id": "XVA3_Cama_doble",
+      "version": "2.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        1.66,
+        2.05,
+        1.505
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 7984,
+      "memoria_estimada_mb": 4.42,
+      "materiales": [
+        "XVA3_Lino_natural.001",
+        "XVA3_Lino_oliva.001",
+        "XVA3_Marfil.001",
+        "XVA3_Oliva.001",
+        "XVA3_Roble_premium.001"
+      ],
+      "texturas": [
+        "rough_linen_base_color_1k.jpg",
+        "rough_linen_normal_1k.jpg",
+        "rough_linen_roughness_1k.jpg",
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "d7c1d401184cab9cf783cf30bf3c43698780fe31ca5106d7ef7295c6a7a53ce5",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        121,
+        180,
+        240
+      ]
+    },
+    {
+      "id": "XVA3_Cama_king",
+      "version": "2.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        1.98,
+        2.05,
+        1.505
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 7984,
+      "memoria_estimada_mb": 4.42,
+      "materiales": [
+        "XVA3_Lino_natural.001",
+        "XVA3_Lino_oliva.001",
+        "XVA3_Marfil.001",
+        "XVA3_Oliva.001",
+        "XVA3_Roble_premium.001"
+      ],
+      "texturas": [
+        "rough_linen_base_color_1k.jpg",
+        "rough_linen_normal_1k.jpg",
+        "rough_linen_roughness_1k.jpg",
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "24d842684469ceaf2645ca8244152585f58c7e51ffdd3b33e171e10645f3f87e",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        361,
+        420,
+        480
+      ]
+    },
+    {
+      "id": "XVA3_Cocina_premium",
+      "version": "2.0.0",
+      "categoria": "Cocina",
+      "dimensiones_m": [
+        0.783,
+        4.062,
+        2.42
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 952,
+      "memoria_estimada_mb": 4.79,
+      "materiales": [
+        "XVA3_Acero.001",
+        "XVA3_Grafito.001",
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Marfil.001",
+        "XVA3_Piedra_crema.001",
+        "XVA3_Roble_premium.001",
+        "XVA3_Vidrio_oscuro.001"
+      ],
+      "texturas": [
+        "marble_01_base_color_1k.jpg",
+        "marble_01_normal_1k.jpg",
+        "marble_01_roughness_1k.jpg",
+        "rough_linen_base_color_1k.jpg",
+        "rough_linen_normal_1k.jpg",
+        "rough_linen_roughness_1k.jpg",
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "685f62c197d8d1dbd8fe79459bac0ff3f286b40bac68e0cbb92e6359e65361d2",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        601,
+        660,
+        720
+      ]
+    },
+    {
+      "id": "XVA3_Mesita_L",
+      "version": "2.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.44,
+        0.484,
+        0.58
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 148,
+      "memoria_estimada_mb": 1.61,
+      "materiales": [
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Roble_premium.001"
+      ],
+      "texturas": [
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "99baa99e678d3393ce0d51296e8077ee38bb42572c659cf1340f8c1fa17de290",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        361,
+        420,
+        480
+      ]
+    },
+    {
+      "id": "XVA3_Mesita_R",
+      "version": "2.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.44,
+        0.484,
+        0.58
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 148,
+      "memoria_estimada_mb": 1.61,
+      "materiales": [
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Roble_premium.001"
+      ],
+      "texturas": [
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "9c9f60a40dfca77d39dcd30a6b6ada3c5cf6f3c91efb0b7db703dec76a49f3b5",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        361,
+        420,
+        480
+      ]
+    },
+    {
+      "id": "XVA3_Mesita_sec",
+      "version": "2.0.0",
+      "categoria": "Dormitorio",
+      "dimensiones_m": [
+        0.44,
+        0.484,
+        0.58
+      ],
+      "archivo": "${XIXOVA_LIBRARY_DIR}/xixova_interiores_v2.blend",
+      "licencia": "CC0 / geometría propia",
+      "autor": "XIXOVÁ Atelier",
+      "url": "",
+      "dependencias": [],
+      "triangulos": 148,
+      "memoria_estimada_mb": 1.61,
+      "materiales": [
+        "XVA3_Laton_cepillado.001",
+        "XVA3_Roble_premium.001"
+      ],
+      "texturas": [
+        "wood_floor_base_color_1k.jpg",
+        "wood_floor_normal_1k.jpg",
+        "wood_floor_roughness_1k.jpg"
+      ],
+      "miniatura": false,
+      "validado": true,
+      "hash_receta_sha256": "b2299f90fdc03e71bc9854035bdd6561c9d07a9b8cc6c8e07919376b55ab8ed3",
+      "quality_tier": "hero",
+      "lod_variants": [
+        "proxy",
+        "final"
+      ],
+      "mapas_pbr": [
+        "base_color",
+        "roughness",
+        "normal"
+      ],
+      "densidad_texel_px_m": 1024,
+      "uv_validado": true,
+      "normales_validadas": true,
+      "resolucion_texturas": 1024,
+      "estado_visual": "pendiente_piloto",
+      "tomas": [
+        121,
+        180,
+        240
+      ]
+    }
+  ]
+}

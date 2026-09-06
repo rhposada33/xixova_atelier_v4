@@ -1,4 +1,4 @@
-schema: 2
+schema: 3
 proyecto: xixova_recorrido
 blender:
   version: "4.5"
@@ -9,10 +9,11 @@ herramientas:
   ffprobe: "${FFPROBE_BIN:-ffprobe}"
 rutas:
   original: originales/xixova_atelier.blend
-  base: trabajo/xixova_fotorrealista.blend
-  escena: trabajo/xixova_recorrido_completo.blend
-  biblioteca: "${XIXOVA_LIBRARY_DIR:-~/RenderCasa/biblioteca_blender}/xixova_interiores_v1.blend"
-  salidas: "${XIXOVA_OUTPUT_DIR:-salidas/recorrido_v2}"
+  base: trabajo/xixova_recorrido_completo.blend
+  escena: trabajo/xixova_recorrido_fotorrealista_v2.blend
+  biblioteca: "${XIXOVA_LIBRARY_DIR:-~/RenderCasa/biblioteca_blender}/xixova_interiores_v2.blend"
+  recursos_pbr: "${XIXOVA_LIBRARY_DIR:-~/RenderCasa/biblioteca_blender}/texturas_cc0"
+  salidas: "${XIXOVA_OUTPUT_DIR:-salidas/recorrido_v3}"
 video:
   fps: 24
   inicio: 1
@@ -21,12 +22,23 @@ video:
 perfiles:
   composicion: {motor: BLENDER_WORKBENCH, resolucion: [640, 360], muestras: 1, denoise: false}
   iluminacion: {motor: CYCLES, resolucion: [480, 270], muestras: 16, denoise: true}
+  piloto: {motor: CYCLES, resolucion: [746, 420], muestras: 32, denoise: true}
   final: {motor: CYCLES, resolucion: [746, 420], muestras: 32, denoise: true}
 restricciones:
   gpu_vram_gb: 6
   ram_gb: 16
   licencias_permitidas: [CC0, CC Attribution, propia]
   empacar_recursos: true
+calidad:
+  biblioteca_version: "2.0.0"
+  variante_trabajo: final
+  textura_maxima: 2048
+  textura_proxy: 1024
+  objetivo_vram_mb: 5800
+  preservar_primer_plano: true
+  pilotos:
+    suite_principal: [361, 420, 480]
+    cocina_comedor: [601, 660, 720]
 tomas:
   - {id: R01_ACCESO_CIRCULACION, inicio: 1, fin: 120, lente: 25, posicion: [7.78, 4.88, 1.55], objetivo: [8.52, 5.68, 1.18], desplazamiento: [0.06, 0.02, 0.01]}
   - {id: R02_SUITE_SECUNDARIA, inicio: 121, fin: 240, lente: 28, posicion: [9.20, 1.52, 1.50], objetivo: [10.10, 2.58, 0.88], desplazamiento: [0.06, 0.08, 0.01]}
@@ -36,5 +48,5 @@ tomas:
   - {id: R06_COMEDOR_COCINA, inicio: 601, fin: 720, lente: 28, posicion: [4.15, 4.82, 1.48], objetivo: [2.05, 3.65, 1.12], desplazamiento: [-0.30, -0.16, 0.02]}
   - {id: R07_TERRAZA, inicio: 721, fin: 840, lente: 28, posicion: [3.55, 2.55, 1.44], objetivo: [2.75, 0.92, 1.12], desplazamiento: [0.24, -0.16, 0.02]}
 activos:
-  catalogo: catalogo_activos.json
+  catalogo: catalogo_activos_v3.json
   recetas: recetas_colocacion.json

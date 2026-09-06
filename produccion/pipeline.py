@@ -32,9 +32,9 @@ def load(path):
     raw['_hash']=hashlib.sha256(canonical).hexdigest()[:16]
     return raw
 
-def validate(c):
+def validate(c, allow_missing_catalog=False):
     errors=[]; warnings=[]
-    if c.get('schema')!=2: errors.append('schema debe ser 2')
+    if c.get('schema')!=3: errors.append('schema debe ser 3')
     if '/originales/' in c['rutas']['escena']: errors.append('rutas.escena no puede apuntar a originales')
     shots=c.get('tomas',[]); expected=int(c['video']['inicio'])
     for s in shots:
@@ -50,15 +50,18 @@ def validate(c):
     try:
         data=json.loads(catalog.read_text(encoding='utf-8')); ids={x['id'] for x in data['activos']}
         required={'version','categoria','dimensiones_m','archivo','licencia','autor','triangulos','memoria_estimada_mb','miniatura','validado','hash_receta_sha256'}
-        if data.get('schema')!=2: errors.append('catálogo de activos debe usar schema 2')
+        if data.get('schema')!=3: errors.append('catálogo de activos debe usar schema 3')
         for asset in data['activos']:
             if not required.issubset(asset): errors.append(f"{asset.get('id')}: metadatos incompletos")
+            quality={'quality_tier','lod_variants','mapas_pbr','densidad_texel_px_m','uv_validado','normales_validadas','resolucion_texturas','estado_visual','tomas'}
+            if not quality.issubset(asset): errors.append(f"{asset.get('id')}: metadatos v3 incompletos")
             if not asset['archivo'].startswith('${XIXOVA_LIBRARY_DIR}'): errors.append(f"{asset['id']}: ruta de biblioteca no portable")
         placements=json.loads(recipes.read_text(encoding='utf-8'))['colocaciones']
         for item in placements:
             if item['activo'] not in ids: errors.append(f"receta usa activo desconocido: {item['activo']}")
             if not isinstance(item['escala'],(int,float)) or item['escala']<=0: errors.append(f"{item['activo']}: escala no uniforme/válida")
-    except (OSError,KeyError,ValueError,TypeError) as exc: errors.append('catálogo/recetas inválidos: '+str(exc))
+    except (OSError,KeyError,ValueError,TypeError) as exc:
+        (warnings if allow_missing_catalog else errors).append('catálogo/recetas inválidos: '+str(exc))
     for name in ('blender','ffmpeg','ffprobe'):
         exe=c['blender']['ejecutable'] if name=='blender' else c['herramientas'].get(name)
         if not exe or not Path(exe).exists(): errors.append(f'{name} no disponible')
@@ -84,7 +87,7 @@ def blender(c,script,extra=(),target=None):
     if pid: raise SystemExit(f'Escena en uso por Blender PID {pid}; no se modifica: {scene}')
     cfg=resolved(c)
     if Path(scene)==Path(c['rutas']['escena']) and script!='preflight_blender.py':
-        phase='camaras' if script=='configurar_recorrido_completo.py' else ('construir' if script=='completar_zonas_y_biblioteca.py' else 'render')
+        phase='camaras' if script=='configurar_recorrido_completo.py' else ('construir' if script in {'completar_zonas_y_biblioteca.py','construir_fotorrealismo_v3.py','optimizar_vram.py'} else 'render')
         subprocess.run([c['blender']['ejecutable'],'--background',scene,'--factory-startup','--python-exit-code','1','--python',str(HERE/'scripts'/'preflight_blender.py'),'--','--config',str(cfg),'--fase',phase],check=True)
     cmd=[c['blender']['ejecutable'],'--background',scene,'--factory-startup','--python-exit-code','1','--python',str(HERE/'scripts'/script),'--','--config',str(cfg),*extra]
     subprocess.run(cmd,check=True,env={**os.environ,'XIXOVA_LIBRARY_DIR':str(Path(c['rutas']['biblioteca']).parent)})
@@ -128,7 +131,9 @@ def status(c):
     print('config_hash:',c['_hash'])
     for name,p in c['perfiles'].items():
         folder=profile_dir(c,name)/'frames'; w,h=p['resolucion']
-        expected=sorted({x for s in c['tomas'] for x in (s['inicio'],(s['inicio']+s['fin'])//2,s['fin'])}) if name=='iluminacion' else list(range(c['video']['inicio'],c['video']['fin']+1))
+        if name=='iluminacion': expected=sorted({x for s in c['tomas'] for x in (s['inicio'],(s['inicio']+s['fin'])//2,s['fin'])})
+        elif name=='piloto': expected=sorted({x for values in c['calidad']['pilotos'].values() for x in values})
+        else: expected=list(range(c['video']['inicio'],c['video']['fin']+1))
         total=len(expected); count=sum(png_ok(folder/f'frame_{n:04d}.png',w,h) for n in expected)
         log=profile_dir(c,name)/'logs'/f'{name}.jsonl'; times=[]
         if log.exists():
@@ -142,10 +147,25 @@ def status(c):
         print(f'{name}: {count}/{total} ({count/total:.1%}){suffix}')
     pid=active_on(c['rutas']['escena']); print('blender_pid:',pid or 'inactivo')
 
+def quality_audit(c):
+    out=Path(c['rutas']['salidas'])/'auditoria_calidad'; out.mkdir(parents=True,exist_ok=True)
+    checks=','.join(str(x) for s in c['tomas'] for x in (s['inicio'],(s['inicio']+s['fin'])//2,s['fin']))
+    blender(c,'auditar_calidad.py',('--salida',str(out),'--frames',checks))
+
+def compare(c):
+    subprocess.run([sys.executable,str(HERE/'scripts'/'comparar_pilotos.py'),'--config',str(resolved(c))],check=True)
+
+def optimize_vram(c):
+    blender(c,'optimizar_vram.py',('--objetivo-mb',str(c['calidad']['objetivo_vram_mb'])))
+
+def ensure_pbr(c):
+    subprocess.run([sys.executable,str(HERE/'scripts'/'descargar_recursos_pbr.py'),'--destino',c['rutas']['recursos_pbr']],check=True)
+
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('-c','--config',type=Path,default=HERE/'proyecto.yaml')
-    ap.add_argument('accion',choices=['validar','resolver','preparar','construir','camaras','revisar','animatica','render','montar','estado','biblioteca'])
-    a=ap.parse_args(); c=load(a.config); errors,warnings=validate(c)
+    ap.add_argument('accion',choices=['validar','resolver','preparar','construir','camaras','revisar','pilotos','animatica','render','montar','estado','biblioteca','auditar-calidad','comparar','optimizar-vram'])
+    ap.add_argument('--quality',choices=['proxy','final'],default='final')
+    a=ap.parse_args(); c=load(a.config); errors,warnings=validate(c,a.accion in {'preparar','construir','biblioteca'})
     if errors: raise SystemExit('\n'.join('ERROR: '+x for x in errors))
     if a.accion=='validar': print('CONFIG_OK',c['_hash']); return
     if a.accion=='resolver': print(resolved(c)); return
@@ -154,17 +174,24 @@ def main():
         dst=Path(c['rutas']['escena']); dst.parent.mkdir(parents=True,exist_ok=True)
         if dst.exists(): print('Existe, no se sobrescribe:',dst)
         else: shutil.copy2(c['rutas']['base'],dst); print(dst)
-    elif a.accion=='construir': blender(c,'completar_zonas_y_biblioteca.py')
+    elif a.accion=='construir':
+        ensure_pbr(c); blender(c,'construir_fotorrealismo_v3.py',('--quality',a.quality))
     elif a.accion=='camaras': blender(c,'configurar_recorrido_completo.py')
     elif a.accion=='revisar':
         checks=','.join(str(x) for s in c['tomas'] for x in (s['inicio'],(s['inicio']+s['fin'])//2,s['fin']))
         render(c,'iluminacion',checks)
+    elif a.accion=='pilotos':
+        frames=','.join(str(x) for values in c['calidad']['pilotos'].values() for x in values)
+        render(c,'piloto',frames)
     elif a.accion=='animatica': render(c,'composicion'); assemble(c,'composicion')
     elif a.accion=='render': render(c,'final')
     elif a.accion=='montar': assemble(c,'final')
     elif a.accion=='biblioteca':
-        blender(c,'completar_zonas_y_biblioteca.py')
+        ensure_pbr(c); blender(c,'construir_fotorrealismo_v3.py',('--quality',a.quality))
         blender(c,'normalizar_biblioteca.py',('--biblioteca',c['rutas']['biblioteca']),target=c['rutas']['biblioteca'])
         blender(c,'generar_previews_biblioteca.py',('--biblioteca',c['rutas']['biblioteca']),target=c['rutas']['biblioteca'])
+    elif a.accion=='auditar-calidad': quality_audit(c)
+    elif a.accion=='comparar': compare(c)
+    elif a.accion=='optimizar-vram': optimize_vram(c)
 
 if __name__=='__main__': main()

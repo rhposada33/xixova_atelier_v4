@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def cli():
     p = argparse.ArgumentParser()
-    p.add_argument('--modo', choices=('previa', 'animatica', 'final', 'composicion', 'iluminacion'), required=True)
+    p.add_argument('--modo', choices=('previa', 'animatica', 'final', 'composicion', 'iluminacion', 'piloto'), required=True)
     p.add_argument('--frames', default='')
     p.add_argument('--salida', type=Path)
     p.add_argument('--samples', type=int)
@@ -61,6 +61,7 @@ def main():
         'final': (746, 420, 32, 'CYCLES', ROOT/'salidas/final_frames'),
         'composicion': (640, 360, 1, 'BLENDER_WORKBENCH', ROOT/'salidas/composicion/frames'),
         'iluminacion': (480, 270, 16, 'CYCLES', ROOT/'salidas/iluminacion/frames'),
+        'piloto': (746, 420, 32, 'CYCLES', ROOT/'salidas/piloto/frames'),
     }
     width, height, samples, engine, default_out = defaults[a.modo]
     if config:
@@ -83,7 +84,7 @@ def main():
         scene.cycles.device = 'GPU'; scene.cycles.samples = a.samples or samples
         scene.cycles.use_adaptive_sampling = True; scene.cycles.use_denoising = bool(config['perfiles'][a.modo]['denoise']) if config else True
         scene.cycles.adaptive_threshold = .02 if a.modo == 'final' else .03
-        scene.render.use_persistent_data = a.modo == 'final'
+        scene.render.use_persistent_data = a.modo in {'final','piloto'}
     else:
         scene.display.shading.light = 'STUDIO'
         scene.display.shading.studio_light = 'paint.sl'

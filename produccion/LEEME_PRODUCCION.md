@@ -1,6 +1,39 @@
 # XIXOVÁ — producción de video (Blender 4.5 LTS)
 
-## Pipeline v2 declarativo
+## Pipeline v3 fotorrealista
+
+La escena activa de esta fase es `trabajo/xixova_recorrido_fotorrealista_v2.blend`
+y la biblioteca externa es `xixova_interiores_v2.blend`. Ambas se crearon como
+versiones nuevas: la escena completa y la biblioteca v1 permanecen intactas.
+
+Los materiales CC0 se descargan reproduciblemente desde Poly Haven y se guardan
+fuera de Git. El manifiesto conserva URL, autor, tamaño y SHA-256. La escena de
+entrega empaca estos mapas. Los pilotos usan Cycles CUDA, 746×420 y 32 muestras.
+
+```bash
+bash produccion/xixova.sh pipeline preparar
+bash produccion/xixova.sh pipeline construir --quality final
+bash produccion/xixova.sh pipeline auditar-calidad
+bash produccion/xixova.sh pipeline pilotos
+bash produccion/xixova.sh pipeline comparar
+bash produccion/xixova.sh pipeline estado
+```
+
+Después de aprobar los pilotos:
+
+```bash
+bash produccion/xixova.sh pipeline revisar       # 21 controles Cycles
+bash produccion/xixova.sh pipeline animatica     # 840 PNG + MP4 económico
+# Solo tras aprobar la animática:
+bash produccion/xixova.sh pipeline render
+bash produccion/xixova.sh pipeline montar
+```
+
+`optimizar-vram` consolida mallas repetidas sin cambiar cámaras ni reducir los
+mapas de activos protagonistas. El catálogo v3 registra nivel de calidad, LOD,
+mapas PBR, densidad texel, validación UV/normales, memoria y tomas de uso.
+
+## Pipeline v2 declarativo (compatibilidad)
 
 `proyecto.yaml` es la fuente única para rutas, siete tomas, perfiles y límites
 de hardware. El lanzador usa `uv` para resolver YAML y entrega JSON sin
