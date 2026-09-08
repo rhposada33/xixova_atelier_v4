@@ -1,0 +1,2 @@
+import{defineConfig}from'@playwright/test';
+export default defineConfig({testDir:'./tests',timeout:30000,use:{baseURL:'http://127.0.0.1:8891',headless:true,launchOptions:{executablePath:'/usr/bin/google-chrome',args:['--use-angle=swiftshader','--enable-webgl']}},webServer:{command:'cd ../.. && uv run xixova_director.py -p proyectos/apartamento_compacto/proyecto.yaml --variante natural_lila --no-browser --port 8891',url:'http://127.0.0.1:8891/api/project',reuseExistingServer:false,timeout:30000}});

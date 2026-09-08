@@ -1,23 +1,76 @@
 """Servidor local de Xixova Director."""
 from __future__ import annotations
-import asyncio, json, os, subprocess, sys, threading, time, uuid, webbrowser
+import asyncio, copy, json, os, re, subprocess, sys, threading, time, uuid, webbrowser
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket
 from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from .core import digest
-from .director import apply_command, atomic_yaml, compile_script, context, read_or_import, scene_payload, validate_script
+from .director import apply_command, atomic_yaml, compile_script, context, import_legacy, read_or_import, scene_payload, validate_script
 from .director_glb import make_glb
 
 class DirectorSession:
     def __init__(self,project,variant):
         self.project=Path(project).resolve(); self.variant=variant; self.bundle,self.script,self.source,self.draft,self.hash=read_or_import(self.project,variant)
+        selected=variant or next(iter(self.bundle['proyecto']['variantes'])); self.director_root=self.project.parent/'.director'/selected
+        self.scripts_root=self.director_root/'guiones'; self.drafts_root=self.director_root/'borradores'; self.active_id='principal'; self.active_name='Guion principal'; self.dirty=self.draft.is_file(); self.loaded_draft=self.draft
+        self.meta_path=self.director_root/'biblioteca.yaml'; self.meta={}
+        if self.meta_path.is_file():
+            import yaml
+            self.meta=yaml.safe_load(self.meta_path.read_text()) or {}
         self.undo=[]; self.redo=[]; self.jobs={}; self.lock=threading.Lock(); self.project_sources=dict(self.bundle.get('sincronizacion',{}).get('archivos',{}))
     def sources_current(self):
         import hashlib
         return all(Path(path).is_file() and hashlib.sha256(Path(path).read_bytes()).hexdigest()==value for path,value in self.project_sources.items())
-    def save_draft(self): atomic_yaml(self.draft,self.script); self.hash=digest(self.script)
+    def draft_path(self,identifier=None):return self.drafts_root/f'{identifier or self.active_id}.yaml'
+    def script_path(self,identifier=None):return self.scripts_root/f'{identifier or self.active_id}.yaml'
+    def save_draft(self):
+        target=self.draft_path(); atomic_yaml(target,self.script)
+        if self.loaded_draft!=target and self.loaded_draft.is_file():self.loaded_draft.unlink()
+        self.draft=target; self.loaded_draft=target; self.hash=digest(self.script); self.dirty=True
+    def library(self):
+        entries=[]; seen=set()
+        def add(identifier,name,path,state,origin):
+            if identifier in seen or not path.is_file():return
+            seen.add(identifier); data=__import__('yaml').safe_load(path.read_text()) or {}; stat=path.stat()
+            metadata=self.meta.get(identifier,{})
+            entries.append({'id':identifier,'nombre':metadata.get('nombre',name),'estado':'archivado' if metadata.get('estado')=='archivado' else state,'origen':origin,'duracion':data.get('duracion'), 'fps':data.get('fps'),'hash':digest(data),'modificado':stat.st_mtime,'activo':identifier==self.active_id,'cambios':identifier==self.active_id and self.dirty})
+        identifiers={p.stem for p in self.scripts_root.glob('*.yaml')}|{p.stem for p in self.drafts_root.glob('*.yaml')}
+        for identifier in sorted(identifiers):
+            draft=self.draft_path(identifier); published=self.script_path(identifier); add(identifier,identifier.replace('_',' ').title(),draft if draft.is_file() else published,'borrador' if draft.is_file() else 'publicado','director')
+        for path in sorted((self.director_root/'archivados').glob('*.yaml')):add(path.stem,path.stem.replace('_',' ').title(),path,'archivado','director')
+        add('principal','Guion principal',self.loaded_draft if self.dirty else self.source,'borrador' if self.dirty else 'publicado','guion_direccion')
+        legacy=self.bundle['proyecto'].get('guion_camara')
+        if legacy and (self.project.parent/legacy).is_file():entries.append({'id':'legacy_camara','nombre':'Guion de cámara original','estado':'importado','origen':'guion_camara','duracion':self.script.get('duracion'),'fps':self.script.get('fps'),'hash':None,'modificado':(self.project.parent/legacy).stat().st_mtime,'activo':False,'cambios':False})
+        return sorted(entries,key=lambda x:(not x['activo'],-x['modificado']))
+    def activate(self,identifier):
+        if self.dirty:raise ValueError('El guion activo tiene cambios en borrador; publícalos antes de cambiar.')
+        path=self.draft_path(identifier) if self.draft_path(identifier).is_file() else self.script_path(identifier)
+        if identifier=='principal' and not path.is_file():path=self.source
+        if not path.is_file():raise ValueError('Guion inexistente.')
+        import yaml
+        candidate=yaml.safe_load(path.read_text()); issues=validate_script(candidate,self.bundle)
+        if issues:raise ValueError('; '.join(x['explicacion'] for x in issues))
+        self.active_id=identifier; self.active_name=identifier.replace('_',' ').title(); self.script=candidate; self.hash=digest(candidate); self.draft=self.draft_path(); self.loaded_draft=self.draft; self.source=self.script_path(); self.dirty=self.draft.is_file(); self.undo=[]; self.redo=[]
+    def create_script(self,name,source=None):
+        identifier=re.sub(r'[^a-z0-9]+','_',name.lower()).strip('_') or 'guion'; base=identifier; counter=2
+        while self.script_path(identifier).exists() or self.draft_path(identifier).exists():identifier=f'{base}_{counter}';counter+=1
+        candidate=copy.deepcopy(source or self.script); atomic_yaml(self.draft_path(identifier),candidate); self.meta[identifier]={'nombre':name,'estado':'borrador'}; atomic_yaml(self.meta_path,self.meta); return identifier
+    def rename(self,identifier,name):
+        self.meta.setdefault(identifier,{})['nombre']=name; atomic_yaml(self.meta_path,self.meta)
+    def archive(self,identifier):
+        if identifier==self.active_id:raise ValueError('No se puede archivar el guion activo.')
+        archive=self.director_root/'archivados'; archive.mkdir(parents=True,exist_ok=True)
+        for path in (self.draft_path(identifier),self.script_path(identifier)):
+            if path.is_file():os.replace(path,archive/f'{identifier}.yaml')
+        self.meta.setdefault(identifier,{})['estado']='archivado'; atomic_yaml(self.meta_path,self.meta)
+    def publish(self):
+        atomic_yaml(self.script_path(),self.script)
+        if self.active_id=='principal':atomic_yaml(self.source,self.script)
+        draft=self.draft_path()
+        if draft.is_file():draft.unlink()
+        self.loaded_draft=draft; self.meta.setdefault(self.active_id,{})['estado']='publicado'; atomic_yaml(self.meta_path,self.meta); self.dirty=False
     def command(self,value,expected):
         with self.lock:
             if not self.sources_current():raise ValueError('El proyecto cambió externamente; reinicia Director para evitar una edición obsoleta.')
@@ -90,6 +143,38 @@ def create_app(project,variant=None):
     def glb(): return Response(make_glb(scene_payload(session.bundle,session.script)),media_type='model/gltf-binary',headers={'ETag':session.bundle['arquitectura_hash']+'-'+session.hash})
     @app.get('/api/script')
     def script(): return {'hash':session.hash,'script':session.script}
+    @app.get('/api/scripts')
+    def scripts():return {'activo':session.active_id,'cambios':session.dirty,'guiones':session.library()}
+    @app.post('/api/scripts')
+    def create_script(body:dict):
+        identifier=session.create_script(body.get('nombre','Nuevo guion')); return {'ok':True,'id':identifier,'guiones':session.library()}
+    @app.post('/api/scripts/import')
+    def import_script(body:dict):
+        if body.get('origen')=='legacy_camara':candidate=import_legacy(session.bundle); name=body.get('nombre','Importado de guion_camara')
+        elif isinstance(body.get('script'),dict):candidate=body['script']; name=body.get('nombre','Guion importado')
+        else:raise HTTPException(422,'Indica origen legacy_camara o un script válido.')
+        issues=validate_script(candidate,session.bundle)
+        if issues:raise HTTPException(422,issues)
+        identifier=session.create_script(name,candidate); return {'ok':True,'id':identifier,'guiones':session.library()}
+    @app.post('/api/scripts/{identifier}/duplicate')
+    def duplicate_script(identifier:str,body:dict):
+        path=session.draft_path(identifier) if session.draft_path(identifier).is_file() else session.script_path(identifier)
+        if identifier=='principal' and not path.is_file():path=session.source
+        if not path.is_file():raise HTTPException(404,'Guion inexistente.')
+        import yaml
+        created=session.create_script(body.get('nombre',identifier+' copia'),yaml.safe_load(path.read_text())); return {'ok':True,'id':created,'guiones':session.library()}
+    @app.post('/api/scripts/{identifier}/activate')
+    def activate_script(identifier:str):
+        try:session.activate(identifier); return {'ok':True,'id':identifier,'hash':session.hash,'script':session.script}
+        except ValueError as exc:raise HTTPException(409,str(exc))
+    @app.patch('/api/scripts/{identifier}')
+    def rename_script(identifier:str,body:dict):
+        if not body.get('nombre'):raise HTTPException(422,'El nombre es obligatorio.')
+        session.rename(identifier,body['nombre']); return {'ok':True,'guiones':session.library()}
+    @app.post('/api/scripts/{identifier}/archive')
+    def archive_script(identifier:str):
+        try:session.archive(identifier); return {'ok':True,'guiones':session.library()}
+        except ValueError as exc:raise HTTPException(409,str(exc))
     @app.put('/api/script')
     def put_script(body:dict):
         if not session.sources_current():raise HTTPException(409,'El proyecto cambió externamente; reinicia Director.')
@@ -97,7 +182,7 @@ def create_app(project,variant=None):
         issues=validate_script(body.get('script',{}),session.bundle)
         if issues:raise HTTPException(422,issues)
         session.undo.append(session.script); session.script=body['script']; session.save_draft()
-        if body.get('publish'): atomic_yaml(session.source,session.script)
+        if body.get('publish'):session.publish()
         return {'ok':True,'hash':session.hash,'publicado':bool(body.get('publish'))}
     @app.post('/api/commands')
     def commands(body:dict):

@@ -27,7 +27,7 @@ def import_legacy(bundle):
 
 def validate_script(script,bundle):
     openings={opening['id'] for wall in bundle['arquitectura']['paredes'] for opening in wall['aberturas']}
-    issues=contract(script,'guion_direccion'); ids={x['id'] for x in bundle['interiorismo']['elementos']}|{x['id'] for x in bundle['presentacion']['luces']}|{x['id'] for x in bundle['presentacion']['tomas']}|openings
+    issues=contract(script,'guion_direccion'); ids={x['id'] for x in bundle['interiorismo']['elementos']}|{x['id'] for x in bundle['presentacion']['luces']}|{x['id'] for x in bundle['presentacion']['tomas']}|{x.get('camara') for x in script.get('tomas',[])}|openings
     for track in script.get('pistas',[]):
         if track['objetivo'] not in ids and track['tipo']!='material':issues.append({'codigo':'DIRECTOR_REFERENCIA','gravedad':'error','elemento':track['id'],'explicacion':'Objetivo inexistente.'})
         previous=-1
@@ -73,6 +73,15 @@ def apply_command(script,command):
         target['claves']=[_key(command.get('tiempo',0),max(18,min(70,command['lente'])),'hold')]
     elif action=='add_cut':
         shot=copy.deepcopy(command['toma']); out['tomas'].append(shot); out['tomas'].sort(key=lambda x:x['inicio'])
+    elif action=='create_camera':
+        identifier=command['id']; start=out['duracion']; duration=max(.25,command.get('duracion',4)); position=command['posicion']; target=command['objetivo']
+        out['tomas'].append({'id':identifier,'inicio':start,'duracion':duration,'camara':identifier,'transicion':'corte'}); out['duracion']=round(start+duration,4)
+        out['pistas'] += [
+          {'id':identifier+':posicion','tipo':'camara','objetivo':identifier,'propiedad':'posicion','claves':[_key(start,position,'hold'),_key(start+duration,position,'hold')]},
+          {'id':identifier+':objetivo','tipo':'camara','objetivo':identifier,'propiedad':'objetivo','claves':[_key(start,target,'hold'),_key(start+duration,target,'hold')]},
+          {'id':identifier+':lente','tipo':'camara','objetivo':identifier,'propiedad':'lente','claves':[_key(start,command.get('lente',35),'hold')]},
+          {'id':identifier+':apertura','tipo':'camara','objetivo':identifier,'propiedad':'apertura','claves':[_key(start,7.1,'hold')]},
+          {'id':identifier+':exposicion','tipo':'camara','objetivo':identifier,'propiedad':'exposicion','claves':[_key(start,0,'hold')]},]
     elif action=='duplicate_shot':
         original=next((x for x in out['tomas'] if x['id']==command['toma']),None)
         if not original:raise ValueError('Toma inexistente.')
@@ -110,7 +119,10 @@ def paths(project,variant):
     bundle,_=load(project,variant); base=Path(bundle['archivo']).parent; selected=variant or next(iter(bundle['proyecto']['variantes'])); source=base/bundle['proyecto'].get('guion_direccion',f'.director/{selected}/guion_direccion.yaml'); draft=base/'.director'/selected/'borrador.yaml'; return bundle,source,draft
 
 def read_or_import(project,variant):
-    bundle,source,draft=paths(project,variant); path=draft if draft.is_file() else source
+    bundle,legacy_source,legacy_draft=paths(project,variant); selected=variant or next(iter(bundle['proyecto']['variantes'])); root=Path(bundle['archivo']).parent/'.director'/selected
+    source=root/'guiones'/'principal.yaml' if (root/'guiones'/'principal.yaml').is_file() else legacy_source
+    draft=root/'borradores'/'principal.yaml' if (root/'borradores'/'principal.yaml').is_file() else legacy_draft
+    path=draft if draft.is_file() else source
     script=yaml.safe_load(path.read_text()) if path.is_file() else import_legacy(bundle)
     return bundle,script,source,draft,digest(script)
 

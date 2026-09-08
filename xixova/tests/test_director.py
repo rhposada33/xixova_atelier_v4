@@ -1,10 +1,13 @@
 import copy
 import json
 import unittest
+import shutil
+import tempfile
 from pathlib import Path
 
 from xixova.core import load
 from xixova.director import apply_command, compile_script, context, import_legacy, sample, validate_script
+from xixova.director_server import DirectorSession
 
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -39,6 +42,22 @@ class DirectorTests(unittest.TestCase):
     def test_unknown_target_is_rejected(self):
         script=import_legacy(self.bundle); script['pistas'][0]['objetivo']='no_existe'
         self.assertTrue(any(x['codigo']=='DIRECTOR_REFERENCIA' for x in validate_script(script,self.bundle)))
+
+    def test_script_library_lifecycle(self):
+        source=ROOT/'proyectos/apartamento_compacto'
+        with tempfile.TemporaryDirectory(dir=ROOT/'proyectos') as folder:
+            target=Path(folder)
+            for path in source.glob('*.yaml'):shutil.copy2(path,target/path.name)
+            session=DirectorSession(target/'proyecto.yaml','natural_lila')
+            self.assertIn('legacy_camara',{x['id'] for x in session.library()})
+            identifier=session.create_script('Recorrido alternativo')
+            self.assertTrue(session.draft_path(identifier).is_file())
+            session.activate(identifier); self.assertEqual(session.active_id,identifier)
+            session.publish(); self.assertTrue(session.script_path(identifier).is_file())
+            self.assertFalse(session.dirty)
+            copy_id=session.create_script('Otra versión',session.script)
+            session.archive(copy_id)
+            self.assertTrue((session.director_root/'archivados'/f'{copy_id}.yaml').is_file())
 
 
 if __name__=='__main__':unittest.main()

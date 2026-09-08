@@ -126,25 +126,28 @@ Los comandos `enriquecer-arquitectura`, `asignar-activos`, `resolver-iluminacion
 ## Xixova Director
 
 El Director abre un editor local WebGL con planta sincronizada, árbol de escena,
-inspector de lente, presets de movimiento y timeline de cámaras, objetos, puertas,
-luces y materiales:
+reproducción desde la cámara activa, gizmos y timeline de cámaras, objetos, puertas,
+luces y materiales. La vista libre usa controles tipo Blender: botón central para
+orbitar, `Shift` + botón central para desplazar, rueda para zoom, `F` para encuadrar
+la selección y `Home` para ver el proyecto completo:
 
 ```bash
 uv run xixova_cli.py director -p proyectos/apartamento_compacto/proyecto.yaml \
   --variante natural_lila
 ```
 
-Los cambios se guardan primero en `.director/VARIANTE/borrador.yaml`. **Publicar
-guion** hace un reemplazo atómico de `guion_direccion.yaml`; el antiguo
-`guion_camara.yaml` permanece intacto. Director rechaza cambios si un YAML del
-proyecto cambió desde que se abrió. `Vista rápida`, `Validar toma`, la animática y
-el render construyen una escena aislada por el hash completo del guion y pueden
-cancelarse desde la API.
+Los guiones publicados se guardan en `.director/VARIANTE/guiones/` y sus autosaves
+en `.director/VARIANTE/borradores/`. El selector superior permite crear, abrir,
+duplicar, renombrar, archivar e importar una copia del antiguo `guion_camara.yaml`,
+que permanece intacto. Director rechaza cambios si un YAML del proyecto cambió
+desde que se abrió. `Vista rápida`, `Validar toma`, la animática y el render
+construyen una escena aislada por el hash completo del guion.
 
 La interfaz pública incluye `/api/project`, `/api/scene.glb`, `/api/script`,
-`/api/commands`, `/api/validate`, `/api/preview/frame`, `/api/preview/shot`,
-`/api/animatic`, `/api/render` y el WebSocket `/api/jobs`. `/api/context` devuelve
-el contexto compacto para una IA, normalmente muy por debajo de 4 KB.
+`/api/scripts`, `/api/commands`, `/api/validate`, `/api/preview/frame`,
+`/api/preview/shot`, `/api/animatic`, `/api/render` y el WebSocket `/api/jobs`.
+`/api/context` devuelve el contexto compacto para una IA, normalmente muy por
+debajo de 4 KB.
 
 ## Informe de las entregas
 

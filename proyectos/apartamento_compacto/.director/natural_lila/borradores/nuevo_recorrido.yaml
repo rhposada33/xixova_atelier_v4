@@ -1,0 +1,443 @@
+schema: 1
+fps: 24
+duracion: 28
+semilla: 1842
+tomas:
+- id: sala_presentacion
+  inicio: 0
+  duracion: 4
+  camara: sala_presentacion
+  transicion: corte
+- id: cocina_comedor
+  inicio: 4
+  duracion: 4
+  camara: cocina_comedor
+  transicion: corte
+- id: dormitorio_derecho
+  inicio: 8
+  duracion: 4
+  camara: dormitorio_derecho
+  transicion: corte
+- id: mesa_detalle
+  inicio: 12
+  duracion: 4
+  camara: mesa_detalle
+  transicion: corte
+- id: bano_central
+  inicio: 16
+  duracion: 4
+  camara: bano_central
+  transicion: corte
+- id: mesa_detalle_copia
+  inicio: 20
+  duracion: 4
+  camara: mesa_detalle
+  transicion: corte
+- id: camara_510087
+  inicio: 24
+  duracion: 4
+  camara: camara_510087
+  transicion: corte
+pistas:
+- id: sala_presentacion:posicion
+  tipo: camara
+  objetivo: sala_presentacion
+  propiedad: posicion
+  claves:
+  - id: c72ecb90965f
+    tiempo: 0
+    valor:
+    - 2.637
+    - 6.71
+    - 1.55
+    interpolacion: ease_in_out
+  - id: 21e7e47dece6
+    tiempo: 0.71
+    valor:
+    - 2.037
+    - 6.56
+    - 1.55
+    interpolacion: ease_in_out
+  - id: 71f688a28351
+    tiempo: 4
+    valor:
+    - 3.263
+    - 7.29
+    - 1.55
+    interpolacion: ease_in_out
+  - id: d80acc49393f
+    tiempo: 4.71
+    valor:
+    - 3.237
+    - 6.86
+    - 1.55
+    interpolacion: ease_in_out
+- id: sala_presentacion:objetivo
+  tipo: camara
+  objetivo: sala_presentacion
+  propiedad: objetivo
+  claves:
+  - id: a11bf0b26f10
+    tiempo: 0
+    valor:
+    - 4.27
+    - 5.578
+    - 0.65
+    interpolacion: ease_in_out
+  - id: 74b8627c2131
+    tiempo: 4
+    valor:
+    - 4.27
+    - 5.578
+    - 0.65
+    interpolacion: ease_in_out
+- id: sala_presentacion:lente
+  tipo: camara
+  objetivo: sala_presentacion
+  propiedad: lente
+  claves:
+  - id: bb842d2b8b93
+    tiempo: 0
+    valor: 28
+    interpolacion: hold
+- id: sala_presentacion:apertura
+  tipo: camara
+  objetivo: sala_presentacion
+  propiedad: apertura
+  claves:
+  - id: '865254621884'
+    tiempo: 0
+    valor: 7.1
+    interpolacion: hold
+- id: sala_presentacion:exposicion
+  tipo: camara
+  objetivo: sala_presentacion
+  propiedad: exposicion
+  claves:
+  - id: 04580617e6af
+    tiempo: 0
+    valor: -0.2
+    interpolacion: hold
+- id: cocina_comedor:posicion
+  tipo: camara
+  objetivo: cocina_comedor
+  propiedad: posicion
+  claves:
+  - id: 3b9f3151c540
+    tiempo: 4
+    valor:
+    - 5.551
+    - 6.568
+    - 1.55
+    interpolacion: ease_in_out
+  - id: 277fa42c3fbf
+    tiempo: 8
+    valor:
+    - 5.319
+    - 6.003
+    - 1.55
+    interpolacion: ease_in_out
+- id: cocina_comedor:objetivo
+  tipo: camara
+  objetivo: cocina_comedor
+  propiedad: objetivo
+  claves:
+  - id: 463812b56fc2
+    tiempo: 4
+    valor:
+    - 6.568
+    - 5.82
+    - 0.65
+    interpolacion: ease_in_out
+  - id: de415f3354ab
+    tiempo: 8
+    valor:
+    - 6.568
+    - 5.82
+    - 0.65
+    interpolacion: ease_in_out
+- id: cocina_comedor:lente
+  tipo: camara
+  objetivo: cocina_comedor
+  propiedad: lente
+  claves:
+  - id: d3a8b0ff5d7d
+    tiempo: 4
+    valor: 28
+    interpolacion: hold
+- id: cocina_comedor:apertura
+  tipo: camara
+  objetivo: cocina_comedor
+  propiedad: apertura
+  claves:
+  - id: bdc6e4ce07f1
+    tiempo: 4
+    valor: 7.1
+    interpolacion: hold
+- id: cocina_comedor:exposicion
+  tipo: camara
+  objetivo: cocina_comedor
+  propiedad: exposicion
+  claves:
+  - id: 1af45f39ad30
+    tiempo: 4
+    valor: -0.3
+    interpolacion: hold
+- id: dormitorio_derecho:posicion
+  tipo: camara
+  objetivo: dormitorio_derecho
+  propiedad: posicion
+  claves:
+  - id: f4e59ad716ab
+    tiempo: 8
+    valor:
+    - 6.251
+    - 3.538
+    - 1.55
+    interpolacion: ease_in_out
+  - id: 7d21129ee6c3
+    tiempo: 12
+    valor:
+    - 6.251
+    - 3.538
+    - 1.55
+    interpolacion: ease_in_out
+- id: dormitorio_derecho:objetivo
+  tipo: camara
+  objetivo: dormitorio_derecho
+  propiedad: objetivo
+  claves:
+  - id: fa95e0967b7f
+    tiempo: 8
+    valor:
+    - 9.121
+    - 4.692
+    - 0.768
+    interpolacion: ease_in_out
+  - id: 5c495302b513
+    tiempo: 12
+    valor:
+    - 9.121
+    - 4.692
+    - 0.768
+    interpolacion: ease_in_out
+- id: dormitorio_derecho:lente
+  tipo: camara
+  objetivo: dormitorio_derecho
+  propiedad: lente
+  claves:
+  - id: 999b9eacc4e1
+    tiempo: 8
+    valor: 20
+    interpolacion: hold
+- id: dormitorio_derecho:apertura
+  tipo: camara
+  objetivo: dormitorio_derecho
+  propiedad: apertura
+  claves:
+  - id: 2dc120506fcb
+    tiempo: 8
+    valor: 7.1
+    interpolacion: hold
+- id: dormitorio_derecho:exposicion
+  tipo: camara
+  objetivo: dormitorio_derecho
+  propiedad: exposicion
+  claves:
+  - id: a86e2658a2df
+    tiempo: 8
+    valor: -0.9
+    interpolacion: hold
+- id: mesa_detalle:posicion
+  tipo: camara
+  objetivo: mesa_detalle
+  propiedad: posicion
+  claves:
+  - id: 0c4f8e96949e
+    tiempo: 12
+    valor:
+    - 3.974
+    - 6.936
+    - 1.55
+    interpolacion: ease_in_out
+  - id: d35885d1a0fe
+    tiempo: 16
+    valor:
+    - 3.32
+    - 6.984
+    - 1.55
+    interpolacion: ease_in_out
+- id: mesa_detalle:objetivo
+  tipo: camara
+  objetivo: mesa_detalle
+  propiedad: objetivo
+  claves:
+  - id: 4614c88f931f
+    tiempo: 12
+    valor:
+    - 3.55
+    - 5.65
+    - 0.65
+    interpolacion: ease_in_out
+  - id: 13ff18137483
+    tiempo: 16
+    valor:
+    - 3.55
+    - 5.65
+    - 0.65
+    interpolacion: ease_in_out
+- id: mesa_detalle:lente
+  tipo: camara
+  objetivo: mesa_detalle
+  propiedad: lente
+  claves:
+  - id: 74699251cffc
+    tiempo: 12
+    valor: 35
+    interpolacion: hold
+- id: mesa_detalle:apertura
+  tipo: camara
+  objetivo: mesa_detalle
+  propiedad: apertura
+  claves:
+  - id: a0e8492bbbd2
+    tiempo: 12
+    valor: 7.1
+    interpolacion: hold
+- id: mesa_detalle:exposicion
+  tipo: camara
+  objetivo: mesa_detalle
+  propiedad: exposicion
+  claves:
+  - id: 69b109612eff
+    tiempo: 12
+    valor: -0.3
+    interpolacion: hold
+- id: bano_central:posicion
+  tipo: camara
+  objetivo: bano_central
+  propiedad: posicion
+  claves:
+  - id: 05b4cb93b7c4
+    tiempo: 16
+    valor:
+    - 2.7
+    - 2.204
+    - 1.55
+    interpolacion: ease_in_out
+  - id: 246e24a87caa
+    tiempo: 20
+    valor:
+    - 2.7
+    - 2.204
+    - 1.55
+    interpolacion: ease_in_out
+- id: bano_central:objetivo
+  tipo: camara
+  objetivo: bano_central
+  propiedad: objetivo
+  claves:
+  - id: 08c9e2b41f2a
+    tiempo: 16
+    valor:
+    - 5.75
+    - 2.25
+    - 0.925
+    interpolacion: ease_in_out
+  - id: b795f9873cae
+    tiempo: 20
+    valor:
+    - 5.75
+    - 2.25
+    - 0.925
+    interpolacion: ease_in_out
+- id: bano_central:lente
+  tipo: camara
+  objetivo: bano_central
+  propiedad: lente
+  claves:
+  - id: 9b37de79b577
+    tiempo: 16
+    valor: 33.3
+    interpolacion: hold
+- id: bano_central:apertura
+  tipo: camara
+  objetivo: bano_central
+  propiedad: apertura
+  claves:
+  - id: 098bde3fc5d7
+    tiempo: 16
+    valor: 7.1
+    interpolacion: hold
+- id: bano_central:exposicion
+  tipo: camara
+  objetivo: bano_central
+  propiedad: exposicion
+  claves:
+  - id: e270e3f3925a
+    tiempo: 16
+    valor: -0.6
+    interpolacion: hold
+- id: camara_510087:posicion
+  tipo: camara
+  objetivo: camara_510087
+  propiedad: posicion
+  claves:
+  - id: 3fa46dc15c73
+    tiempo: 24
+    valor: &id001
+    - -4.299999999999988
+    - -7.537499999999774
+    - 8.384999999999838
+    interpolacion: hold
+  - id: 7a76400c917b
+    tiempo: 28
+    valor: *id001
+    interpolacion: hold
+- id: camara_510087:objetivo
+  tipo: camara
+  objetivo: camara_510087
+  propiedad: objetivo
+  claves:
+  - id: 26fa547b52df
+    tiempo: 24
+    valor: &id002
+    - 5.375
+    - 3.75
+    - 0.8000000000000003
+    interpolacion: hold
+  - id: e1b86fcd5b64
+    tiempo: 28
+    valor: *id002
+    interpolacion: hold
+- id: camara_510087:lente
+  tipo: camara
+  objetivo: camara_510087
+  propiedad: lente
+  claves:
+  - id: 9e61e32b1e64
+    tiempo: 24
+    valor: 35
+    interpolacion: hold
+- id: camara_510087:apertura
+  tipo: camara
+  objetivo: camara_510087
+  propiedad: apertura
+  claves:
+  - id: b5a232204f2c
+    tiempo: 24
+    valor: 7.1
+    interpolacion: hold
+- id: camara_510087:exposicion
+  tipo: camara
+  objetivo: camara_510087
+  propiedad: exposicion
+  claves:
+  - id: 6b22722d2dad
+    tiempo: 24
+    valor: 0
+    interpolacion: hold
+marcadores: []
+revision:
+  estado: pendiente
+  motivo: Guion, cámara, luz, material o animación modificados.
