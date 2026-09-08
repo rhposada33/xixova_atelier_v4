@@ -1,0 +1,160 @@
+schema: 1
+id: natural_lila
+arquitectura:
+  id: apartamento_compacto
+  version: 0.1-borrador
+  hash: c8486c74633793adb7504a44d0bf7343793e5329484243ef5f6405eab7237324
+materiales:
+  pared_lino:
+    color:
+    - 0.72
+    - 0.68
+    - 0.65
+    rugosidad: 0.75
+  roble_claro:
+    color:
+    - 0.55
+    - 0.38
+    - 0.2
+    rugosidad: 0.48
+  baldosa:
+    color:
+    - 0.72
+    - 0.72
+    - 0.7
+    rugosidad: 0.42
+  techo:
+    color:
+    - 0.84
+    - 0.83
+    - 0.8
+    rugosidad: 0.82
+acabados:
+  fachada_oeste: pared_lino
+  fachada_sur: pared_lino
+  fachada_norte_izq: pared_lino
+  eje_izquierdo: pared_lino
+  division_izquierda: pared_lino
+  fachada_norte_social: pared_lino
+  bano_central_sur: pared_lino
+  bano_central_oeste: pared_lino
+  bano_central_norte: pared_lino
+  bano_central_este: pared_lino
+  separacion_social_derecha: pared_lino
+  fachada_dorm_derecho_sur: pared_lino
+  fachada_dorm_derecho_este: pared_lino
+  fachada_dorm_derecho_norte: pared_lino
+  fachada_social_este: pared_lino
+  circulacion_este: pared_lino
+  bano_social:piso: baldosa
+  bano_social:techo: techo
+  dormitorio_izquierdo:piso: roble_claro
+  dormitorio_izquierdo:techo: techo
+  circulacion:piso: roble_claro
+  circulacion:techo: techo
+  bano_central:piso: baldosa
+  bano_central:techo: techo
+  social:piso: roble_claro
+  social:techo: techo
+  dormitorio_derecho:piso: roble_claro
+  dormitorio_derecho:techo: techo
+elementos:
+- id: cama_izquierda
+  activo: XVA3_Cama_doble
+  espacio: dormitorio_izquierdo
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 1.2
+    - 4.55
+    - 0
+    rotacion: 0
+  escala: 0.94
+- id: cama_derecha
+  activo: XVA3_Cama_doble
+  espacio: dormitorio_derecho
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 9.18
+    - 4.65
+    - 0
+    rotacion: 0
+  escala: 0.96
+- id: mesita_derecha
+  activo: XVA3_Mesita_L
+  espacio: dormitorio_derecho
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.05
+    - 5.45
+    - 0
+    rotacion: 0
+  escala: 0.9
+- id: sofa_social
+  activo: sofa_recto
+  espacio: social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 4.55
+    - 5.55
+    - 0
+    rotacion: 90
+  escala: 0.95
+- id: mesa_social
+  activo: mesa_centro
+  espacio: social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 3.55
+    - 5.65
+    - 0
+    rotacion: 0
+  escala: 0.95
+- id: comedor_social
+  activo: comedor
+  espacio: social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.8
+    - 5.55
+    - 0
+    rotacion: 90
+  escala: 0.62
+- id: cocina_lineal
+  activo: XVA3_Cocina_premium
+  espacio: social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 7.08
+    - 6.0
+    - 0
+    rotacion: 90
+  escala: 0.62
+- id: bano_social_equipo
+  activo: XVA3_Bano_principal
+  espacio: bano_social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 1.2
+    - 1.05
+    - 0
+    rotacion: 0
+  escala: 0.82
+- id: bano_central_equipo
+  activo: XVA3_Bano_principal
+  espacio: bano_central
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.75
+    - 2.25
+    - 0
+    rotacion: 90
+  escala: 0.82

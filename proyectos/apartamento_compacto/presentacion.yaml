@@ -1,0 +1,175 @@
+schema: 1
+exposicion: 0.15
+entorno:
+  color:
+  - 0.64
+  - 0.76
+  - 0.9
+  intensidad: 0.65
+luces:
+- id: luz_social
+  posicion:
+  - 4.8
+  - 5.8
+  - 2.55
+  objetivo:
+  - 4.8
+  - 5.6
+  - 0.8
+  potencia: 520
+  tamano: 1.8
+  color:
+  - 1
+  - 0.88
+  - 0.74
+- id: luz_dorm_izq
+  posicion:
+  - 1.2
+  - 4.5
+  - 2.5
+  objetivo:
+  - 1.2
+  - 4.5
+  - 0.7
+  potencia: 260
+  tamano: 1.1
+  color:
+  - 1
+  - 0.86
+  - 0.72
+- id: luz_dorm_der
+  posicion:
+  - 9.1
+  - 4.7
+  - 2.5
+  objetivo:
+  - 9.1
+  - 4.7
+  - 0.7
+  potencia: 280
+  tamano: 1.1
+  color:
+  - 1
+  - 0.86
+  - 0.72
+- id: luz_banos
+  posicion:
+  - 4.0
+  - 2.0
+  - 2.5
+  objetivo:
+  - 3.5
+  - 1.5
+  - 0.7
+  potencia: 300
+  tamano: 1.3
+  color:
+  - 1
+  - 0.9
+  - 0.8
+tomas:
+- id: sala
+  lente: 26
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 2.75
+    - 4.0
+    - 1.55
+    objetivo: &id001
+    - 4.55
+    - 5.55
+    - 0.85
+  - posicion:
+    - 6.8
+    - 4.0
+    - 1.58
+    objetivo: *id001
+- id: cocina_comedor
+  lente: 27
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 5.0
+    - 6.95
+    - 1.58
+    objetivo: &id002
+    - 6.55
+    - 5.85
+    - 0.9
+  - posicion:
+    - 3.0
+    - 6.9
+    - 1.55
+    objetivo: *id002
+- id: dormitorio_derecho
+  lente: 25
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 7.85
+    - 4.0
+    - 1.52
+    objetivo: &id003
+    - 9.2
+    - 4.75
+    - 0.82
+  - posicion:
+    - 8.0
+    - 5.8
+    - 1.55
+    objetivo: *id003
+- id: dormitorio_izquierdo
+  lente: 25
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 2.05
+    - 5.82
+    - 1.52
+    objetivo:
+    - 1.2
+    - 4.55
+    - 0.8
+  - posicion:
+    - 0.35
+    - 5.82
+    - 1.55
+    objetivo:
+    - 1.2
+    - 4.55
+    - 0.8
+- id: bano_central
+  lente: 24
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 4.42
+    - 1.55
+    - 1.5
+    objetivo: &id004
+    - 5.75
+    - 2.25
+    - 0.8
+  - posicion:
+    - 7.2
+    - 1.55
+    - 1.5
+    objetivo: *id004
+- id: acceso
+  lente: 27
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 3.55
+    - 0.38
+    - 1.55
+    objetivo: &id005
+    - 3.25
+    - 3.65
+    - 1.0
+  - posicion:
+    - 2.72
+    - 2.9
+    - 1.55
+    objetivo: *id005

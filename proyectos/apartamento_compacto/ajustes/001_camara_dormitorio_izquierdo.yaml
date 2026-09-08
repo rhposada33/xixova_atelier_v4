@@ -1,0 +1,12 @@
+schema: 1
+arquitectura_hash: c8486c74633793adb7504a44d0bf7343793e5329484243ef5f6405eab7237324
+operaciones:
+  - accion: ajustar_toma
+    toma: dormitorio_izquierdo
+    cambios:
+      lente: 25
+      puntos:
+        - posicion: [2.05, 5.82, 1.52]
+          objetivo: [1.2, 4.55, 0.8]
+        - posicion: [0.35, 5.82, 1.55]
+          objetivo: [1.2, 4.55, 0.8]

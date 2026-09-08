@@ -28,7 +28,7 @@ class ProductionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory); folder=root/'previa'; folder.mkdir()
             (folder/'render.jsonl').write_text('\n'.join(json.dumps({'estado':'ok','segundos':2}) for _ in range(3)))
-            progress=render_progress(root,{'previa':{'resolucion':[10,10]}},5,lambda path,w,h:path.name in {'frame_0001.png','frame_0002.png'})
+            progress=render_progress(root,{'previa':{'resolucion':[10,10]}},{'previa':[1,2,3,4,5]},lambda path,w,h:path.name in {'frame_0001.png','frame_0002.png'})
             self.assertEqual(progress['previa']['completos'],2)
             self.assertEqual(progress['previa']['eta_segundos'],6)
 

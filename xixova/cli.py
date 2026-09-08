@@ -140,7 +140,11 @@ def main(argv=None):
             atomic(review_path(b),{'hash':b['arquitectura_hash'],'revisor':args.revisor,'nota':args.nota}); print(review_path(b)); return 0
         if args.accion=='estado':
             from .production import render_progress
-            total=len(b['fotogramas']); progress=render_progress(root,b['proyecto']['produccion']['perfiles'],total,png_ok)
+            total=len(b['fotogramas']); samples=[]; offset=0
+            for shot in b['presentacion']['tomas']:
+                samples.extend((offset+1,offset+(shot['fotogramas']+1)//2,offset+shot['fotogramas'])); offset+=shot['fotogramas']
+            expected={name:(sorted(set(samples)) if name=='previa' else list(range(1,total+1))) for name in b['proyecto']['produccion']['perfiles']}
+            progress=render_progress(root,b['proyecto']['produccion']['perfiles'],expected,png_ok)
             print(json.dumps({'salida':str(root),'arquitectura_revisada':review_path(b).exists(),'escena':(root/'escena.blend').exists(),'renders':progress},indent=2)); return 0
         if args.accion not in architecture_actions and not review_path(b).exists(): raise ValueError('Arquitectura pendiente de revisión: ejecuta arquitectura y confirmar-arquitectura.')
         with lock(root):

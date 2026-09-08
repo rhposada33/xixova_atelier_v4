@@ -4,12 +4,12 @@ import subprocess
 from pathlib import Path
 
 
-def render_progress(root, profiles, total_frames, png_validator):
+def render_progress(root, profiles, expected_frames, png_validator):
     result = {}
     for name, profile in profiles.items():
         folder = Path(root)/name; width, height = profile['resolucion']
-        done = sum(png_validator(folder/f'frame_{frame:04d}.png', width, height)
-                   for frame in range(1, total_frames+1))
+        expected = expected_frames[name]; total_frames = len(expected)
+        done = sum(png_validator(folder/f'frame_{frame:04d}.png', width, height) for frame in expected)
         times = []
         log = folder/'render.jsonl'
         if log.exists():

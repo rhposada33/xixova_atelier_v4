@@ -1,0 +1,320 @@
+schema: 1
+id: apartamento_compacto
+version: 0.1-borrador
+unidades: m
+fuentes:
+- archivo: plano_usuario_2026-09-07.png
+  descripcion: Planta amueblada sin cotas; referencia visual aportada en conversación.
+cota_referencia:
+  valor_m: 1.6
+  descripcion: Ancho de la cama derecha confirmado por el usuario como 1,60 m.
+  fiable: true
+dudas:
+- Medidas y espesores inferidos de una imagen en perspectiva; requieren una segunda
+  cota para precisión constructiva.
+- Puertas, ventanas y aparatos sanitarios se simplifican como huecos rectangulares
+  y activos compuestos.
+- La pieza curva de la esquina superior derecha se interpreta como mobiliario fijo
+  y no como geometría arquitectónica.
+espacios:
+- id: bano_social
+  contorno:
+  - - 0
+    - 0
+  - - 2.4
+    - 0
+  - - 2.4
+    - 2.15
+  - - 0
+    - 2.15
+  altura: 2.7
+- id: dormitorio_izquierdo
+  contorno:
+  - - 0
+    - 2.15
+  - - 2.4
+    - 2.15
+  - - 2.4
+    - 6.15
+  - - 0
+    - 6.15
+  altura: 2.7
+- id: circulacion
+  contorno:
+  - - 2.4
+    - 0
+  - - 4.1
+    - 0
+  - - 4.1
+    - 3.3
+  - - 2.4
+    - 3.3
+  altura: 2.7
+- id: bano_central
+  contorno:
+  - - 4.1
+    - 1.4
+  - - 7.55
+    - 1.4
+  - - 7.55
+    - 3.3
+  - - 4.1
+    - 3.3
+  altura: 2.7
+- id: social
+  contorno:
+  - - 2.4
+    - 3.3
+  - - 7.55
+    - 3.3
+  - - 7.55
+    - 7.5
+  - - 2.4
+    - 7.5
+  altura: 2.7
+- id: dormitorio_derecho
+  contorno:
+  - - 7.55
+    - 3.3
+  - - 10.75
+    - 3.3
+  - - 10.75
+    - 6.15
+  - - 7.55
+    - 6.15
+  altura: 2.7
+paredes:
+- id: fachada_oeste
+  a:
+  - 0
+  - 0
+  b:
+  - 0
+  - 6.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: fachada_sur
+  a:
+  - 0
+  - 0
+  b:
+  - 4.1
+  - 0
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: entrada
+    tipo: puerta
+    distancia: 3.18
+    ancho: 0.82
+    alto: 2.15
+    antepecho: 0
+- id: fachada_norte_izq
+  a:
+  - 0
+  - 6.15
+  b:
+  - 2.4
+  - 6.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_dorm_izq
+    tipo: ventana
+    distancia: 0.45
+    ancho: 1.5
+    alto: 1.25
+    antepecho: 1.0
+- id: eje_izquierdo
+  a:
+  - 2.4
+  - 0
+  b:
+  - 2.4
+  - 7.5
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano_social
+    tipo: puerta
+    distancia: 1.05
+    ancho: 0.75
+    alto: 2.15
+    antepecho: 0
+  - id: puerta_dorm_izq
+    tipo: puerta
+    distancia: 2.55
+    ancho: 0.8
+    alto: 2.15
+    antepecho: 0
+- id: division_izquierda
+  a:
+  - 0
+  - 2.15
+  b:
+  - 2.4
+  - 2.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: fachada_norte_social
+  a:
+  - 2.4
+  - 7.5
+  b:
+  - 7.55
+  - 7.5
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_social_1
+    tipo: ventana
+    distancia: 0.9
+    ancho: 1.1
+    alto: 1.25
+    antepecho: 1.0
+  - id: ventana_social_2
+    tipo: ventana
+    distancia: 2.8
+    ancho: 1.1
+    alto: 1.25
+    antepecho: 1.0
+- id: bano_central_sur
+  a:
+  - 4.1
+  - 1.4
+  b:
+  - 7.55
+  - 1.4
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: bano_central_oeste
+  a:
+  - 4.1
+  - 1.4
+  b:
+  - 4.1
+  - 3.3
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano_central
+    tipo: puerta
+    distancia: 0.45
+    ancho: 0.75
+    alto: 2.15
+    antepecho: 0
+- id: bano_central_norte
+  a:
+  - 4.1
+  - 3.3
+  b:
+  - 7.55
+  - 3.3
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: bano_central_este
+  a:
+  - 7.55
+  - 1.4
+  b:
+  - 7.55
+  - 3.3
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: separacion_social_derecha
+  a:
+  - 7.55
+  - 3.3
+  b:
+  - 7.55
+  - 7.5
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_dorm_derecho
+    tipo: puerta
+    distancia: 0.35
+    ancho: 0.82
+    alto: 2.15
+    antepecho: 0
+- id: fachada_dorm_derecho_sur
+  a:
+  - 7.55
+  - 3.3
+  b:
+  - 10.75
+  - 3.3
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: fachada_dorm_derecho_este
+  a:
+  - 10.75
+  - 3.3
+  b:
+  - 10.75
+  - 6.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: fachada_dorm_derecho_norte
+  a:
+  - 7.55
+  - 6.15
+  b:
+  - 10.75
+  - 6.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_dorm_der
+    tipo: ventana
+    distancia: 0.8
+    ancho: 1.55
+    alto: 1.25
+    antepecho: 1.0
+- id: fachada_social_este
+  a:
+  - 7.55
+  - 6.15
+  b:
+  - 7.55
+  - 7.5
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: circulacion_este
+  a:
+  - 4.1
+  - 0
+  b:
+  - 4.1
+  - 1.4
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+pilares: []
+instalaciones:
+- id: agua_bano_social
+  tipo: agua
+  posicion:
+  - 1.3
+  - 0.7
+  - 0.5
+- id: agua_bano_central
+  tipo: agua
+  posicion:
+  - 5.5
+  - 1.6
+  - 0.5
+- id: agua_cocina
+  tipo: agua
+  posicion:
+  - 7.35
+  - 6.4
+  - 0.6
