@@ -57,6 +57,35 @@
             "type": "number",
             "minimum": 0,
             "maximum": 1
+          },
+          "escala_m": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "normal_fuerza": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "height_fuerza_m": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 0.02
+          },
+          "microdetalle": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "mapas": {
+            "type": "object",
+            "properties": {
+              "color": {"type": "string", "minLength": 1},
+              "roughness": {"type": "string", "minLength": 1},
+              "normal": {"type": "string", "minLength": 1},
+              "height": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": false
           }
         },
         "required": [

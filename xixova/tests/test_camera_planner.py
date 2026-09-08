@@ -4,6 +4,8 @@ from pathlib import Path
 
 from xixova.camera_planner import plan_cameras
 from xixova.core import camera_frames, load
+from xixova.core import read
+from shapely.geometry import Point, Polygon
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -33,6 +35,9 @@ class CameraPlannerTests(unittest.TestCase):
         self.assertFalse(issues)
         self.assertEqual(shots[0]['fotogramas'], 4*self.bundle['proyecto']['produccion']['fps'])
         self.assertEqual(shots[0]['interpolacion'], 'suave')
+        self.assertEqual(shots[0]['foco'], self.script['escenas'][0]['mostrar'][0])
+        self.assertEqual(shots[0]['apertura_f'], 7.1)
+        self.assertGreaterEqual(shots[0]['lente'], 28)
         self.assertGreater(report[0]['candidatos_validos'], 0)
 
     def test_unknown_subject_is_structured_diagnostic(self):
@@ -46,6 +51,15 @@ class CameraPlannerTests(unittest.TestCase):
         frames = list(camera_frames({'tomas': shots}))
         self.assertEqual(frames[0][2], shots[0]['puntos'][0]['posicion'])
         self.assertEqual(frames[-1][2], shots[0]['puntos'][-1]['posicion'])
+
+    def test_access_mode_can_place_camera_in_adjacent_room(self):
+        bundle,errors=load(REPO/'proyectos/apartamento_compacto/proyecto.yaml','natural_lila')
+        self.assertFalse(errors)
+        script=read(REPO/'proyectos/apartamento_compacto/guion_camara.yaml')
+        shots,_,issues=plan_cameras(bundle,script); self.assertFalse(issues)
+        shot=next(x for x in shots if x['id']=='dormitorio_derecho')
+        room=Polygon(next(x['contorno'] for x in bundle['arquitectura']['espacios'] if x['id']=='dormitorio_derecho'))
+        self.assertFalse(room.covers(Point(shot['puntos'][0]['posicion'][:2])))
 
 
 if __name__ == '__main__':

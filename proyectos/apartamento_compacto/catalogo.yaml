@@ -15,6 +15,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: 600173a825c2af2edbcfd5c147dd1034aa5cf8a529fbb26667659dd5dcd512c2
+  ocupacion_encuadre:
+    minima: 0.22
+    maxima: 0.58
 - id: XVA3_Cama_doble
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Cama_doble.blend
   coleccion: XVA3_Cama_doble
@@ -30,6 +33,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: b2fb54e1105535ff3831699f7593ac595f541fdb2ca93ab7bae52860b95fb7d8
+  ocupacion_encuadre:
+    minima: 0.22
+    maxima: 0.58
 - id: XVA3_Mesita_L
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Mesita_L.blend
   coleccion: XVA3_Mesita_L
@@ -45,6 +51,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: 7a27ecc7049a9ea14e621da5a4529cd6cba5ef63a8de30b6e13b1ccdb7ad9063
+  ocupacion_encuadre:
+    minima: 0.22
+    maxima: 0.58
 - id: XVA3_Mesita_R
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Mesita_R.blend
   coleccion: XVA3_Mesita_R
@@ -60,6 +69,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: 840af7d9f758ed270e691095ce6fcbd9328b8b073358d7328e66d48cccef0e06
+  ocupacion_encuadre:
+    minima: 0.22
+    maxima: 0.58
 - id: XVA3_Armario_principal
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Armario_principal.blend
   coleccion: XVA3_Armario_principal
@@ -75,6 +87,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: 2b7e420699c8ce09b3dc3824a8b67e3ad4610b3870d1df43070006e03b79833e
+  ocupacion_encuadre:
+    minima: 0.22
+    maxima: 0.58
 - id: XVA3_Cocina_premium
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Cocina_premium.blend
   coleccion: XVA3_Cocina_premium
@@ -90,6 +105,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: d3e30156e4b3f9159ec17ae2480dc4834f2e03417daf41cfd0f1c2a5c0fa382b
+  ocupacion_encuadre:
+    minima: 0.18
+    maxima: 0.52
 - id: XVA3_Bano_principal
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Bano_principal.blend
   coleccion: XVA3_Bano_principal
@@ -105,6 +123,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: e82f9645de14ad202d05ac65160095b0e39c2806695c9fda06d29f92b84f4b3d
+  ocupacion_encuadre:
+    minima: 0.18
+    maxima: 0.52
 - id: sofa_recto
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/sofa_recto.blend
   coleccion: sofa_recto
@@ -120,6 +141,9 @@ activos:
   licencia: CC Attribution
   autor: mk.ldeclaros / Sketchfab
   sha256: 6a57749e169470df65d39956af974d999d9e5641ff626e9b09c3d933d00963ab
+  ocupacion_encuadre:
+    minima: 0.22
+    maxima: 0.58
 - id: comedor
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/comedor.blend
   coleccion: comedor
@@ -135,6 +159,9 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: ab5d5a6a900f42cba5ff3d5604e4071a070dc1b957e9c82031406b08eed392d7
+  ocupacion_encuadre:
+    minima: 0.18
+    maxima: 0.52
 - id: mesa_centro
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/mesa_centro.blend
   coleccion: mesa_centro
@@ -150,3 +177,6 @@ activos:
   licencia: propia
   autor: XIXOVÁ Atelier
   sha256: ae31eb2ff378af2f608c634fe47826c050bcfb3c538424d14771804eaaf4f038
+  ocupacion_encuadre:
+    minima: 0.22
+    maxima: 0.58

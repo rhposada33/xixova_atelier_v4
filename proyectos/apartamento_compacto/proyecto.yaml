@@ -42,3 +42,29 @@ produccion:
       denoise: true
       crf: 18
       preset: slow
+    piloto_fotografico:
+      resolucion: [960, 540]
+      muestras: 64
+      motor: CYCLES
+      denoise: true
+      umbral_adaptativo: 0.025
+      max_rebotes: 8
+      rebotes_difusos: 3
+      rebotes_brillantes: 3
+      rebotes_transmision: 6
+      clamp_indirecto: 8
+      profundidad_color: '8'
+    fotografico_1080p:
+      resolucion: [1920, 1080]
+      muestras: 128
+      motor: CYCLES
+      denoise: true
+      umbral_adaptativo: 0.015
+      max_rebotes: 8
+      rebotes_difusos: 3
+      rebotes_brillantes: 3
+      rebotes_transmision: 6
+      clamp_indirecto: 8
+      profundidad_color: '16'
+      crf: 16
+      preset: slow

@@ -54,6 +54,11 @@ def load(path, variant=None):
         return None, errors
     for asset in c['activos']:
         asset['archivo'] = str((base / os.path.expanduser(os.path.expandvars(asset['archivo']))).resolve())
+    for spec in i['materiales'].values():
+        for key, filename in spec.get('mapas', {}).items():
+            spec['mapas'][key] = str((base / os.path.expanduser(os.path.expandvars(filename))).resolve())
+    if s['entorno'].get('archivo'):
+        s['entorno']['archivo'] = str((base / os.path.expanduser(os.path.expandvars(s['entorno']['archivo']))).resolve())
     bundle = dict(proyecto=p, arquitectura=a, interiorismo=i, presentacion=s, catalogo=c,
                   archivo=str(path), arquitectura_hash=digest(a))
     paths = [path, base / p['arquitectura'], base / p['variantes'][selected],
@@ -181,6 +186,11 @@ def validate(b):
     mats = i['materiales']
     for surface, material in i['acabados'].items():
         if surface not in surfaces or material not in mats: errors.append(diagnostic('REFERENCIA',surface,'Superficie o material inexistente.'))
+    for material, spec in mats.items():
+        for role, filename in spec.get('mapas', {}).items():
+            if not Path(filename).is_file(): errors.append(diagnostic('RECURSO_AUSENTE',material,f'Mapa {role}: {filename}'))
+    environment = b['presentacion']['entorno'].get('archivo')
+    if environment and not Path(environment).is_file(): errors.append(diagnostic('RECURSO_AUSENTE','entorno',environment))
     assets = {v['id']:v for v in b['catalogo']['activos']}
     for item in i['elementos']:
         if item.get('material') and item['material'] not in mats: errors.append(diagnostic('REFERENCIA',item['id'],'Material inexistente.'))

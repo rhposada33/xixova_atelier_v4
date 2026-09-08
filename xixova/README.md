@@ -61,6 +61,21 @@ uv run xixova_cli.py planificar-camaras -p proyectos/mi_apto/proyecto.yaml --gui
 uv run xixova_cli.py planificar-camaras -p proyectos/mi_apto/proyecto.yaml --guion proyectos/mi_apto/guion_camara.yaml --aplicar
 ```
 
+El flujo fotográfico valida recursos y encuadres antes de comprometer un render 1080p:
+
+```bash
+uv run xixova_cli.py preparar-realismo -p proyectos/mi_apto/proyecto.yaml
+uv run xixova_cli.py pilotos-fotograficos -p proyectos/mi_apto/proyecto.yaml
+uv run xixova_cli.py auditar-fotografia -p proyectos/mi_apto/proyecto.yaml
+uv run xixova_cli.py piloto-temporal -p proyectos/mi_apto/proyecto.yaml
+uv run xixova_cli.py recorrido -p proyectos/mi_apto/proyecto.yaml --perfil fotografico_1080p
+```
+
+`presentacion.yaml` puede declarar HDRI, sol físico, temperatura de luces, gestión de
+color, exposición por toma y postproducción. Los materiales admiten mapas de color,
+roughness, normal y height con escala métrica. El descargador reproducible
+`xixova/descargar_recursos_pbr.py` conserva procedencia, licencia y SHA-256 de los mapas CC0.
+
 Cada perfil acepta opcionalmente `motor` (`CYCLES` o `BLENDER_WORKBENCH`), `denoise`, `umbral_adaptativo`, `crf` y `preset`. Los valores ausentes conservan el comportamiento anterior. La [evidencia de consolidación](../docs/CONSOLIDACION_PRODUCCION.md) relaciona las funciones migradas con el pipeline archivado.
 
 ## Garantías de separación y reanudación

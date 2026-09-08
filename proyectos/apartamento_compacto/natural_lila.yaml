@@ -11,24 +11,45 @@ materiales:
     - 0.68
     - 0.65
     rugosidad: 0.75
+    escala_m: 0.3
+    normal_fuerza: 0.22
+    microdetalle: 0.12
+    mapas:
+      color: ../../cache/pbr/rough_linen/rough_linen_base_color_1k.jpg
+      roughness: ../../cache/pbr/rough_linen/rough_linen_roughness_1k.jpg
+      normal: ../../cache/pbr/rough_linen/rough_linen_normal_1k.jpg
   roble_claro:
     color:
     - 0.55
     - 0.38
     - 0.2
     rugosidad: 0.48
+    escala_m: 2.0
+    normal_fuerza: 0.32
+    microdetalle: 0.08
+    mapas:
+      color: ../../cache/pbr/wood_floor/wood_floor_base_color_1k.jpg
+      roughness: ../../cache/pbr/wood_floor/wood_floor_roughness_1k.jpg
+      normal: ../../cache/pbr/wood_floor/wood_floor_normal_1k.jpg
   baldosa:
     color:
     - 0.72
     - 0.72
     - 0.7
     rugosidad: 0.42
+    escala_m: 1.5
+    normal_fuerza: 0.2
+    mapas:
+      color: ../../cache/pbr/marble_01/marble_01_base_color_1k.jpg
+      roughness: ../../cache/pbr/marble_01/marble_01_roughness_1k.jpg
+      normal: ../../cache/pbr/marble_01/marble_01_normal_1k.jpg
   techo:
     color:
     - 0.84
     - 0.83
     - 0.8
     rugosidad: 0.82
+    microdetalle: 0.16
 acabados:
   fachada_oeste: pared_lino
   fachada_sur: pared_lino

@@ -23,6 +23,10 @@ out=Path(a.salida); out.mkdir(parents=True,exist_ok=True); frames=list(map(int,a
 if engine=='CYCLES':
     scene.cycles.samples=profile['muestras']; scene.cycles.use_denoising=profile.get('denoise',True)
     scene.cycles.use_adaptive_sampling=True; scene.cycles.adaptive_threshold=profile.get('umbral_adaptativo',.03)
+    scene.cycles.max_bounces=profile.get('max_rebotes',8); scene.cycles.diffuse_bounces=profile.get('rebotes_difusos',3)
+    scene.cycles.glossy_bounces=profile.get('rebotes_brillantes',3); scene.cycles.transmission_bounces=profile.get('rebotes_transmision',6)
+    scene.cycles.volume_bounces=0; scene.cycles.sample_clamp_indirect=profile.get('clamp_indirecto',8)
+    bpy.context.view_layer.cycles.use_denoising=profile.get('denoise',True)
     prefs=bpy.context.preferences.addons['cycles'].preferences
     try:
         prefs.compute_device_type='CUDA'; prefs.get_devices()
@@ -31,10 +35,13 @@ if engine=='CYCLES':
     except Exception: scene.cycles.device='CPU'
 else:
     scene.display.shading.light='STUDIO'; scene.display.shading.show_shadows=True; scene.display.shading.show_cavity=True; scene.display.shading.color_type='MATERIAL'
+scene.render.image_settings.color_depth=profile.get('profundidad_color','8')
 for frame in frames:
     target=out/f'frame_{frame:04d}.png'
     if png_ok(target,w,h): print('OMITIDO',frame,flush=True); continue
     scene.frame_set(frame); marker=max((m for m in scene.timeline_markers if m.frame<=frame),key=lambda m:m.frame); scene.camera=marker.camera
+    shot=next((x for x in data['presentacion']['tomas'] if x['id']==marker.camera.get('xixova_id')),None)
+    scene.view_settings.exposure=shot.get('exposicion',data['presentacion']['exposicion']) if shot else data['presentacion']['exposicion']
     tmp=out/f'frame_{frame:04d}.tmp.png'; scene.render.filepath=str(tmp); start=time.monotonic(); bpy.ops.render.render(write_still=True)
     if not png_ok(tmp,w,h):raise RuntimeError(f'PNG inválido: {tmp}')
     os.replace(tmp,target)

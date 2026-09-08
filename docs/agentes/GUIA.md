@@ -111,3 +111,12 @@ uv run xixova_cli.py previas -p proyectos/mi_apto/proyecto.yaml
 El planificador busca posiciones transitables con visión directa al protagonista, calcula
 lente, duración y una trayectoria suave. Si el desplazamiento solicitado no cabe, conserva
 una toma estática segura y lo registra como `movimiento_resuelto` en el informe compacto.
+
+## Producción fotográfica
+
+Para golden hour, declarar un HDRI cacheado, sol bajo, temperaturas Kelvin y exposición por
+toma. Ejecutar `preparar-realismo`, `pilotos-fotograficos` y `auditar-fotografia` en ese orden.
+La auditoría mide altas luces, sombras, detalle y ocupación del protagonista. Corregir avisos
+antes de `piloto-temporal`; este último renderiza 48 fotogramas consecutivos para comprobar
+parpadeo, reflejos y motion blur. El recorrido 1080p se inicia explícitamente con
+`--perfil fotografico_1080p` y conserva la secuencia PNG reanudable.

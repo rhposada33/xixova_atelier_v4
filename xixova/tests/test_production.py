@@ -24,6 +24,18 @@ class ProductionTests(unittest.TestCase):
         self.assertIn('libx264',command); self.assertEqual(command[command.index('-crf')+1],'20')
         self.assertEqual(command[command.index('-preset')+1],'medium')
 
+    def test_ffmpeg_applies_stable_photographic_postprocess(self):
+        command=ffmpeg_args('/tmp/frames','/tmp/out.mp4',24,{'postproduccion':{'contraste':1.04,'saturacion':1.03,'vineta':.12,'grano':1.2}})
+        filters=command[command.index('-vf')+1]
+        self.assertIn('eq=contrast=1.04:saturation=1.03',filters)
+        self.assertIn('vignette=angle=0.12',filters)
+        self.assertIn('noise=alls=1.2:allf=u',filters)
+
+    def test_photographic_profiles_validate(self):
+        bundle,errors=load(REPO/'proyectos/apartamento_compacto/proyecto.yaml','natural_lila')
+        self.assertFalse(errors)
+        self.assertEqual(bundle['proyecto']['produccion']['perfiles']['fotografico_1080p']['resolucion'],[1920,1080])
+
     def test_progress_reports_eta_from_recent_frames(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory); folder=root/'previa'; folder.mkdir()

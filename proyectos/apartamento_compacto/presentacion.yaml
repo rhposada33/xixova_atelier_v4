@@ -1,11 +1,29 @@
 schema: 1
-exposicion: 0.15
+exposicion: -0.2
 entorno:
   color:
   - 0.64
   - 0.76
   - 0.9
-  intensidad: 0.65
+  intensidad: 0.26
+  archivo: ../../cache/sunset_jhbcentral/entorno_4k.hdr
+  rotacion_grados: 250
+sol:
+  azimut_grados: 90
+  elevacion_grados: 12
+  energia: 1.8
+  angulo_grados: 3
+  temperatura_k: 3600
+color:
+  look: Medium High Contrast
+  balance_blancos_k: 5200
+  tinte: 0.03
+postproduccion:
+  contraste: 1.04
+  saturacion: 1.03
+  vineta: 0.12
+  grano: 1.2
+  bloom: 0.04
 luces:
 - id: luz_social
   posicion:
@@ -22,6 +40,8 @@ luces:
   - 1
   - 0.88
   - 0.74
+  temperatura_k: 2900
+  forma: DISK
 - id: luz_dorm_izq
   posicion:
   - 1.2
@@ -37,6 +57,8 @@ luces:
   - 1
   - 0.86
   - 0.72
+  temperatura_k: 2800
+  forma: DISK
 - id: luz_dorm_der
   posicion:
   - 9.1
@@ -52,124 +74,165 @@ luces:
   - 1
   - 0.86
   - 0.72
-- id: luz_banos
+  temperatura_k: 2800
+  forma: DISK
+- id: luz_bano_social
   posicion:
-  - 4.0
-  - 2.0
-  - 2.5
+  - 1.2
+  - 1.05
+  - 2.45
   objetivo:
-  - 3.5
-  - 1.5
+  - 1.2
+  - 1.05
   - 0.7
-  potencia: 300
-  tamano: 1.3
+  potencia: 420
+  tamano: 0.9
   color:
   - 1
   - 0.9
   - 0.8
+  temperatura_k: 3000
+  forma: DISK
+- id: luz_bano_central
+  posicion:
+  - 5.75
+  - 2.25
+  - 2.45
+  objetivo:
+  - 5.75
+  - 2.25
+  - 0.8
+  potencia: 380
+  tamano: 1.0
+  color:
+  - 1
+  - 0.9
+  - 0.8
+  temperatura_k: 3000
+  forma: DISK
 tomas:
 - id: sala_presentacion
-  lente: 26.7
+  lente: 28
   fotogramas: 96
   interpolacion: suave
+  sensor_mm: 36
+  apertura_f: 7.1
+  foco: sofa_social
   puntos:
   - posicion:
-    - 6.403
-    - 4.603
+    - 2.637
+    - 6.71
     - 1.55
     objetivo:
     - 4.27
     - 5.578
     - 0.65
   - posicion:
-    - 5.797
-    - 3.797
+    - 3.263
+    - 7.29
     - 1.55
     objetivo:
     - 4.27
     - 5.578
     - 0.65
+  exposicion: -0.2
 - id: cocina_comedor
-  lente: 26.6
+  lente: 28
   fotogramas: 96
   interpolacion: suave
+  sensor_mm: 36
+  apertura_f: 7.1
+  foco: comedor_social
   puntos:
   - posicion:
-    - 4.958
-    - 4.191
+    - 5.551
+    - 6.568
     - 1.55
     objetivo:
     - 6.568
     - 5.82
     - 0.65
   - posicion:
-    - 5.911
-    - 3.626
+    - 5.319
+    - 6.003
     - 1.55
     objetivo:
     - 6.568
     - 5.82
     - 0.65
+  exposicion: -0.3
 - id: dormitorio_derecho
-  lente: 25.5
+  lente: 20
   fotogramas: 96
   interpolacion: suave
+  sensor_mm: 36
+  apertura_f: 7.1
+  foco: cama_derecha
   puntos:
   - posicion:
-    - 10.325
-    - 5.952
+    - 6.251
+    - 3.538
     - 1.55
     objetivo:
     - 9.121
     - 4.692
     - 0.768
   - posicion:
-    - 10.44
-    - 5.853
+    - 6.251
+    - 3.538
     - 1.55
     objetivo:
     - 9.121
     - 4.692
     - 0.768
-- id: dormitorio_izquierdo
-  lente: 24.8
+  exposicion: -0.9
+- id: mesa_detalle
+  lente: 35
   fotogramas: 96
   interpolacion: suave
+  sensor_mm: 36
+  apertura_f: 7.1
+  foco: mesa_social
   puntos:
   - posicion:
-    - 1.265
-    - 5.953
+    - 3.974
+    - 6.936
     - 1.55
     objetivo:
-    - 1.2
-    - 4.55
-    - 0.778
+    - 3.55
+    - 5.65
+    - 0.65
   - posicion:
-    - 1.935
-    - 5.747
+    - 3.32
+    - 6.984
     - 1.55
     objetivo:
-    - 1.2
-    - 4.55
-    - 0.778
+    - 3.55
+    - 5.65
+    - 0.65
+  exposicion: -0.3
 - id: bano_central
-  lente: 25.0
+  lente: 33.3
   fotogramas: 96
   interpolacion: suave
+  sensor_mm: 36
+  apertura_f: 7.1
+  foco: bano_central_equipo
   puntos:
   - posicion:
-    - 4.366
-    - 2.862
+    - 2.7
+    - 2.204
     - 1.55
     objetivo:
     - 5.75
     - 2.25
     - 0.925
   - posicion:
-    - 4.412
-    - 2.942
+    - 2.7
+    - 2.204
     - 1.55
     objetivo:
     - 5.75
     - 2.25
     - 0.925
+  exposicion: -0.6

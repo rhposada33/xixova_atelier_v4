@@ -10,6 +10,7 @@ escenas:
   - mesa_social
   movimiento: desplazamiento_lateral
   duracion: 4
+  exposicion: -0.2
 - id: cocina_comedor
   espacio: social
   mostrar:
@@ -17,23 +18,30 @@ escenas:
   - cocina_lineal
   movimiento: orbita_suave
   duracion: 4
+  exposicion: -0.3
 - id: dormitorio_derecho
   espacio: dormitorio_derecho
   mostrar:
   - cama_derecha
   - mesita_derecha
-  movimiento: revelar_desde_puerta
+  movimiento: estatica
+  lente: 20
+  desde: acceso
+  exposicion: -0.9
   duracion: 4
-- id: dormitorio_izquierdo
-  espacio: dormitorio_izquierdo
+- id: mesa_detalle
+  espacio: social
   mostrar:
-  - cama_izquierda
-  movimiento: desplazamiento_lateral
-  desde: norte
+  - mesa_social
+  movimiento: orbita_suave
+  lente: 35
+  exposicion: -0.3
   duracion: 4
 - id: bano_central
   espacio: bano_central
   mostrar:
   - bano_central_equipo
-  movimiento: revelar_desde_puerta
+  movimiento: estatica
+  desde: acceso
   duracion: 4
+  exposicion: -0.6

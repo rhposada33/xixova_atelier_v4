@@ -42,6 +42,15 @@
           "frente": {
             "const": "+Y"
           },
+          "ocupacion_encuadre": {
+            "type": "object",
+            "properties": {
+              "minima": {"type": "number", "minimum": 0.1, "maximum": 0.9},
+              "maxima": {"type": "number", "minimum": 0.1, "maximum": 0.95}
+            },
+            "required": ["minima", "maxima"],
+            "additionalProperties": false
+          },
           "apoyo": {
             "const": "suelo"
           },

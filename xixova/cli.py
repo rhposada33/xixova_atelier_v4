@@ -82,11 +82,11 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras'])
+    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
     parser.add_argument('-p','--proyecto',type=Path,required=True); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
     parser.add_argument('--compacto',action='store_true'); parser.add_argument('--desde',type=Path); parser.add_argument('--operaciones',type=Path); parser.add_argument('--toma',action='append')
-    parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final'],default='previa'); parser.add_argument('--guion',type=Path)
+    parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final','piloto_fotografico','fotografico_1080p']); parser.add_argument('--guion',type=Path)
     args=parser.parse_args(argv)
     try:
         if args.accion=='sincronizar':
@@ -157,7 +157,7 @@ def main(argv=None):
             total=len(b['fotogramas']); samples=[]; offset=0
             for shot in b['presentacion']['tomas']:
                 samples.extend((offset+1,offset+(shot['fotogramas']+1)//2,offset+shot['fotogramas'])); offset+=shot['fotogramas']
-            expected={name:(sorted(set(samples)) if name=='previa' else list(range(1,total+1))) for name in b['proyecto']['produccion']['perfiles']}
+            expected={name:(sorted(set(samples)) if name in {'previa','piloto_fotografico'} else list(range(1,total+1))) for name in b['proyecto']['produccion']['perfiles']}
             progress=render_progress(root,b['proyecto']['produccion']['perfiles'],expected,png_ok)
             print(json.dumps({'salida':str(root),'arquitectura_revisada':review_path(b).exists(),'escena':(root/'escena.blend').exists(),'renders':progress},indent=2)); return 0
         if args.accion not in architecture_actions and not review_path(b).exists(): raise ValueError('Arquitectura pendiente de revisión: ejecuta arquitectura y confirmar-arquitectura.')
@@ -180,23 +180,34 @@ def main(argv=None):
                 if sha(scene)!=json.loads((root/'escena.manifest.json').read_text())['sha256']: raise ValueError('El .blend fue modificado fuera del contrato. Reconstruye la escena.')
                 if args.accion=='preflight':
                     target=root/'preflight.json'; run_blender(b,'preflight.py',['--datos',datafile,'--salida',target],scene,root/'logs'/'preflight.log'); print(target); return 0
+                if args.accion=='preparar-realismo':
+                    target=root/'realismo_preflight.json'; run_blender(b,'realism_preflight.py',['--datos',datafile,'--salida',target],scene,root/'logs'/'realismo_preflight.log'); print(target); return 0
                 if args.accion=='auditar-calidad':
                     target=root/'auditoria_calidad.json'; run_blender(b,'quality_audit.py',['--datos',datafile,'--salida',target],scene,root/'logs'/'auditoria_calidad.log'); print(target); return 0
+                if args.accion=='auditar-fotografia':
+                    target=root/'auditoria_fotografia.json'; images=root/'piloto_fotografico'
+                    run_blender(b,'photography_audit.py',['--datos',datafile,'--imagenes',images,'--salida',target],scene,root/'logs'/'auditoria_fotografia.log'); print(target); return 0
+                if args.accion=='piloto-temporal':
+                    profile='piloto_fotografico'; count=min(48,len(b['fotogramas'])); folder=root/'piloto_temporal'; frames=list(range(1,count+1))
+                    run_blender(b,'render.py',['--datos',datafile,'--salida',folder,'--perfil',profile,'--frames',','.join(map(str,frames))],scene,root/'logs'/'piloto_temporal.log')
+                    target=folder/'piloto.mp4'; temp=folder/'piloto.tmp.mp4'; encoded={**b['proyecto']['produccion']['perfiles'][profile],'postproduccion':b['presentacion'].get('postproduccion',{})}
+                    from .production import ffmpeg_args
+                    subprocess.run(ffmpeg_args(folder,temp,b['proyecto']['produccion']['fps'],encoded),check=True); os.replace(temp,target); print(target); return 0
                 if args.accion=='comparar':
                     if not args.anterior: raise ValueError('Indica --anterior con el directorio de fotogramas de referencia.')
                     from .production import compare_frames
-                    profile=b['proyecto']['produccion']['perfiles'][args.perfil]; frames=[]; offset=0
+                    selected_profile=args.perfil or 'previa'; profile=b['proyecto']['produccion']['perfiles'][selected_profile]; frames=[]; offset=0
                     for shot in b['presentacion']['tomas']:
                         frames.extend((offset+1,offset+(shot['fotogramas']+1)//2,offset+shot['fotogramas'])); offset+=shot['fotogramas']
-                    report=compare_frames(args.anterior,root/args.perfil,root/'comparaciones'/args.perfil,sorted(set(frames)),*profile['resolucion'])
+                    report=compare_frames(args.anterior,root/selected_profile,root/'comparaciones'/selected_profile,sorted(set(frames)),*profile['resolucion'])
                     print(json.dumps(report,ensure_ascii=False,separators=(',',':'))); return 0
-                if args.toma and args.accion!='previas': raise ValueError('--toma solo se admite con previas.')
+                if args.toma and args.accion not in {'previas','pilotos-fotograficos'}: raise ValueError('--toma solo se admite con previas o pilotos-fotograficos.')
                 if args.accion=='confirmar-visual':
                     if not args.revisor or not args.nota: raise ValueError('Especifica --revisor y --nota tras inspeccionar previas y animática.')
                     if not (root/'animatica'/'recorrido.mp4').exists(): raise ValueError('Genera e inspecciona primero la animática.')
                     atomic(root/'revision_visual.json',{'escena':sha(scene),'revisor':args.revisor,'nota':args.nota}); print(root); return 0
-                profile={'previas':'previa','animatica':'animatica','recorrido':'final'}[args.accion]
-                if profile=='final':
+                profile={'previas':'previa','pilotos-fotograficos':'piloto_fotografico','animatica':'animatica','recorrido':args.perfil or ('fotografico_1080p' if 'fotografico_1080p' in b['proyecto']['produccion']['perfiles'] else 'final')}[args.accion]
+                if profile in {'final','fotografico_1080p'}:
                     review=root/'revision_visual.json'
                     if not review.exists() or json.loads(review.read_text())['escena']!=sha(scene): raise ValueError('Falta confirmar-visual para esta escena.')
                 frames=[]; offset=0
@@ -204,20 +215,21 @@ def main(argv=None):
                 unknown=selected-{shot['id'] for shot in b['presentacion']['tomas']}
                 if unknown: raise ValueError('Tomas inexistentes: '+', '.join(sorted(unknown)))
                 for s in b['presentacion']['tomas']:
-                    if profile=='previa' and (not selected or s['id'] in selected):frames.extend([offset+1,offset+(s['fotogramas']+1)//2,offset+s['fotogramas']])
+                    if profile in {'previa','piloto_fotografico'} and (not selected or s['id'] in selected):frames.extend([offset+1,offset+(s['fotogramas']+1)//2,offset+s['fotogramas']])
                     offset+=s['fotogramas']
                 extra=['--frames',','.join(map(str,sorted(set(frames))))] if frames else []
                 run_blender(b,'render.py',['--datos',datafile,'--salida',root/profile,'--perfil',profile,*extra],scene,root/'logs'/(profile+'.log'))
-                if profile=='previa':
+                if profile in {'previa','piloto_fotografico'}:
                     previews=sorted((root/profile).glob('frame_*.png')); rows=max(1,(len(previews)+2)//3)
                     if previews:
                         subprocess.run(['ffmpeg','-v','error','-y','-pattern_type','glob','-i',str(root/profile/'frame_*.png'),'-vf',f'scale=320:-1,tile=3x{rows}','-frames:v','1',str(root/profile/'contacto.jpg')],check=True)
-                if profile!='previa':
+                if profile not in {'previa','piloto_fotografico'}:
                     w,h=b['proyecto']['produccion']['perfiles'][profile]['resolucion']
                     if not all(png_ok(root/profile/f'frame_{f:04d}.png',w,h) for f in range(1,offset+1)): raise ValueError('Secuencia incompleta.')
                     target=root/profile/'recorrido.mp4'; temp=target.with_name('recorrido.tmp.mp4'); fps=b['proyecto']['produccion']['fps']
                     from .production import ffmpeg_args
-                    subprocess.run(ffmpeg_args(root/profile,temp,fps,b['proyecto']['produccion']['perfiles'][profile]),check=True)
+                    encoded={**b['proyecto']['produccion']['perfiles'][profile],'postproduccion':b['presentacion'].get('postproduccion',{})}
+                    subprocess.run(ffmpeg_args(root/profile,temp,fps,encoded),check=True)
                     probe=json.loads(subprocess.check_output(['ffprobe','-v','error','-count_frames','-select_streams','v:0','-show_entries','stream=width,height,nb_read_frames,r_frame_rate','-of','json',str(temp)]))
                     stream=probe['streams'][0]
                     if (stream['width'],stream['height'],int(stream['nb_read_frames']))!=(w,h,offset):raise ValueError('MP4 no coincide con la secuencia.')

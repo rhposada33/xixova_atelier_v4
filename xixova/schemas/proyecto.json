@@ -89,11 +89,67 @@
                   "type": "integer",
                   "minimum": 1
                 },
-                "motor": {"enum": ["CYCLES", "BLENDER_WORKBENCH"]},
-                "denoise": {"type": "boolean"},
-                "umbral_adaptativo": {"type": "number", "exclusiveMinimum": 0},
-                "crf": {"type": "integer", "minimum": 0, "maximum": 51},
-                "preset": {"enum": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"]}
+                "motor": {
+                  "enum": [
+                    "CYCLES",
+                    "BLENDER_WORKBENCH"
+                  ]
+                },
+                "denoise": {
+                  "type": "boolean"
+                },
+                "umbral_adaptativo": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "crf": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 51
+                },
+                "preset": {
+                  "enum": [
+                    "ultrafast",
+                    "superfast",
+                    "veryfast",
+                    "faster",
+                    "fast",
+                    "medium",
+                    "slow",
+                    "slower",
+                    "veryslow"
+                  ]
+                },
+                "max_rebotes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 32
+                },
+                "rebotes_difusos": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_brillantes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_transmision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "clamp_indirecto": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "profundidad_color": {
+                  "enum": [
+                    "8",
+                    "16"
+                  ]
+                }
               },
               "required": [
                 "resolucion",
@@ -118,11 +174,67 @@
                   "type": "integer",
                   "minimum": 1
                 },
-                "motor": {"enum": ["CYCLES", "BLENDER_WORKBENCH"]},
-                "denoise": {"type": "boolean"},
-                "umbral_adaptativo": {"type": "number", "exclusiveMinimum": 0},
-                "crf": {"type": "integer", "minimum": 0, "maximum": 51},
-                "preset": {"enum": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"]}
+                "motor": {
+                  "enum": [
+                    "CYCLES",
+                    "BLENDER_WORKBENCH"
+                  ]
+                },
+                "denoise": {
+                  "type": "boolean"
+                },
+                "umbral_adaptativo": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "crf": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 51
+                },
+                "preset": {
+                  "enum": [
+                    "ultrafast",
+                    "superfast",
+                    "veryfast",
+                    "faster",
+                    "fast",
+                    "medium",
+                    "slow",
+                    "slower",
+                    "veryslow"
+                  ]
+                },
+                "max_rebotes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 32
+                },
+                "rebotes_difusos": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_brillantes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_transmision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "clamp_indirecto": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "profundidad_color": {
+                  "enum": [
+                    "8",
+                    "16"
+                  ]
+                }
               },
               "required": [
                 "resolucion",
@@ -147,11 +259,237 @@
                   "type": "integer",
                   "minimum": 1
                 },
-                "motor": {"enum": ["CYCLES", "BLENDER_WORKBENCH"]},
-                "denoise": {"type": "boolean"},
-                "umbral_adaptativo": {"type": "number", "exclusiveMinimum": 0},
-                "crf": {"type": "integer", "minimum": 0, "maximum": 51},
-                "preset": {"enum": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"]}
+                "motor": {
+                  "enum": [
+                    "CYCLES",
+                    "BLENDER_WORKBENCH"
+                  ]
+                },
+                "denoise": {
+                  "type": "boolean"
+                },
+                "umbral_adaptativo": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "crf": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 51
+                },
+                "preset": {
+                  "enum": [
+                    "ultrafast",
+                    "superfast",
+                    "veryfast",
+                    "faster",
+                    "fast",
+                    "medium",
+                    "slow",
+                    "slower",
+                    "veryslow"
+                  ]
+                },
+                "max_rebotes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 32
+                },
+                "rebotes_difusos": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_brillantes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_transmision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "clamp_indirecto": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "profundidad_color": {
+                  "enum": [
+                    "8",
+                    "16"
+                  ]
+                }
+              },
+              "required": [
+                "resolucion",
+                "muestras"
+              ],
+              "additionalProperties": false
+            },
+            "piloto_fotografico": {
+              "type": "object",
+              "properties": {
+                "resolucion": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "multipleOf": 2
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "muestras": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "motor": {
+                  "enum": [
+                    "CYCLES",
+                    "BLENDER_WORKBENCH"
+                  ]
+                },
+                "denoise": {
+                  "type": "boolean"
+                },
+                "umbral_adaptativo": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "crf": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 51
+                },
+                "preset": {
+                  "enum": [
+                    "ultrafast",
+                    "superfast",
+                    "veryfast",
+                    "faster",
+                    "fast",
+                    "medium",
+                    "slow",
+                    "slower",
+                    "veryslow"
+                  ]
+                },
+                "max_rebotes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 32
+                },
+                "rebotes_difusos": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_brillantes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_transmision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "clamp_indirecto": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "profundidad_color": {
+                  "enum": [
+                    "8",
+                    "16"
+                  ]
+                }
+              },
+              "required": [
+                "resolucion",
+                "muestras"
+              ],
+              "additionalProperties": false
+            },
+            "fotografico_1080p": {
+              "type": "object",
+              "properties": {
+                "resolucion": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "multipleOf": 2
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "muestras": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "motor": {
+                  "enum": [
+                    "CYCLES",
+                    "BLENDER_WORKBENCH"
+                  ]
+                },
+                "denoise": {
+                  "type": "boolean"
+                },
+                "umbral_adaptativo": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "crf": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 51
+                },
+                "preset": {
+                  "enum": [
+                    "ultrafast",
+                    "superfast",
+                    "veryfast",
+                    "faster",
+                    "fast",
+                    "medium",
+                    "slow",
+                    "slower",
+                    "veryslow"
+                  ]
+                },
+                "max_rebotes": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 32
+                },
+                "rebotes_difusos": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_brillantes": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "rebotes_transmision": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 16
+                },
+                "clamp_indirecto": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "profundidad_color": {
+                  "enum": [
+                    "8",
+                    "16"
+                  ]
+                }
               },
               "required": [
                 "resolucion",

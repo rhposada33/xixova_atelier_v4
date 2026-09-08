@@ -25,7 +25,14 @@ def render_progress(root, profiles, expected_frames, png_validator):
 
 
 def ffmpeg_args(frames, target, fps, profile):
-    return ['ffmpeg', '-v', 'error', '-y', '-framerate', str(fps), '-i', str(Path(frames)/'frame_%04d.png'),
+    post=profile.get('postproduccion',{}); filters=[]
+    if post.get('contraste',1)!=1 or post.get('saturacion',1)!=1:
+        filters.append(f"eq=contrast={post.get('contraste',1)}:saturation={post.get('saturacion',1)}")
+    if post.get('vineta',0)>0: filters.append(f"vignette=angle={post['vineta']}")
+    if post.get('grano',0)>0: filters.append(f"noise=alls={post['grano']}:allf=u")
+    command=['ffmpeg', '-v', 'error', '-y', '-framerate', str(fps), '-i', str(Path(frames)/'frame_%04d.png')]
+    if filters: command += ['-vf',','.join(filters)]
+    return command+[
             '-c:v', 'libx264', '-preset', profile.get('preset', 'slow' if profile.get('motor', 'CYCLES') == 'CYCLES' else 'medium'),
             '-crf', str(profile.get('crf', 18 if profile.get('motor', 'CYCLES') == 'CYCLES' else 20)),
             '-pix_fmt', 'yuv420p', '-movflags', '+faststart', str(target)]
