@@ -84,7 +84,12 @@
                 "muestras": {
                   "type": "integer",
                   "minimum": 1
-                }
+                },
+                "motor": {"enum": ["CYCLES", "BLENDER_WORKBENCH"]},
+                "denoise": {"type": "boolean"},
+                "umbral_adaptativo": {"type": "number", "exclusiveMinimum": 0},
+                "crf": {"type": "integer", "minimum": 0, "maximum": 51},
+                "preset": {"enum": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"]}
               },
               "required": [
                 "resolucion",
@@ -108,7 +113,12 @@
                 "muestras": {
                   "type": "integer",
                   "minimum": 1
-                }
+                },
+                "motor": {"enum": ["CYCLES", "BLENDER_WORKBENCH"]},
+                "denoise": {"type": "boolean"},
+                "umbral_adaptativo": {"type": "number", "exclusiveMinimum": 0},
+                "crf": {"type": "integer", "minimum": 0, "maximum": 51},
+                "preset": {"enum": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"]}
               },
               "required": [
                 "resolucion",
@@ -132,7 +142,12 @@
                 "muestras": {
                   "type": "integer",
                   "minimum": 1
-                }
+                },
+                "motor": {"enum": ["CYCLES", "BLENDER_WORKBENCH"]},
+                "denoise": {"type": "boolean"},
+                "umbral_adaptativo": {"type": "number", "exclusiveMinimum": 0},
+                "crf": {"type": "integer", "minimum": 0, "maximum": 51},
+                "preset": {"enum": ["ultrafast", "superfast", "veryfast", "faster", "fast", "medium", "slow", "slower", "veryslow"]}
               },
               "required": [
                 "resolucion",

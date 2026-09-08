@@ -32,12 +32,18 @@ def output(b):
 def review_path(b):
     return Path(b['archivo']).parent/'.revisiones'/f"{b['arquitectura_hash']}.json"
 
-def run_blender(b,script,args,scene=None):
+def run_blender(b,script,args,scene=None,log=None):
     exe=os.path.expandvars(os.path.expanduser(b['proyecto']['produccion']['blender']))
     cmd=[exe,'--background','--factory-startup','--disable-autoexec']
     cmd += [str(scene)] if scene else []
     cmd += ['--python-exit-code','1','--python',str(ROOT/script),'--',*map(str,args)]
-    subprocess.run(cmd,check=True,stdout=sys.stderr)
+    if log:
+        log=Path(log); log.parent.mkdir(parents=True,exist_ok=True)
+        print(json.dumps({'evento':'blender_inicio','script':script,'log':str(log)},ensure_ascii=False),file=sys.stderr,flush=True)
+        with log.open('w') as stream: subprocess.run(cmd,check=True,stdout=stream,stderr=subprocess.STDOUT)
+        print(json.dumps({'evento':'blender_fin','script':script,'log':str(log)},ensure_ascii=False),file=sys.stderr,flush=True)
+    else:
+        subprocess.run(cmd,check=True,stdout=sys.stderr)
 
 @contextlib.contextmanager
 def lock(root):
@@ -76,9 +82,11 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar'])
+    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar'])
     parser.add_argument('-p','--proyecto',type=Path,required=True); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
+    parser.add_argument('--compacto',action='store_true'); parser.add_argument('--desde',type=Path); parser.add_argument('--operaciones',type=Path); parser.add_argument('--toma',action='append')
+    parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final'],default='previa')
     args=parser.parse_args(argv)
     try:
         if args.accion=='sincronizar':
@@ -88,7 +96,21 @@ def main(argv=None):
             print(json.dumps(report,indent=2,ensure_ascii=False)); return 0 if report['ok'] else 1
         b,errors=load(args.proyecto,args.variante)
         if b is None: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
-        root=output(b); resolved,issues=resolve(b)
+        root=output(b)
+        if args.accion=='contexto-agente':
+            from .agent import agent_context, context_delta
+            current=agent_context(b,errors,root); previous=json.loads(args.desde.read_text()) if args.desde else None
+            root.mkdir(parents=True,exist_ok=True); atomic(root/'contexto-agente.json',current)
+            print(json.dumps(context_delta(current,previous),ensure_ascii=False,separators=(',',':'))); return 0
+        if args.accion=='operar':
+            if not args.operaciones: raise ValueError('Indica --operaciones con un archivo YAML o JSON.')
+            from .agent import apply_operations, publish_operations, read_operations
+            updated,changes,layers,operation_issues,new_variant=apply_operations(b,read_operations(args.operaciones))
+            report={'ok':not operation_issues,'aplicado':False,'capas':layers,'cambios':changes,'diagnosticos':operation_issues}
+            if args.aplicar and not operation_issues:
+                with lock(root): report['archivos']=publish_operations(b,updated,layers,new_variant); report['aplicado']=True
+            print(json.dumps(report,ensure_ascii=False,separators=(',',':'))); return 0 if not operation_issues else 1
+        resolved,issues=resolve(b)
         b['resueltos']=resolved; b['fotogramas']=[dict(toma=s,numero=f,posicion=p,objetivo=t) for s,f,p,t in camera_frames(b['presentacion'])]
         if args.accion=='capturar':
             if not args.captura or not args.escena: raise ValueError('Indica --escena BLEND guardado y --captura JSON de salida. Para cambios sin guardar usa capturar() mediante MCP.')
@@ -98,7 +120,11 @@ def main(argv=None):
             assets=[v for v in b['catalogo']['activos'] if (not args.categoria or v['categoria']==args.categoria) and (args.ancho_max is None or v['dimensiones'][0]<=args.ancho_max)]
             print(json.dumps({'activos':[{**v,'disponible':Path(v['archivo']).is_file()} for v in assets]},ensure_ascii=False)); return 0
         if args.accion in {'validar','comprobar'}:
-            print(json.dumps({'ok':not errors,'arquitectura_hash':b['arquitectura_hash'],'diagnosticos':errors},ensure_ascii=False,indent=2)); return bool(errors)
+            report={'ok':not errors,'arquitectura_hash':b['arquitectura_hash'],'diagnosticos':errors}
+            if args.compacto:
+                print(('OK '+b['arquitectura_hash']) if not errors else '\n'.join(f'{e["gravedad"]}|{e["codigo"]}|{e["elemento"]}|{e["explicacion"]}' for e in errors))
+            else: print(json.dumps(report,ensure_ascii=False,indent=2))
+            return bool(errors)
         # Architecture review can proceed while the proposal is stale or obstructed.
         architecture_actions={'arquitectura','confirmar-arquitectura'}
         if args.accion in architecture_actions:
@@ -113,25 +139,40 @@ def main(argv=None):
             if not (root/'arquitectura.blend').exists(): raise ValueError('Genera e inspecciona primero arquitectura.')
             atomic(review_path(b),{'hash':b['arquitectura_hash'],'revisor':args.revisor,'nota':args.nota}); print(review_path(b)); return 0
         if args.accion=='estado':
-            print(json.dumps({'salida':str(root),'arquitectura_revisada':review_path(b).exists(),'escena':(root/'escena.blend').exists(),'renders':{p:len(list((root/p).glob('frame_*.png'))) for p in b['proyecto']['produccion']['perfiles']}},indent=2)); return 0
+            from .production import render_progress
+            total=len(b['fotogramas']); progress=render_progress(root,b['proyecto']['produccion']['perfiles'],total,png_ok)
+            print(json.dumps({'salida':str(root),'arquitectura_revisada':review_path(b).exists(),'escena':(root/'escena.blend').exists(),'renders':progress},indent=2)); return 0
         if args.accion not in architecture_actions and not review_path(b).exists(): raise ValueError('Arquitectura pendiente de revisión: ejecuta arquitectura y confirmar-arquitectura.')
         with lock(root):
             datafile=root/'resuelto.json'; atomic(datafile,b)
             if args.accion=='arquitectura':
-                floorplan(b,root/'planta.svg'); run_blender(b,'blender_build.py',['--datos',datafile,'--salida',root/'arquitectura.blend','--arquitectura'])
+                floorplan(b,root/'planta.svg'); run_blender(b,'blender_build.py',['--datos',datafile,'--salida',root/'arquitectura.blend','--arquitectura'],log=root/'logs'/'arquitectura_build.log')
                 samples=[]; offset=0
                 for s in b['presentacion']['tomas']: samples.append(offset+1); offset+=s['fotogramas']
-                run_blender(b,'render.py',['--datos',datafile,'--salida',root/'arquitectura_previas','--perfil','previa','--frames',','.join(map(str,samples))],root/'arquitectura.blend')
+                run_blender(b,'render.py',['--datos',datafile,'--salida',root/'arquitectura_previas','--perfil','previa','--frames',','.join(map(str,samples))],root/'arquitectura.blend',root/'logs'/'arquitectura_previas.log')
             elif args.accion=='componer':
                 for item in resolved:
                     asset=next(x for x in b['catalogo']['activos'] if x['id']==item['activo'])
                     if sha(asset['archivo'])!=asset['sha256']: raise ValueError('Recurso cambió; actualiza catálogo: '+asset['id'])
-                run_blender(b,'blender_build.py',['--datos',datafile,'--salida',root/'escena.blend'])
+                run_blender(b,'blender_build.py',['--datos',datafile,'--salida',root/'escena.blend'],log=root/'logs'/'componer.log')
                 atomic(root/'escena.manifest.json',{'sha256':sha(root/'escena.blend')})
             else:
                 scene=root/'escena.blend'
                 if not scene.exists(): raise ValueError('Ejecuta componer antes de renderizar.')
                 if sha(scene)!=json.loads((root/'escena.manifest.json').read_text())['sha256']: raise ValueError('El .blend fue modificado fuera del contrato. Reconstruye la escena.')
+                if args.accion=='preflight':
+                    target=root/'preflight.json'; run_blender(b,'preflight.py',['--datos',datafile,'--salida',target],scene,root/'logs'/'preflight.log'); print(target); return 0
+                if args.accion=='auditar-calidad':
+                    target=root/'auditoria_calidad.json'; run_blender(b,'quality_audit.py',['--datos',datafile,'--salida',target],scene,root/'logs'/'auditoria_calidad.log'); print(target); return 0
+                if args.accion=='comparar':
+                    if not args.anterior: raise ValueError('Indica --anterior con el directorio de fotogramas de referencia.')
+                    from .production import compare_frames
+                    profile=b['proyecto']['produccion']['perfiles'][args.perfil]; frames=[]; offset=0
+                    for shot in b['presentacion']['tomas']:
+                        frames.extend((offset+1,offset+(shot['fotogramas']+1)//2,offset+shot['fotogramas'])); offset+=shot['fotogramas']
+                    report=compare_frames(args.anterior,root/args.perfil,root/'comparaciones'/args.perfil,sorted(set(frames)),*profile['resolucion'])
+                    print(json.dumps(report,ensure_ascii=False,separators=(',',':'))); return 0
+                if args.toma and args.accion!='previas': raise ValueError('--toma solo se admite con previas.')
                 if args.accion=='confirmar-visual':
                     if not args.revisor or not args.nota: raise ValueError('Especifica --revisor y --nota tras inspeccionar previas y animática.')
                     if not (root/'animatica'/'recorrido.mp4').exists(): raise ValueError('Genera e inspecciona primero la animática.')
@@ -141,16 +182,24 @@ def main(argv=None):
                     review=root/'revision_visual.json'
                     if not review.exists() or json.loads(review.read_text())['escena']!=sha(scene): raise ValueError('Falta confirmar-visual para esta escena.')
                 frames=[]; offset=0
+                selected=set(args.toma or [])
+                unknown=selected-{shot['id'] for shot in b['presentacion']['tomas']}
+                if unknown: raise ValueError('Tomas inexistentes: '+', '.join(sorted(unknown)))
                 for s in b['presentacion']['tomas']:
-                    if profile=='previa':frames.extend([offset+1,offset+(s['fotogramas']+1)//2,offset+s['fotogramas']])
+                    if profile=='previa' and (not selected or s['id'] in selected):frames.extend([offset+1,offset+(s['fotogramas']+1)//2,offset+s['fotogramas']])
                     offset+=s['fotogramas']
                 extra=['--frames',','.join(map(str,sorted(set(frames))))] if frames else []
-                run_blender(b,'render.py',['--datos',datafile,'--salida',root/profile,'--perfil',profile,*extra],scene)
+                run_blender(b,'render.py',['--datos',datafile,'--salida',root/profile,'--perfil',profile,*extra],scene,root/'logs'/(profile+'.log'))
+                if profile=='previa':
+                    previews=sorted((root/profile).glob('frame_*.png')); rows=max(1,(len(previews)+2)//3)
+                    if previews:
+                        subprocess.run(['ffmpeg','-v','error','-y','-pattern_type','glob','-i',str(root/profile/'frame_*.png'),'-vf',f'scale=320:-1,tile=3x{rows}','-frames:v','1',str(root/profile/'contacto.jpg')],check=True)
                 if profile!='previa':
                     w,h=b['proyecto']['produccion']['perfiles'][profile]['resolucion']
                     if not all(png_ok(root/profile/f'frame_{f:04d}.png',w,h) for f in range(1,offset+1)): raise ValueError('Secuencia incompleta.')
                     target=root/profile/'recorrido.mp4'; temp=target.with_name('recorrido.tmp.mp4'); fps=b['proyecto']['produccion']['fps']
-                    subprocess.run(['ffmpeg','-v','error','-y','-framerate',str(fps),'-i',str(root/profile/'frame_%04d.png'),'-c:v','libx264','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(temp)],check=True)
+                    from .production import ffmpeg_args
+                    subprocess.run(ffmpeg_args(root/profile,temp,fps,b['proyecto']['produccion']['perfiles'][profile]),check=True)
                     probe=json.loads(subprocess.check_output(['ffprobe','-v','error','-count_frames','-select_streams','v:0','-show_entries','stream=width,height,nb_read_frames,r_frame_rate','-of','json',str(temp)]))
                     stream=probe['streams'][0]
                     if (stream['width'],stream['height'],int(stream['nb_read_frames']))!=(w,h,offset):raise ValueError('MP4 no coincide con la secuencia.')

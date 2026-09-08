@@ -16,15 +16,21 @@ def png_ok(path,w,h):
 
 p=argparse.ArgumentParser(); p.add_argument('--datos',required=True); p.add_argument('--salida',required=True); p.add_argument('--perfil',required=True); p.add_argument('--frames',default='')
 a=p.parse_args(sys.argv[sys.argv.index('--')+1:]); data=json.loads(Path(a.datos).read_text()); profile=data['proyecto']['produccion']['perfiles'][a.perfil]
-scene=bpy.context.scene; scene.render.use_persistent_data=True; w,h=profile['resolucion']; scene.render.resolution_x=w; scene.render.resolution_y=h; scene.render.resolution_percentage=100; scene.cycles.samples=profile['muestras']
+scene=bpy.context.scene; engine=profile.get('motor','CYCLES'); scene.render.engine=engine
+scene.render.use_persistent_data=engine=='CYCLES'; w,h=profile['resolucion']; scene.render.resolution_x=w; scene.render.resolution_y=h; scene.render.resolution_percentage=100
 out=Path(a.salida); out.mkdir(parents=True,exist_ok=True); frames=list(map(int,a.frames.split(','))) if a.frames else range(scene.frame_start,scene.frame_end+1)
 # Device preferences are per process, not stored in the .blend.
-prefs=bpy.context.preferences.addons['cycles'].preferences
-try:
-    prefs.compute_device_type='CUDA'; prefs.get_devices()
-    for device in prefs.devices: device.use=device.type=='CUDA'
-    scene.cycles.device='GPU' if any(d.use for d in prefs.devices) else 'CPU'
-except Exception: scene.cycles.device='CPU'
+if engine=='CYCLES':
+    scene.cycles.samples=profile['muestras']; scene.cycles.use_denoising=profile.get('denoise',True)
+    scene.cycles.use_adaptive_sampling=True; scene.cycles.adaptive_threshold=profile.get('umbral_adaptativo',.03)
+    prefs=bpy.context.preferences.addons['cycles'].preferences
+    try:
+        prefs.compute_device_type='CUDA'; prefs.get_devices()
+        for device in prefs.devices: device.use=device.type=='CUDA'
+        scene.cycles.device='GPU' if any(d.use for d in prefs.devices) else 'CPU'
+    except Exception: scene.cycles.device='CPU'
+else:
+    scene.display.shading.light='STUDIO'; scene.display.shading.show_shadows=True; scene.display.shading.show_cavity=True; scene.display.shading.color_type='MATERIAL'
 for frame in frames:
     target=out/f'frame_{frame:04d}.png'
     if png_ok(target,w,h): print('OMITIDO',frame,flush=True); continue

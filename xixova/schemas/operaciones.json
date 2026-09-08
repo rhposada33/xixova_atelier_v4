@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/operaciones.json",
+  "type": "object",
+  "properties": {
+    "schema": {"const": 1},
+    "arquitectura_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "operaciones": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "accion": {"const": "mover_elemento"}, "elemento": {"type": "string"},
+              "espacio": {"type": "string"}, "colocacion": {"type": "object"}
+            },
+            "required": ["accion", "elemento", "colocacion"], "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "accion": {"const": "cambiar_activo"}, "elemento": {"type": "string"},
+              "activo": {"type": "string"}, "escala": {"type": "number", "exclusiveMinimum": 0}
+            },
+            "required": ["accion", "elemento", "activo"], "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {"accion": {"const": "anadir_elemento"}, "elemento": {"type": "object"}},
+            "required": ["accion", "elemento"], "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {"accion": {"const": "eliminar_elemento"}, "elemento": {"type": "string"}},
+            "required": ["accion", "elemento"], "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "accion": {"const": "aplicar_acabado"}, "superficie": {"type": "string"}, "material": {"type": "string"}
+            },
+            "required": ["accion", "superficie", "material"], "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "accion": {"const": "ajustar_luz"}, "luz": {"type": "string"},
+              "cambios": {
+                "type": "object", "minProperties": 1, "additionalProperties": false,
+                "properties": {
+                  "posicion": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+                  "objetivo": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+                  "potencia": {"type": "number", "minimum": 0}, "tamano": {"type": "number", "exclusiveMinimum": 0},
+                  "color": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3}
+                }
+              }
+            },
+            "required": ["accion", "luz", "cambios"], "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "accion": {"const": "ajustar_toma"}, "toma": {"type": "string"},
+              "cambios": {
+                "type": "object", "minProperties": 1, "additionalProperties": false,
+                "properties": {
+                  "lente": {"type": "number", "minimum": 18, "maximum": 70},
+                  "fotogramas": {"type": "integer", "minimum": 2},
+                  "puntos": {"type": "array", "minItems": 2, "items": {"type": "object"}}
+                }
+              }
+            },
+            "required": ["accion", "toma", "cambios"], "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {"accion": {"const": "crear_variante"}, "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"}},
+            "required": ["accion", "id"], "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": ["schema", "arquitectura_hash", "operaciones"],
+  "additionalProperties": false
+}

@@ -1,6 +1,6 @@
 # Xixova framework v1
 
-Motor local que compone **arquitectura + interiorismo + presentación + producción**. Los datos son la fuente de verdad; Blender genera escenas y renders. El pipeline histórico de `produccion/` sigue disponible y conserva sus archivos.
+Motor local que compone **arquitectura + interiorismo + presentación + producción**. Los datos son la fuente de verdad; Blender genera escenas y renders. Este es el único pipeline activo; el código anterior se conserva congelado en `legacy/produccion/`.
 
 ## Proyectos incluidos
 
@@ -19,7 +19,7 @@ Los binarios están fuera de Git. En este workspace se prepararon en `cache/fram
 ~/Aplicaciones/blender-4.5/blender --background --factory-startup --python-exit-code 1 \
   --python xixova/migrar_activos.py -- \
   --biblioteca ~/RenderCasa/biblioteca_blender/xixova_interiores_v2.blend \
-  --escena produccion/trabajo/xixova_recorrido_fotorrealista_v2.blend \
+  --escena legacy/produccion/trabajo/xixova_recorrido_fotorrealista_v2.blend \
   --salida cache/framework/activos
 ```
 
@@ -42,9 +42,17 @@ uv run xixova_cli.py confirmar-visual -p proyectos/estudio/proyecto.yaml --varia
   --revisor "Nombre" --nota "Encuadres, materiales y recorrido revisados"
 uv run xixova_cli.py recorrido -p proyectos/estudio/proyecto.yaml --variante calida
 uv run xixova_cli.py estado -p proyectos/estudio/proyecto.yaml --variante calida
+uv run xixova_cli.py preflight -p proyectos/estudio/proyecto.yaml --variante calida
+uv run xixova_cli.py auditar-calidad -p proyectos/estudio/proyecto.yaml --variante calida
+uv run xixova_cli.py comparar -p proyectos/estudio/proyecto.yaml --variante calida \
+  --anterior /ruta/a/fotogramas/anteriores --perfil previa
 ```
 
 Repetir desde `componer` para `mineral`. `resolver` imprime el paquete JSON completo, con posiciones resueltas y todos los fotogramas de las cámaras. `comprobar` ejecuta la misma auditoría espacial que `validar`.
+
+Para sesiones de IA con poco contexto, usar `contexto-agente`, `validar --compacto` y `operar`. La [guía de agentes](../docs/agentes/GUIA.md) describe el flujo incremental y las previas por toma.
+
+Cada perfil acepta opcionalmente `motor` (`CYCLES` o `BLENDER_WORKBENCH`), `denoise`, `umbral_adaptativo`, `crf` y `preset`. Los valores ausentes conservan el comportamiento anterior. La [evidencia de consolidación](../docs/CONSOLIDACION_PRODUCCION.md) relaciona las funciones migradas con el pipeline archivado.
 
 ## Garantías de separación y reanudación
 
@@ -60,7 +68,6 @@ Los valores de RAM/VRAM son presupuestos declarados del proyecto, no límites du
 
 ```bash
 uv run --with pyyaml --with jsonschema --with shapely python -m unittest discover -s xixova/tests -v
-uv run --with pyyaml python -m unittest discover -s produccion/tests -v
 ```
 
 Contratos: `xixova/schemas/`. Instrucciones para interpretar planos y corregir proyectos: [guía de agentes](../docs/agentes/GUIA.md). Crédito del sofá importado: `CREDITOS.md`; el catálogo conserva autor y licencia. No se han descargado activos nuevos.

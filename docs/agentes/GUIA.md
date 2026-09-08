@@ -48,3 +48,32 @@ La versión 1 admite una planta, paredes rectas oblicuas u ortogonales y huecos 
 ## Ajustes desde Blender MCP
 
 Para conservar cambios hechos sobre una escena abierta, seguir [Blender MCP → YAML](BLENDER_MCP.md). Usar los IDs y objetos raíz etiquetados, guardar una copia, capturar, validar la diferencia y sincronizar. No cambiar la arquitectura para encajar muebles y no saltarse conflictos de versiones. Después de publicar, reconstruir y continuar sobre la nueva escena.
+
+## Interfaz compacta para agentes
+
+No uses `resolver` como contexto habitual: incluye la escena completa y todos los fotogramas interpolados. Obtén el resumen persistente con:
+
+```bash
+uv run xixova_cli.py contexto-agente -p proyectos/estudio/proyecto.yaml --variante calida
+```
+
+El comando guarda `contexto-agente.json` en la salida versionada. En el turno siguiente, indica ese archivo con `--desde`; la salida contendrá únicamente las secciones cuyo fingerprint cambió. Para diagnósticos breves usa `validar --compacto`.
+
+Las ediciones usan `schemas/operaciones.json`. `operar` simula por defecto y devuelve cambios y diagnósticos en JSON compacto. `--aplicar` publica el resultado validado:
+
+```bash
+uv run xixova_cli.py operar -p proyectos/estudio/proyecto.yaml --variante calida \
+  --operaciones docs/agentes/operaciones-ejemplo.yaml
+uv run xixova_cli.py operar -p proyectos/estudio/proyecto.yaml --variante calida \
+  --operaciones docs/agentes/operaciones-ejemplo.yaml --aplicar
+```
+
+Las acciones son `mover_elemento`, `cambiar_activo`, `anadir_elemento`, `eliminar_elemento`, `aplicar_acabado`, `ajustar_luz`, `ajustar_toma` y `crear_variante`. No mezcles interiorismo y presentación en una ejecución. Cada solicitud exige el hash vigente de arquitectura.
+
+Para corregir una cámara, renderiza solo sus tres puntos representativos. También se genera `previa/contacto.jpg`:
+
+```bash
+uv run xixova_cli.py previas -p proyectos/estudio/proyecto.yaml --variante calida --toma estar
+```
+
+Blender escribe su salida extensa en `logs/`; el terminal recibe únicamente inicio, fin y ruta del proceso.

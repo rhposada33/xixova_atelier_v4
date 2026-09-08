@@ -1,0 +1,9 @@
+schema: 1
+arquitectura_hash: b954becc5b8441569c7808c2ebf08c0a5aa2bb4366b903497f077650d58e97a4
+operaciones:
+  - accion: mover_elemento
+    elemento: sofa
+    colocacion:
+      tipo: explicita
+      posicion: [1.55, 1.5, 0]
+      rotacion: 0

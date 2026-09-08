@@ -15,12 +15,12 @@ __pycache__/
 
 # Recursos descargados y cachés
 /cache/
-/produccion/originales/
-/produccion/trabajo/
+/legacy/produccion/originales/
+/legacy/produccion/trabajo/
 
 # Resultados generados
 /resultados/
-/produccion/salidas/
+/legacy/produccion/salidas/
 
 # Imágenes, vídeo y audio generados o externos
 *.png

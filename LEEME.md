@@ -1,4 +1,4 @@
-> **Framework declarativo nuevo:** consulta [xixova/README.md](xixova/README.md) para crear apartamentos desde datos, separar arquitectura e interiorismo y generar recorridos. El contenido siguiente documenta el pipeline histórico.
+> **Pipeline activo:** consulta [xixova/README.md](xixova/README.md) para crear apartamentos desde datos, separar arquitectura e interiorismo y generar recorridos. El contenido siguiente es documentación histórica y sus archivos están congelados en `legacy/produccion/`.
 
 # Ajuste Atelier 4.0.2
 
