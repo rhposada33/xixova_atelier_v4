@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/guion_camara.json",
+  "type": "object",
+  "properties": {
+    "schema": {"const": 1},
+    "duracion_segundos": {"type": "number", "exclusiveMinimum": 0},
+    "estilo": {"enum": ["inmobiliario_suave", "cinematografico", "documental"]},
+    "altura": {"type": "number", "minimum": 0.6, "maximum": 2.2},
+    "escenas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+          "espacio": {"type": "string"},
+          "mostrar": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "movimiento": {"enum": ["estatica", "aproximacion", "retroceso", "desplazamiento_lateral", "orbita_suave", "revelar_desde_puerta"]},
+          "duracion": {"type": "number", "exclusiveMinimum": 0},
+          "lente": {"type": "number", "minimum": 18, "maximum": 70}
+        },
+        "required": ["espacio", "mostrar", "movimiento"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["schema", "duracion_segundos", "estilo", "escenas"],
+  "additionalProperties": false
+}

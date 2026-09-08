@@ -77,3 +77,37 @@ uv run xixova_cli.py previas -p proyectos/estudio/proyecto.yaml --variante calid
 ```
 
 Blender escribe su salida extensa en `logs/`; el terminal recibe únicamente inicio, fin y ruta del proceso.
+
+## Guion y planificación automática de cámaras
+
+La IA puede describir intención visual en vez de calcular coordenadas. El guion admite
+`estatica`, `aproximacion`, `retroceso`, `desplazamiento_lateral`, `orbita_suave` y
+`revelar_desde_puerta`. Cada escena referencia una estancia y uno o más elementos existentes:
+
+```yaml
+schema: 1
+duracion_segundos: 20
+estilo: inmobiliario_suave
+altura: 1.55
+escenas:
+  - id: sala_presentacion
+    espacio: sala
+    mostrar: [sofa_principal, mesa_centro]
+    movimiento: desplazamiento_lateral
+    duracion: 5
+```
+
+Guardar el archivo en el proyecto y declararlo como `guion_camara: guion_camara.yaml`, o
+pasarlo mediante `--guion`. Primero se inspecciona el resultado sin escribir; `--aplicar`
+reemplaza únicamente `tomas` en la presentación:
+
+```bash
+uv run xixova_cli.py planificar-camaras -p proyectos/mi_apto/proyecto.yaml
+uv run xixova_cli.py planificar-camaras -p proyectos/mi_apto/proyecto.yaml --aplicar
+uv run xixova_cli.py validar -p proyectos/mi_apto/proyecto.yaml --compacto
+uv run xixova_cli.py previas -p proyectos/mi_apto/proyecto.yaml
+```
+
+El planificador busca posiciones transitables con visión directa al protagonista, calcula
+lente, duración y una trayectoria suave. Si el desplazamiento solicitado no cabe, conserva
+una toma estática segura y lo registra como `movimiento_resuelto` en el informe compacto.

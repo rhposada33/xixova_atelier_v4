@@ -126,6 +126,7 @@ def camera_frames(presentation):
         keys = shot['puntos']; count = shot['fotogramas']
         for frame in range(count):
             t = frame/(count-1)*(len(keys)-1); idx = min(int(t), len(keys)-2); f = t-idx
+            if shot.get('interpolacion') == 'suave': f = f*f*(3-2*f)
             def lerp(field): return [keys[idx][field][j]*(1-f)+keys[idx+1][field][j]*f for j in range(3)]
             yield shot['id'], frame+1, lerp('posicion'), lerp('objetivo')
 

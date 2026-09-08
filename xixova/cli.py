@@ -82,11 +82,11 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar'])
+    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras'])
     parser.add_argument('-p','--proyecto',type=Path,required=True); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
     parser.add_argument('--compacto',action='store_true'); parser.add_argument('--desde',type=Path); parser.add_argument('--operaciones',type=Path); parser.add_argument('--toma',action='append')
-    parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final'],default='previa')
+    parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final'],default='previa'); parser.add_argument('--guion',type=Path)
     args=parser.parse_args(argv)
     try:
         if args.accion=='sincronizar':
@@ -97,6 +97,20 @@ def main(argv=None):
         b,errors=load(args.proyecto,args.variante)
         if b is None: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
         root=output(b)
+        if args.accion=='planificar-camaras':
+            from .camera_planner import plan_cameras
+            import yaml
+            source=args.guion or (args.proyecto.parent/b['proyecto'].get('guion_camara',''))
+            if not source or not Path(source).is_file(): raise ValueError('Indica --guion o guion_camara en proyecto.yaml.')
+            script=yaml.safe_load(Path(source).read_text(encoding='utf-8'))
+            shots,planning,planning_issues=plan_cameras(b,script)
+            report={'ok':not planning_issues,'aplicado':False,'tomas':planning,'diagnosticos':planning_issues}
+            if args.aplicar and not planning_issues:
+                target=args.proyecto.parent/b['proyecto']['presentacion']
+                presentation=yaml.safe_load(target.read_text(encoding='utf-8')); presentation['tomas']=shots
+                temp=target.with_suffix(target.suffix+'.tmp'); temp.write_text(yaml.safe_dump(presentation,sort_keys=False,allow_unicode=True),encoding='utf-8'); os.replace(temp,target)
+                report['aplicado']=True; report['archivo']=str(target)
+            print(json.dumps(report,ensure_ascii=False,separators=(',',':'))); return 0 if not planning_issues else 1
         if args.accion=='contexto-agente':
             from .agent import agent_context, context_delta
             current=agent_context(b,errors,root); previous=json.loads(args.desde.read_text()) if args.desde else None

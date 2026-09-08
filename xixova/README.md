@@ -52,6 +52,15 @@ Repetir desde `componer` para `mineral`. `resolver` imprime el paquete JSON comp
 
 Para sesiones de IA con poco contexto, usar `contexto-agente`, `validar --compacto` y `operar`. La [guía de agentes](../docs/agentes/GUIA.md) describe el flujo incremental y las previas por toma.
 
+Las cámaras también pueden generarse desde intención visual compacta. `planificar-camaras`
+convierte un guion de estancias, protagonistas y movimientos en las tomas numéricas que ya
+consume Blender:
+
+```bash
+uv run xixova_cli.py planificar-camaras -p proyectos/mi_apto/proyecto.yaml --guion proyectos/mi_apto/guion_camara.yaml
+uv run xixova_cli.py planificar-camaras -p proyectos/mi_apto/proyecto.yaml --guion proyectos/mi_apto/guion_camara.yaml --aplicar
+```
+
 Cada perfil acepta opcionalmente `motor` (`CYCLES` o `BLENDER_WORKBENCH`), `denoise`, `umbral_adaptativo`, `crf` y `preset`. Los valores ausentes conservan el comportamiento anterior. La [evidencia de consolidación](../docs/CONSOLIDACION_PRODUCCION.md) relaciona las funciones migradas con el pipeline archivado.
 
 ## Garantías de separación y reanudación

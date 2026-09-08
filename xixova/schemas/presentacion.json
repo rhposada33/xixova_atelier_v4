@@ -103,6 +103,9 @@
             "type": "integer",
             "minimum": 2
           },
+          "interpolacion": {
+            "enum": ["lineal", "suave"]
+          },
           "puntos": {
             "type": "array",
             "items": {
