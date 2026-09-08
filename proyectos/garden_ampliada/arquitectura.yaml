@@ -1,0 +1,484 @@
+schema: 1
+id: garden_ampliada
+version: 0.1-borrador
+unidades: m
+fuentes:
+- archivo: plano_usuario_2026-09-06.png
+  descripcion: Imagen de planta amueblada Tipo Garden Ampliada, sin cotas visibles.
+cota_referencia:
+  valor_m: 1.8
+  descripcion: Escala provisional inferida de la cama principal de 1,80 m de ancho.
+  fiable: true
+dudas:
+- Todas las medidas son inferidas de la imagen; necesitan una cota real antes de una
+  entrega definitiva.
+- Se simplificaron espesores, puertas y pequeños quiebres del perímetro.
+- La zona superior izquierda se interpreta como jardín/terraza exterior descubierta.
+espacios:
+- id: suite_principal
+  contorno:
+  - - 4.55
+    - 0
+  - - 7.55
+    - 0
+  - - 7.55
+    - 4.15
+  - - 3.35
+    - 4.15
+  - - 3.35
+    - 2.15
+  - - 4.55
+    - 2.15
+  altura: 2.7
+  cubierto: true
+- id: bano_principal
+  contorno:
+  - - 3.35
+    - 0
+  - - 4.55
+    - 0
+  - - 4.55
+    - 2.15
+  - - 3.35
+    - 2.15
+  altura: 2.7
+  cubierto: true
+- id: suite_secundaria
+  contorno:
+  - - 7.55
+    - 0
+  - - 8.75
+    - 0
+  - - 8.75
+    - 2.05
+  - - 10.05
+    - 2.05
+  - - 10.05
+    - 4.15
+  - - 7.55
+    - 4.15
+  altura: 2.7
+  cubierto: true
+- id: bano_secundario
+  contorno:
+  - - 8.75
+    - 0
+  - - 10.05
+    - 0
+  - - 10.05
+    - 2.05
+  - - 8.75
+    - 2.05
+  altura: 2.7
+  cubierto: true
+- id: circulacion
+  contorno:
+  - - 4.55
+    - 4.15
+  - - 8.55
+    - 4.15
+  - - 8.55
+    - 5.15
+  - - 4.55
+    - 5.15
+  altura: 2.7
+  cubierto: true
+- id: sala
+  contorno:
+  - - 3.35
+    - 5.15
+  - - 7.55
+    - 5.15
+  - - 7.55
+    - 8.55
+  - - 3.35
+    - 8.55
+  altura: 2.7
+  cubierto: true
+- id: comedor
+  contorno:
+  - - 7.55
+    - 5.15
+  - - 9.75
+    - 5.15
+  - - 9.75
+    - 8.55
+  - - 7.55
+    - 8.55
+  altura: 2.7
+  cubierto: true
+- id: lavabo
+  contorno:
+  - - 8.55
+    - 4.15
+  - - 9.75
+    - 4.15
+  - - 9.75
+    - 5.15
+  - - 8.55
+    - 5.15
+  altura: 2.7
+  cubierto: true
+- id: cocina
+  contorno:
+  - - 6.35
+    - 8.55
+  - - 9.75
+    - 8.55
+  - - 9.75
+    - 11.05
+  - - 6.35
+    - 11.05
+  altura: 2.7
+  cubierto: true
+- id: bano_servicio
+  contorno:
+  - - 4.55
+    - 10.05
+  - - 6.35
+    - 10.05
+  - - 6.35
+    - 11.05
+  - - 4.55
+    - 11.05
+  altura: 2.7
+  cubierto: true
+- id: garden_lateral
+  contorno:
+  - - 0
+    - 4.15
+  - - 3.35
+    - 4.15
+  - - 3.35
+    - 11.05
+  - - 0
+    - 11.05
+  altura: 3.5
+  cubierto: false
+- id: garden_superior
+  contorno:
+  - - 0
+    - 11.05
+  - - 6.35
+    - 11.05
+  - - 6.35
+    - 15.2
+  - - 0
+    - 15.2
+  altura: 3.5
+  cubierto: false
+paredes:
+- id: fachada_sur_master
+  a:
+  - 3.35
+  - 0
+  b:
+  - 7.55
+  - 0
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_master
+    tipo: ventana
+    distancia: 1.2
+    ancho: 2.2
+    alto: 1.5
+    antepecho: 0.75
+- id: fachada_sur_sec
+  a:
+  - 7.55
+  - 0
+  b:
+  - 10.05
+  - 0
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_sec
+    tipo: ventana
+    distancia: 0.35
+    ancho: 1.45
+    alto: 1.5
+    antepecho: 0.75
+- id: fachada_este
+  a:
+  - 10.05
+  - 0
+  b:
+  - 10.05
+  - 4.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: limite_este_social
+  a:
+  - 9.75
+  - 4.15
+  b:
+  - 9.75
+  - 11.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_comedor
+    tipo: ventana
+    distancia: 2.25
+    ancho: 1.25
+    alto: 1.45
+    antepecho: 0.85
+- id: norte_cocina
+  a:
+  - 6.35
+  - 11.05
+  b:
+  - 9.75
+  - 11.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: ventana_cocina
+    tipo: ventana
+    distancia: 1.35
+    ancho: 1.0
+    alto: 1.1
+    antepecho: 1.15
+- id: oeste_master
+  a:
+  - 3.35
+  - 0
+  b:
+  - 3.35
+  - 5.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: entrada_apto
+    tipo: puerta
+    distancia: 3.75
+    ancho: 0.9
+    alto: 2.15
+    antepecho: 0
+- id: oeste_sala
+  a:
+  - 3.35
+  - 5.15
+  b:
+  - 3.35
+  - 8.55
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: corredera_sala_garden
+    tipo: puerta
+    distancia: 0.65
+    ancho: 2.0
+    alto: 2.4
+    antepecho: 0
+- id: oeste_servicio
+  a:
+  - 4.55
+  - 8.55
+  b:
+  - 4.55
+  - 11.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: salida_garden
+    tipo: puerta
+    distancia: 0.55
+    ancho: 0.85
+    alto: 2.15
+    antepecho: 0
+- id: sur_social
+  a:
+  - 3.35
+  - 5.15
+  b:
+  - 9.75
+  - 5.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: paso_master
+    tipo: puerta
+    distancia: 3.35
+    ancho: 0.9
+    alto: 2.15
+    antepecho: 0
+  - id: paso_sec
+    tipo: puerta
+    distancia: 4.85
+    ancho: 0.8
+    alto: 2.15
+    antepecho: 0
+- id: division_suites
+  a:
+  - 7.55
+  - 0
+  b:
+  - 7.55
+  - 5.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_suite_sec
+    tipo: puerta
+    distancia: 3.45
+    ancho: 0.8
+    alto: 2.15
+    antepecho: 0
+- id: bano_master_vertical
+  a:
+  - 4.55
+  - 0
+  b:
+  - 4.55
+  - 2.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: bano_master_norte
+  a:
+  - 3.35
+  - 2.15
+  b:
+  - 4.55
+  - 2.15
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano_master
+    tipo: puerta
+    distancia: 0.2
+    ancho: 0.8
+    alto: 2.15
+    antepecho: 0
+- id: bano_sec_vertical
+  a:
+  - 8.75
+  - 0
+  b:
+  - 8.75
+  - 2.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: bano_sec_norte
+  a:
+  - 8.75
+  - 2.05
+  b:
+  - 10.05
+  - 2.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano_sec
+    tipo: puerta
+    distancia: 0.25
+    ancho: 0.8
+    alto: 2.15
+    antepecho: 0
+- id: sala_comedor
+  a:
+  - 7.55
+  - 5.15
+  b:
+  - 7.55
+  - 8.55
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: social_cocina
+  a:
+  - 3.35
+  - 8.55
+  b:
+  - 9.75
+  - 8.55
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: paso_cocina
+    tipo: puerta
+    distancia: 3.0
+    ancho: 1.4
+    alto: 2.45
+    antepecho: 0
+- id: bano_servicio_sur
+  a:
+  - 4.55
+  - 10.05
+  b:
+  - 6.35
+  - 10.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano_servicio
+    tipo: puerta
+    distancia: 1.0
+    ancho: 0.7
+    alto: 2.15
+    antepecho: 0
+- id: bano_servicio_este
+  a:
+  - 6.35
+  - 10.05
+  b:
+  - 6.35
+  - 11.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+- id: garden_oeste
+  a:
+  - 0
+  - 4.15
+  b:
+  - 0
+  - 15.2
+  espesor: 0.08
+  altura: 1.1
+  aberturas: []
+- id: garden_norte
+  a:
+  - 0
+  - 15.2
+  b:
+  - 6.35
+  - 15.2
+  espesor: 0.08
+  altura: 1.1
+  aberturas: []
+- id: garden_retorno
+  a:
+  - 6.35
+  - 15.2
+  b:
+  - 6.35
+  - 11.05
+  espesor: 0.08
+  altura: 1.1
+  aberturas: []
+pilares: []
+instalaciones:
+- id: agua_cocina
+  tipo: agua
+  posicion:
+  - 8.25
+  - 10.85
+  - 0.6
+- id: agua_master
+  tipo: agua
+  posicion:
+  - 3.5
+  - 0.9
+  - 0.5
+- id: agua_sec
+  tipo: agua
+  posicion:
+  - 9.85
+  - 0.9
+  - 0.5

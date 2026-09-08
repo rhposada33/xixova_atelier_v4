@@ -93,6 +93,10 @@
           "altura": {
             "type": "number",
             "exclusiveMinimum": 0
+          },
+          "cubierto": {
+            "type": "boolean",
+            "default": true
           }
         },
         "required": [

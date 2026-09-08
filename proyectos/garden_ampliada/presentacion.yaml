@@ -1,0 +1,205 @@
+schema: 1
+exposicion: 0.1
+entorno:
+  color:
+  - 0.62
+  - 0.76
+  - 0.92
+  intensidad: 0.7
+luces:
+- id: luz_social
+  posicion:
+  - 6.5
+  - 7.4
+  - 2.55
+  objetivo:
+  - 6.2
+  - 7.0
+  - 0.8
+  potencia: 500
+  tamano: 1.8
+  color:
+  - 1
+  - 0.86
+  - 0.7
+- id: luz_cocina
+  posicion:
+  - 8.0
+  - 9.8
+  - 2.55
+  objetivo:
+  - 8.0
+  - 9.8
+  - 0.8
+  potencia: 350
+  tamano: 1.3
+  color:
+  - 1
+  - 0.9
+  - 0.78
+- id: luz_master
+  posicion:
+  - 6.0
+  - 2.2
+  - 2.55
+  objetivo:
+  - 6.0
+  - 1.8
+  - 0.7
+  potencia: 320
+  tamano: 1.2
+  color:
+  - 1
+  - 0.86
+  - 0.7
+- id: luz_sec
+  posicion:
+  - 8.5
+  - 3.0
+  - 2.55
+  objetivo:
+  - 8.5
+  - 2.7
+  - 0.7
+  potencia: 280
+  tamano: 1.0
+  color:
+  - 1
+  - 0.86
+  - 0.7
+- id: luz_garden
+  posicion:
+  - 2.6
+  - 12.8
+  - 3.8
+  objetivo:
+  - 2.6
+  - 11.5
+  - 0
+  potencia: 650
+  tamano: 3.0
+  color:
+  - 1
+  - 0.93
+  - 0.82
+tomas:
+- id: garden_comedor
+  lente: 26
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 0.45
+    - 10.55
+    - 1.55
+    objetivo:
+    - 1.65
+    - 9.25
+    - 0.85
+  - posicion:
+    - 0.55
+    - 8.15
+    - 1.58
+    objetivo:
+    - 1.65
+    - 9.25
+    - 0.85
+- id: garden_lounge
+  lente: 25
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 1.0
+    - 11.65
+    - 1.58
+    objetivo:
+    - 3.2
+    - 14.1
+    - 0.85
+  - posicion:
+    - 4.9
+    - 11.55
+    - 1.62
+    objetivo:
+    - 3.2
+    - 14.1
+    - 0.85
+- id: cocina
+  lente: 27
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 6.7
+    - 9.15
+    - 1.55
+    objetivo:
+    - 8.0
+    - 10.45
+    - 1.0
+  - posicion:
+    - 9.25
+    - 9.0
+    - 1.6
+    objetivo:
+    - 8.0
+    - 10.45
+    - 1.0
+- id: sala
+  lente: 25
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 3.7
+    - 5.3
+    - 1.58
+    objetivo:
+    - 6.15
+    - 6.65
+    - 0.9
+  - posicion:
+    - 7.35
+    - 5.3
+    - 1.58
+    objetivo:
+    - 6.15
+    - 6.65
+    - 0.9
+- id: suite_principal
+  lente: 27
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 7.25
+    - 4.55
+    - 1.58
+    objetivo:
+    - 6.2
+    - 1.7
+    - 0.8
+  - posicion:
+    - 7.3
+    - 3.25
+    - 1.52
+    objetivo:
+    - 6.2
+    - 1.7
+    - 0.8
+- id: comedor_interior
+  lente: 27
+  fotogramas: 80
+  puntos:
+  - posicion:
+    - 9.45
+    - 8.1
+    - 1.58
+    objetivo:
+    - 8.65
+    - 6.9
+    - 0.85
+  - posicion:
+    - 7.85
+    - 8.15
+    - 1.55
+    objetivo:
+    - 8.65
+    - 6.9
+    - 0.85

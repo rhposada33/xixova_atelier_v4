@@ -202,7 +202,10 @@ def validate(b):
             for op in w['aberturas']:
                 if op['tipo'] != 'puerta': continue
                 points = [[w['a'][j]+(w['b'][j]-w['a'][j])*v/length for j in range(2)] for v in (op['distancia'],op['distancia']+op['ancho'])]
-                clearance = LineString(points).buffer(op['ancho'], cap_style=2)
+                # Reserva aproximada para aproximarse y abrir la hoja. El búfer
+                # anterior usaba el ancho completo a ambos lados y bloqueaba
+                # muebles situados a más de un metro de la puerta.
+                clearance = LineString(points).buffer(min(op['ancho']*.55, .55), cap_style=2)
                 if poly.intersection(clearance).area > .0001 and z < op['alto']:
                     errors.append(diagnostic('PUERTA_BLOQUEADA',item['id'],f'Invade espacio de maniobra conservador de {op["id"]}.'))
     for idx, left in enumerate(placements):

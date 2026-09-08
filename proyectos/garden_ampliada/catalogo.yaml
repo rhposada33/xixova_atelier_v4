@@ -1,0 +1,152 @@
+schema: 1
+activos:
+- id: XVA3_Cama_king
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Cama_king.blend
+  coleccion: XVA3_Cama_king
+  categoria: Dormitorio
+  dimensiones:
+  - 1.98
+  - 2.05
+  - 1.505
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: 600173a825c2af2edbcfd5c147dd1034aa5cf8a529fbb26667659dd5dcd512c2
+- id: XVA3_Cama_doble
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Cama_doble.blend
+  coleccion: XVA3_Cama_doble
+  categoria: Dormitorio
+  dimensiones:
+  - 1.66
+  - 2.05
+  - 1.505
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: b2fb54e1105535ff3831699f7593ac595f541fdb2ca93ab7bae52860b95fb7d8
+- id: XVA3_Mesita_L
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Mesita_L.blend
+  coleccion: XVA3_Mesita_L
+  categoria: Dormitorio
+  dimensiones:
+  - 0.44
+  - 0.484
+  - 0.58
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: 7a27ecc7049a9ea14e621da5a4529cd6cba5ef63a8de30b6e13b1ccdb7ad9063
+- id: XVA3_Mesita_R
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Mesita_R.blend
+  coleccion: XVA3_Mesita_R
+  categoria: Dormitorio
+  dimensiones:
+  - 0.44
+  - 0.484
+  - 0.58
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: 840af7d9f758ed270e691095ce6fcbd9328b8b073358d7328e66d48cccef0e06
+- id: XVA3_Armario_principal
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Armario_principal.blend
+  coleccion: XVA3_Armario_principal
+  categoria: Dormitorio
+  dimensiones:
+  - 1.55
+  - 0.565
+  - 2.4
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: 2b7e420699c8ce09b3dc3824a8b67e3ad4610b3870d1df43070006e03b79833e
+- id: XVA3_Cocina_premium
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Cocina_premium.blend
+  coleccion: XVA3_Cocina_premium
+  categoria: Cocina
+  dimensiones:
+  - 4.0625
+  - 0.783
+  - 2.42
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: d3e30156e4b3f9159ec17ae2480dc4834f2e03417daf41cfd0f1c2a5c0fa382b
+- id: XVA3_Bano_principal
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Bano_principal.blend
+  coleccion: XVA3_Bano_principal
+  categoria: Baño
+  dimensiones:
+  - 1.408567
+  - 1.572
+  - 2.05
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: e82f9645de14ad202d05ac65160095b0e39c2806695c9fda06d29f92b84f4b3d
+- id: sofa_recto
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/sofa_recto.blend
+  coleccion: sofa_recto
+  categoria: Sala
+  dimensiones:
+  - 2.1
+  - 0.791289
+  - 0.800514
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: CC Attribution
+  autor: mk.ldeclaros / Sketchfab
+  sha256: 6a57749e169470df65d39956af974d999d9e5641ff626e9b09c3d933d00963ab
+- id: comedor
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/comedor.blend
+  coleccion: comedor
+  categoria: Comedor
+  dimensiones:
+  - 0.9
+  - 2.36
+  - 0.97123
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: ab5d5a6a900f42cba5ff3d5604e4071a070dc1b957e9c82031406b08eed392d7
+- id: mesa_centro
+  archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/mesa_centro.blend
+  coleccion: mesa_centro
+  categoria: Sala
+  dimensiones:
+  - 1.04
+  - 0.62
+  - 0.45035
+  origen: CENTER_XY_BASE_Z
+  frente: +Y
+  apoyo: suelo
+  holgura: 0.02
+  licencia: propia
+  autor: XIXOVÁ Atelier
+  sha256: ae31eb2ff378af2f608c634fe47826c050bcfb3c538424d14771804eaaf4f038

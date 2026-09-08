@@ -1,0 +1,205 @@
+schema: 1
+id: natural_contemporanea
+arquitectura:
+  id: garden_ampliada
+  version: 0.1-borrador
+  hash: 069e269d1cd4eac29598d72d1bbded02017c929e33517e4b05ad78a5a80fd6ef
+materiales:
+  pared_cal:
+    color:
+    - 0.72
+    - 0.69
+    - 0.62
+    rugosidad: 0.78
+  porcelanato:
+    color:
+    - 0.69
+    - 0.66
+    - 0.58
+    rugosidad: 0.38
+  roble:
+    color:
+    - 0.32
+    - 0.16
+    - 0.07
+    rugosidad: 0.52
+  garden:
+    color:
+    - 0.5
+    - 0.48
+    - 0.4
+    rugosidad: 0.72
+  techo:
+    color:
+    - 0.82
+    - 0.81
+    - 0.76
+    rugosidad: 0.82
+acabados:
+  fachada_sur_master: pared_cal
+  fachada_sur_sec: pared_cal
+  fachada_este: pared_cal
+  limite_este_social: pared_cal
+  norte_cocina: pared_cal
+  oeste_master: pared_cal
+  oeste_sala: pared_cal
+  oeste_servicio: pared_cal
+  sur_social: pared_cal
+  division_suites: pared_cal
+  bano_master_vertical: pared_cal
+  bano_master_norte: pared_cal
+  bano_sec_vertical: pared_cal
+  bano_sec_norte: pared_cal
+  sala_comedor: pared_cal
+  social_cocina: pared_cal
+  bano_servicio_sur: pared_cal
+  bano_servicio_este: pared_cal
+  garden_oeste: pared_cal
+  garden_norte: pared_cal
+  garden_retorno: pared_cal
+  suite_principal:piso: roble
+  suite_principal:techo: techo
+  bano_principal:piso: porcelanato
+  bano_principal:techo: techo
+  suite_secundaria:piso: roble
+  suite_secundaria:techo: techo
+  bano_secundario:piso: porcelanato
+  bano_secundario:techo: techo
+  circulacion:piso: porcelanato
+  circulacion:techo: techo
+  sala:piso: porcelanato
+  sala:techo: techo
+  comedor:piso: porcelanato
+  comedor:techo: techo
+  lavabo:piso: porcelanato
+  lavabo:techo: techo
+  cocina:piso: porcelanato
+  cocina:techo: techo
+  bano_servicio:piso: porcelanato
+  bano_servicio:techo: techo
+  garden_lateral:piso: garden
+  garden_lateral:techo: techo
+  garden_superior:piso: garden
+  garden_superior:techo: techo
+elementos:
+- id: cama_principal
+  activo: XVA3_Cama_king
+  espacio: suite_principal
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 6.25
+    - 1.75
+    - 0
+    rotacion: 0
+  escala: 1
+- id: mesita_principal
+  activo: XVA3_Mesita_L
+  espacio: suite_principal
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 4.88
+    - 1.55
+    - 0
+    rotacion: 0
+  escala: 1
+- id: armario_principal
+  activo: XVA3_Armario_principal
+  espacio: suite_principal
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.35
+    - 3.75
+    - 0
+    rotacion: 0
+  escala: 1
+- id: cama_secundaria
+  activo: XVA3_Cama_doble
+  espacio: suite_secundaria
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.7
+    - 3.35
+    - 0
+    rotacion: 0
+  escala: 0.72
+- id: cocina_lineal
+  activo: XVA3_Cocina_premium
+  espacio: cocina
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.0
+    - 10.62
+    - 0
+    rotacion: 0
+  escala: 0.78
+- id: comedor_interior
+  activo: comedor
+  espacio: comedor
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.65
+    - 6.9
+    - 0
+    rotacion: 0
+  escala: 0.68
+- id: sofa_principal
+  activo: sofa_recto
+  espacio: sala
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 6.25
+    - 6.55
+    - 0
+    rotacion: 180
+  escala: 0.9
+- id: mesa_centro
+  activo: mesa_centro
+  espacio: sala
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.9
+    - 7.55
+    - 0
+    rotacion: 0
+  escala: 0.9
+- id: comedor_garden
+  activo: comedor
+  espacio: garden_lateral
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 1.65
+    - 9.25
+    - 0
+    rotacion: 0
+  escala: 0.88
+- id: sofa_garden
+  activo: sofa_recto
+  espacio: garden_superior
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 3.2
+    - 14.25
+    - 0
+    rotacion: 180
+  escala: 1.12
+- id: mesa_garden
+  activo: mesa_centro
+  espacio: garden_superior
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 2.3
+    - 12.65
+    - 0
+    rotacion: 0
+  escala: 1.1

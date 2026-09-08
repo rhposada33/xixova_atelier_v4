@@ -1,0 +1,33 @@
+schema: 1
+id: garden_ampliada
+arquitectura: arquitectura.yaml
+variantes:
+  natural_contemporanea: natural_contemporanea.yaml
+presentacion: presentacion.yaml
+produccion:
+  catalogo: catalogo.yaml
+  blender: ~/Aplicaciones/blender-4.5/blender
+  salidas: ../../resultados/framework
+  fps: 24
+  gpu_vram_gb: 6
+  ram_gb: 16
+  licencias_permitidas:
+  - propia
+  - CC0
+  - CC Attribution
+  perfiles:
+    previa:
+      resolucion:
+      - 640
+      - 360
+      muestras: 12
+    animatica:
+      resolucion:
+      - 480
+      - 270
+      muestras: 6
+    final:
+      resolucion:
+      - 746
+      - 420
+      muestras: 32

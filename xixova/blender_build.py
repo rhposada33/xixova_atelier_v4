@@ -52,7 +52,8 @@ def build(data,out,architecture_only=False):
     def finish(id): return neutral if architecture_only else mats.get(interior['acabados'].get(id),neutral)
     for r in a['espacios']:
         slab(arch,r['id']+':piso',r['contorno'],0,.12,finish(r['id']+':piso'))
-        slab(arch,r['id']+':techo',r['contorno'],r['altura']+.12,.12,finish(r['id']+':techo'))
+        if r.get('cubierto', True):
+            slab(arch,r['id']+':techo',r['contorno'],r['altura']+.12,.12,finish(r['id']+':techo'))
     for p in a['pilares']: slab(arch,p['id'],p['contorno'],p['altura'],p['altura'],finish(p['id']))
     for w in a['paredes']:
         dx,dy=w['b'][0]-w['a'][0],w['b'][1]-w['a'][1]; length=math.hypot(dx,dy); angle=math.atan2(dy,dx)
