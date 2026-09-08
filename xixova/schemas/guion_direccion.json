@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/guion_direccion.json",
+  "type": "object",
+  "required": [
+    "schema",
+    "fps",
+    "duracion",
+    "semilla",
+    "tomas",
+    "pistas",
+    "marcadores"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "fps": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "duracion": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "semilla": {
+      "type": "integer"
+    },
+    "tomas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "inicio",
+          "duracion",
+          "camara"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "inicio": {
+            "type": "number",
+            "minimum": 0
+          },
+          "duracion": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "camara": {
+            "type": "string"
+          },
+          "transicion": {
+            "enum": [
+              "corte",
+              "disolver"
+            ]
+          }
+        }
+      }
+    },
+    "pistas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "tipo",
+          "objetivo",
+          "propiedad",
+          "claves"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tipo": {
+            "enum": [
+              "camara",
+              "objeto",
+              "puerta",
+              "luz",
+              "material"
+            ]
+          },
+          "objetivo": {
+            "type": "string"
+          },
+          "propiedad": {
+            "enum": [
+              "posicion",
+              "rotacion",
+              "escala",
+              "visible",
+              "objetivo",
+              "lente",
+              "apertura",
+              "foco",
+              "exposicion",
+              "potencia",
+              "temperatura",
+              "color",
+              "rugosidad",
+              "metalico",
+              "emision"
+            ]
+          },
+          "claves": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "tiempo",
+                "valor",
+                "interpolacion"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "tiempo": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "valor": {},
+                "interpolacion": {
+                  "enum": [
+                    "linear",
+                    "bezier",
+                    "ease_in",
+                    "ease_out",
+                    "ease_in_out",
+                    "hold"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "marcadores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "tiempo",
+          "texto"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tiempo": {
+            "type": "number",
+            "minimum": 0
+          },
+          "texto": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

@@ -79,6 +79,21 @@ def slab(c,id,points,z,thickness,mat):
 
 def aim(o,target): o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
 
+def timeline_value(track,time):
+    keys=sorted(track.get('claves',[]),key=lambda k:k['tiempo'])
+    if not keys:return None
+    if time<=keys[0]['tiempo']:return keys[0]['valor']
+    if time>=keys[-1]['tiempo']:return keys[-1]['valor']
+    i=next(i for i,k in enumerate(keys) if k['tiempo']>=time); a,b=keys[i-1],keys[i]
+    t=(time-a['tiempo'])/(b['tiempo']-a['tiempo']); mode=a.get('interpolacion','linear')
+    if mode=='hold':t=0
+    elif mode in {'bezier','ease_in_out'}:t=t*t*(3-2*t)
+    elif mode=='ease_in':t=t*t
+    elif mode=='ease_out':t=1-(1-t)*(1-t)
+    if isinstance(a['valor'],list):return [x+(y-x)*t for x,y in zip(a['valor'],b['valor'])]
+    if isinstance(a['valor'],bool):return a['valor'] if t<.5 else b['valor']
+    return a['valor']+(b['valor']-a['valor'])*t
+
 def segment_distance(point,a,b):
     dx,dy=b[0]-a[0],b[1]-a[1]; length=dx*dx+dy*dy
     t=0 if not length else max(0,min(1,((point[0]-a[0])*dx+(point[1]-a[1])*dy)/length))
@@ -131,6 +146,9 @@ def build(data,out,architecture_only=False):
             for edge,label in ((door['distancia'],'izq'),(door['distancia']+door['ancho'],'der')):
                 center=edge
                 obj=box(enrichment,door['id']+':jamba:'+label,(w['a'][0]+dx*center/length,w['a'][1]+dy*center/length,door['alto']/2),(.055,w['espesor']+.035,door['alto']),neutral,angle,.003); obj['xixova_regenerable']=True
+            center=door['distancia']+door['ancho']/2
+            leaf=box(enrichment,door['id'],(w['a'][0]+dx*center/length,w['a'][1]+dy*center/length,door['alto']/2),(door['ancho'],.04,door['alto']),neutral,angle,.004)
+            leaf['xixova_sync_role']='puerta'; leaf['xixova_regenerable']=True
         trim_part(trim_cursor,length,'final')
     for p in a['instalaciones']:
         o=bpy.data.objects.new(p['id'],None); arch.objects.link(o); o.location=p['posicion']; o['xixova_capa']='ARQUITECTURA'; o['xixova_id']=p['id']; o['tipo']=p['tipo']
@@ -192,6 +210,16 @@ def build(data,out,architecture_only=False):
             cam.dof.focus_object=focus
         marker=scene.timeline_markers.new(shot['id'],frame=offset+1); marker.camera=o
         if offset==0: scene.camera=o
+        direction=data.get('direccion'); source=shot.get('_director_camera',shot['id'])
+        if direction:
+            for prop,path in (('lente','lens'),('apertura','dof.aperture_fstop')):
+                track=next((t for t in direction['pistas'] if t['objetivo']==source and t['propiedad']==prop),None)
+                if track:
+                    for local in range(shot['fotogramas']):
+                        tm=shot.get('_director_inicio',0)+local/max(1,shot['fotogramas']-1)*(shot['fotogramas']/direction['fps'])
+                        value=timeline_value(track,tm)
+                        if prop=='lente':cam.lens=value; cam.keyframe_insert('lens',frame=offset+local+1)
+                        else:cam.dof.use_dof=True; cam.dof.aperture_fstop=value; cam.dof.keyframe_insert('aperture_fstop',frame=offset+local+1)
         # Corte arquitectónico fotográfico: oculta sólo durante esta toma los muros
         # que contienen la cámara o bloquean la línea al protagonista.
         hidden=[]
@@ -199,6 +227,32 @@ def build(data,out,architecture_only=False):
             if any(segment_distance(point['posicion'],wall['a'],wall['b'])<.28 or segments_cross(point['posicion'],point['objetivo'],wall['a'],wall['b']) for point in shot['puntos']): hidden.append(wall['id'])
         shot_ranges.append((shot['id'],offset+1,offset+shot['fotogramas'],hidden))
         offset+=shot['fotogramas']
+    # Pistas de objetos, puertas y luces. Se hornean para que Blender y WebGL
+    # compartan exactamente el mismo reloj.
+    if data.get('direccion'):
+        fps=data['direccion']['fps']
+        for track in data['direccion']['pistas']:
+            if track['tipo']=='material':
+                mat=next((m for m in bpy.data.materials if m.get('xixova_material_id')==track['objetivo']),None)
+                if not mat or not mat.use_nodes:continue
+                bs=mat.node_tree.nodes.get('Principled BSDF'); sockets={'rugosidad':'Roughness','metalico':'Metallic','color':'Base Color','emision':'Emission Strength'}
+                socket=bs.inputs.get(sockets.get(track['propiedad'],'')) if bs else None
+                if socket:
+                    for key in track['claves']:
+                        value=key['valor']; socket.default_value=(*value,1) if track['propiedad']=='color' else value; socket.keyframe_insert('default_value',frame=round(key['tiempo']*fps)+1)
+                continue
+            if track['tipo'] not in {'objeto','puerta','luz'}:continue
+            obj=next((o for o in scene.objects if o.get('xixova_id')==track['objetivo'] and (o.get('xixova_sync_role') or o.type=='LIGHT')),None)
+            if obj is None:continue
+            for key in track['claves']:
+                value=key['valor']; frame=round(key['tiempo']*fps)+1; prop=track['propiedad']
+                if prop=='posicion':obj.location=value; obj.keyframe_insert('location',frame=frame)
+                elif prop=='rotacion':obj.rotation_euler=[math.radians(x) for x in value] if isinstance(value,list) else (0,0,math.radians(value)); obj.keyframe_insert('rotation_euler',frame=frame)
+                elif prop=='escala':obj.scale=value if isinstance(value,list) else (value,)*3; obj.keyframe_insert('scale',frame=frame)
+                elif prop=='visible':obj.hide_render=not value; obj.hide_viewport=not value; obj.keyframe_insert('hide_render',frame=frame); obj.keyframe_insert('hide_viewport',frame=frame)
+                elif prop=='potencia' and obj.type=='LIGHT':obj.data.energy=value; obj.data.keyframe_insert('energy',frame=frame)
+                elif prop=='color' and obj.type=='LIGHT':obj.data.color=value; obj.data.keyframe_insert('color',frame=frame)
+                elif prop=='temperatura' and obj.type=='LIGHT':obj.data.color=kelvin(value); obj.data.keyframe_insert('color',frame=frame)
     scene['xixova_cortes']=json.dumps({shot_id:walls for shot_id,start,end,walls in shot_ranges},sort_keys=True)
     for obj in arch.all_objects:
         identifier=obj.get('xixova_id',''); relevant=[shot_id for shot_id,start,end,walls in shot_ranges if any(identifier==wall or identifier.startswith(wall+':') for wall in walls)]

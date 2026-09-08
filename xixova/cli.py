@@ -83,7 +83,7 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['biblioteca','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
+    parser.add_argument('accion',choices=['director','biblioteca','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
     parser.add_argument('subaccion',nargs='?',choices=['buscar','candidatos','descargar','evaluar','aceptar','rechazar','publicar','auditar'])
     parser.add_argument('-p','--proyecto',type=Path); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
@@ -92,6 +92,7 @@ def main(argv=None):
     parser.add_argument('--biblioteca-raiz',type=Path); parser.add_argument('--consulta'); parser.add_argument('--limite',type=int,default=20)
     parser.add_argument('--entrada',type=Path); parser.add_argument('--id'); parser.add_argument('--archivo',type=Path); parser.add_argument('--motivo')
     parser.add_argument('--puntuacion-materiales',type=float); parser.add_argument('--puntuacion-geometria',type=float)
+    parser.add_argument('--port',type=int,default=8765); parser.add_argument('--no-browser',action='store_true')
     args=parser.parse_args(argv)
     try:
         if args.accion=='biblioteca':
@@ -144,6 +145,9 @@ def main(argv=None):
                 item['estado']='publicado'; write_yaml(root/'catalogo_biblioteca.yaml',data); catalog=rebuild_public_catalog(root,data)
                 print(json.dumps({'ok':True,'provider_id':args.id,'catalogo':str(catalog)},ensure_ascii=False)); return 0
         if not args.proyecto: raise ValueError('Indica -p/--proyecto.')
+        if args.accion=='director':
+            from .director_server import serve
+            serve(args.proyecto,args.variante,port=args.port,open_browser=not args.no_browser); return 0
         if args.accion=='sincronizar':
             if not args.captura: raise ValueError('Falta --captura JSON exportado desde Blender.')
             from .sync import synchronize

@@ -123,6 +123,29 @@ uv run xixova_cli.py auditar-realismo -p proyectos/apartamento_compacto/proyecto
 
 Los comandos `enriquecer-arquitectura`, `asignar-activos`, `resolver-iluminacion`, `resolver-camaras`, `corregir-realismo`, `informe-visual` y `aprobar-realismo` permiten ejecutar cada etapa por separado. El ensamblador conserva la arquitectura confirmada y crea los detalles en `ENRIQUECIMIENTO`. Las correcciones deterministas usan hasta dos rondas; sólo los diagnósticos restantes pasan al agente.
 
+## Xixova Director
+
+El Director abre un editor local WebGL con planta sincronizada, árbol de escena,
+inspector de lente, presets de movimiento y timeline de cámaras, objetos, puertas,
+luces y materiales:
+
+```bash
+uv run xixova_cli.py director -p proyectos/apartamento_compacto/proyecto.yaml \
+  --variante natural_lila
+```
+
+Los cambios se guardan primero en `.director/VARIANTE/borrador.yaml`. **Publicar
+guion** hace un reemplazo atómico de `guion_direccion.yaml`; el antiguo
+`guion_camara.yaml` permanece intacto. Director rechaza cambios si un YAML del
+proyecto cambió desde que se abrió. `Vista rápida`, `Validar toma`, la animática y
+el render construyen una escena aislada por el hash completo del guion y pueden
+cancelarse desde la API.
+
+La interfaz pública incluye `/api/project`, `/api/scene.glb`, `/api/script`,
+`/api/commands`, `/api/validate`, `/api/preview/frame`, `/api/preview/shot`,
+`/api/animatic`, `/api/render` y el WebSocket `/api/jobs`. `/api/context` devuelve
+el contexto compacto para una IA, normalmente muy por debajo de 4 KB.
+
 ## Informe de las entregas
 
 Después de producir los cuatro recorridos, se puede regenerar la comparación local:
