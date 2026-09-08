@@ -13,7 +13,7 @@ from .core import contract, digest, read, validate
 def _placement(item):
     result = {"id": item["id"], "activo": item["activo"], "espacio": item["espacio"],
               "colocacion": item["colocacion"]}
-    for key in ("escala", "material"):
+    for key in ("escala", "material", "nivel_detalle"):
         if key in item:
             result[key] = item[key]
     return result

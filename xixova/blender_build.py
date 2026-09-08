@@ -71,15 +71,27 @@ def slab(c,id,points,z,thickness,mat):
     faces=[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(j,(j+1)%n,(j+1)%n+n,j+n) for j in range(n)]
     mesh=bpy.data.meshes.new(id); mesh.from_pydata(vertices,[],faces); mesh.update()
     o=bpy.data.objects.new(id,mesh); c.objects.link(o); o['xixova_id']=id; o['xixova_capa']=c.name; o.data.materials.append(mat)
+    uv=mesh.uv_layers.new(name='UVMap')
+    for loop in mesh.loops:
+        vertex=mesh.vertices[loop.vertex_index].co; uv.data[loop.index].uv=(vertex.x,vertex.y)
     # Blender tessellates concave n-gons for render.
     return o
 
 def aim(o,target): o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
 
+def segment_distance(point,a,b):
+    dx,dy=b[0]-a[0],b[1]-a[1]; length=dx*dx+dy*dy
+    t=0 if not length else max(0,min(1,((point[0]-a[0])*dx+(point[1]-a[1])*dy)/length))
+    return math.hypot(point[0]-(a[0]+t*dx),point[1]-(a[1]+t*dy))
+
+def segments_cross(a,b,c,d):
+    def side(p,q,r):return (q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0])
+    return side(a,b,c)*side(a,b,d)<0 and side(c,d,a)*side(c,d,b)<0
+
 def build(data,out,architecture_only=False):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     a=data['arquitectura']; interior=data['interiorismo']; scene=bpy.context.scene
-    arch=collection('ARQUITECTURA'); decor=collection('INTERIORISMO'); presentation=collection('PRESENTACION')
+    arch=collection('ARQUITECTURA'); decor=collection('INTERIORISMO'); presentation=collection('PRESENTACION'); enrichment=collection('ENRIQUECIMIENTO')
     neutral=material('Neutro',{'color':[.72,.72,.69],'rugosidad':.65})
     mats={k:material(interior['id']+'/'+k,v) for k,v in interior['materiales'].items()}
     for key, mat in mats.items(): mat['xixova_material_id']=key
@@ -106,15 +118,35 @@ def build(data,out,architecture_only=False):
                 for x,y,z,t,label in [(start,start+.035,bottom,top,'izq'),(end-.035,end,bottom,top,'der'),(start,end,bottom,bottom+.035,'inf'),(start,end,top-.035,top,'sup')]: segment(x,y,z,t,':'+op['id']+label,neutral,.06)
             cursor=end
         segment(cursor,length,0,w['altura'],':final')
+        # Molduras regenerables, cortadas en puertas y apenas separadas de la pared.
+        trim_cursor=0
+        doors=sorted((op for op in w['aberturas'] if op['tipo']=='puerta'),key=lambda op:op['distancia'])
+        def trim_part(start,end,suffix):
+            if end-start<=.01:return
+            center=(start+end)/2
+            obj=box(enrichment,w['id']+':rodapie:'+suffix,(w['a'][0]+dx*center/length,w['a'][1]+dy*center/length,.045),(end-start,w['espesor']+.026,.09),neutral,angle,.004)
+            obj['xixova_regenerable']=True
+        for door in doors:
+            trim_part(trim_cursor,door['distancia'],door['id']+'a'); trim_cursor=door['distancia']+door['ancho']
+            for edge,label in ((door['distancia'],'izq'),(door['distancia']+door['ancho'],'der')):
+                center=edge
+                obj=box(enrichment,door['id']+':jamba:'+label,(w['a'][0]+dx*center/length,w['a'][1]+dy*center/length,door['alto']/2),(.055,w['espesor']+.035,door['alto']),neutral,angle,.003); obj['xixova_regenerable']=True
+        trim_part(trim_cursor,length,'final')
     for p in a['instalaciones']:
         o=bpy.data.objects.new(p['id'],None); arch.objects.link(o); o.location=p['posicion']; o['xixova_capa']='ARQUITECTURA'; o['xixova_id']=p['id']; o['tipo']=p['tipo']
+    # Exterior regenerable: evita ventanas hacia un vacío sin escala ni horizonte.
+    all_points=[point for room in a['espacios'] for point in room['contorno']]; xs=[p[0] for p in all_points]; ys=[p[1] for p in all_points]
+    exterior=box(enrichment,'exterior:suelo',((min(xs)+max(xs))/2,(min(ys)+max(ys))/2,-.16),(max(xs)-min(xs)+24,max(ys)-min(ys)+24,.08),neutral,bevel=0)
+    exterior['xixova_regenerable']=True
     if not architecture_only:
         assets={x['id']:x for x in data['catalogo']['activos']}
         for item in data['resueltos']:
             asset=assets[item['activo']]
-            with bpy.data.libraries.load(asset['archivo'],link=False) as (src,dst):
-                if asset['coleccion'] not in src.collections: raise RuntimeError('Colección ausente: '+asset['coleccion'])
-                dst.collections=[asset['coleccion']]
+            level=item.get('nivel_detalle','standard'); detail=asset.get('niveles',{}).get(level)
+            asset_path=detail['ruta'] if detail else asset['archivo']; asset_collection=detail.get('coleccion',asset['coleccion']) if detail else asset['coleccion']
+            with bpy.data.libraries.load(asset_path,link=False) as (src,dst):
+                if asset_collection not in src.collections: raise RuntimeError('Colección ausente: '+asset_collection)
+                dst.collections=[asset_collection]
             imported=dst.collections[0]; decor.children.link(imported)
             parent=bpy.data.objects.new(item['id'],None); decor.objects.link(parent); parent['xixova_id']=item['id']; parent['xixova_capa']='INTERIORISMO'
             objects=list(imported.all_objects)
@@ -139,7 +171,11 @@ def build(data,out,architecture_only=False):
         kind=light.get('tipo','AREA'); ld=bpy.data.lights.new(light['id'],kind); ld.energy=light['potencia']; ld.color=kelvin(light['temperatura_k']) if light.get('temperatura_k') else light['color']
         if kind=='AREA': ld.shape=light.get('forma','DISK'); ld.size=light['tamano']; ld.size_y=light.get('tamano_y',light['tamano'])
         o=bpy.data.objects.new(light['id'],ld); presentation.objects.link(o); o.location=light['posicion']; aim(o,light['objetivo']); o['xixova_capa']='PRESENTACION'; o['xixova_id']=light['id']; o['xixova_sync_role']='luz'
-    offset=0
+        # Difusor visible asociado a la fuente fotométrica.
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=24,ring_count=12,radius=max(.035,min(.12,light['tamano']*.06)),location=light['posicion'])
+        diffuser=move(bpy.context.object,enrichment,light['id']+':difusor'); diffuser['xixova_fuente_luz']=light['id']; diffuser['xixova_regenerable']=True
+        em=material(light['id']+'/emision',{'color':[1,.82,.62],'rugosidad':.35}); bs=em.node_tree.nodes.get('Principled BSDF'); bs.inputs['Emission Color'].default_value=(*ld.color,1); bs.inputs['Emission Strength'].default_value=2.5; diffuser.data.materials.append(em)
+    offset=0; shot_ranges=[]
     for shot in p['tomas']:
         cam=bpy.data.cameras.new(shot['id']); cam.lens=shot['lente']; cam.sensor_width=shot.get('sensor_mm',36); o=bpy.data.objects.new(shot['id'],cam); presentation.objects.link(o); o['xixova_capa']='PRESENTACION'
         o['xixova_id']=shot['id']; o['xixova_sync_role']='camara'
@@ -156,7 +192,17 @@ def build(data,out,architecture_only=False):
             cam.dof.focus_object=focus
         marker=scene.timeline_markers.new(shot['id'],frame=offset+1); marker.camera=o
         if offset==0: scene.camera=o
+        # Corte arquitectónico fotográfico: oculta sólo durante esta toma los muros
+        # que contienen la cámara o bloquean la línea al protagonista.
+        hidden=[]
+        for wall in a['paredes']:
+            if any(segment_distance(point['posicion'],wall['a'],wall['b'])<.28 or segments_cross(point['posicion'],point['objetivo'],wall['a'],wall['b']) for point in shot['puntos']): hidden.append(wall['id'])
+        shot_ranges.append((shot['id'],offset+1,offset+shot['fotogramas'],hidden))
         offset+=shot['fotogramas']
+    scene['xixova_cortes']=json.dumps({shot_id:walls for shot_id,start,end,walls in shot_ranges},sort_keys=True)
+    for obj in arch.all_objects:
+        identifier=obj.get('xixova_id',''); relevant=[shot_id for shot_id,start,end,walls in shot_ranges if any(identifier==wall or identifier.startswith(wall+':') for wall in walls)]
+        if relevant: obj['xixova_corte_tomas']=','.join(relevant)
     scene.frame_start=1; scene.frame_end=offset; scene.render.fps=data['proyecto']['produccion']['fps']
     scene.render.engine='CYCLES'; scene.cycles.use_denoising=True; scene.cycles.use_adaptive_sampling=True
     prefs=bpy.context.preferences.addons['cycles'].preferences

@@ -51,6 +51,19 @@
             "required": ["minima", "maxima"],
             "additionalProperties": false
           },
+          "niveles": {
+            "type": "object",
+            "properties": {
+              "proxy": {"$ref": "#/$defs/nivel"},
+              "standard": {"$ref": "#/$defs/nivel"},
+              "hero": {"$ref": "#/$defs/nivel"}
+            },
+            "required": ["proxy", "standard", "hero"],
+            "additionalProperties": false
+          },
+          "memoria_estimada_mb": {"type": "number", "minimum": 0},
+          "puntuacion_materiales": {"type": "number", "minimum": 0, "maximum": 10},
+          "puntuacion_geometria": {"type": "number", "minimum": 0, "maximum": 10},
           "apoyo": {
             "const": "suelo"
           },
@@ -94,5 +107,17 @@
     "schema",
     "activos"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "nivel": {
+      "type": "object",
+      "properties": {
+        "ruta": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "coleccion": {"type": "string", "minLength": 1}
+      },
+      "required": ["ruta", "sha256", "coleccion"],
+      "additionalProperties": false
+    }
+  }
 }

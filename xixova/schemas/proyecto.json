@@ -34,12 +34,29 @@
       "type": "string",
       "minLength": 1
     },
+    "realismo": {
+      "type": "object",
+      "properties": {
+        "perfil": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
+        "calidad": {"enum": ["equilibrada", "fotografica"]},
+        "semilla": {"type": "integer"},
+        "hora_solar": {"type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$"},
+        "densidad_decoracion": {"enum": ["baja", "media", "alta"]}
+      },
+      "required": ["perfil", "calidad", "semilla", "hora_solar", "densidad_decoracion"],
+      "additionalProperties": false
+    },
     "produccion": {
       "type": "object",
       "properties": {
         "catalogo": {
           "type": "string",
           "minLength": 1
+        },
+        "bibliotecas": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "uniqueItems": true
         },
         "blender": {
           "type": "string",

@@ -5,6 +5,12 @@ variantes:
   calida: calida.yaml
   mineral: mineral.yaml
 presentacion: presentacion.yaml
+realismo:
+  perfil: lujo_editorial_golden_hour
+  calidad: fotografica
+  semilla: 1842
+  hora_solar: "18:10"
+  densidad_decoracion: media
 produccion:
   catalogo: catalogo.yaml
   blender: ~/Aplicaciones/blender-4.5/blender
@@ -16,6 +22,7 @@ produccion:
   - propia
   - CC0
   - CC Attribution
+  - Royalty Free
   perfiles:
     previa:
       resolucion:

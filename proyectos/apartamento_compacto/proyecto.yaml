@@ -4,6 +4,12 @@ arquitectura: arquitectura.yaml
 variantes:
   natural_lila: natural_lila.yaml
 presentacion: presentacion.yaml
+realismo:
+  perfil: lujo_editorial_golden_hour
+  calidad: fotografica
+  semilla: 1842
+  hora_solar: "18:10"
+  densidad_decoracion: media
 guion_camara: guion_camara.yaml
 produccion:
   catalogo: catalogo.yaml
@@ -16,6 +22,7 @@ produccion:
   - propia
   - CC0
   - CC Attribution
+  - Royalty Free
   perfiles:
     previa:
       resolucion:

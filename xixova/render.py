@@ -40,6 +40,12 @@ for frame in frames:
     target=out/f'frame_{frame:04d}.png'
     if png_ok(target,w,h): print('OMITIDO',frame,flush=True); continue
     scene.frame_set(frame); marker=max((m for m in scene.timeline_markers if m.frame<=frame),key=lambda m:m.frame); scene.camera=marker.camera
+    cutaways=json.loads(scene.get('xixova_cortes','{}')).get(marker.camera.get('xixova_id'),[])
+    architecture=bpy.data.collections.get('ARQUITECTURA')
+    if architecture:
+        for obj in architecture.all_objects:
+            if obj is None: continue
+            identifier=obj.get('xixova_id',''); obj.hide_render=any(identifier==wall or identifier.startswith(wall+':') for wall in cutaways)
     shot=next((x for x in data['presentacion']['tomas'] if x['id']==marker.camera.get('xixova_id')),None)
     scene.view_settings.exposure=shot.get('exposicion',data['presentacion']['exposicion']) if shot else data['presentacion']['exposicion']
     tmp=out/f'frame_{frame:04d}.tmp.png'; scene.render.filepath=str(tmp); start=time.monotonic(); bpy.ops.render.render(write_still=True)

@@ -11,6 +11,7 @@ import struct
 import subprocess
 import sys
 from pathlib import Path
+import yaml
 from .core import ROOT, camera_frames, diagnostic, digest, load, resolve
 
 def atomic(path,data):
@@ -82,13 +83,67 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
-    parser.add_argument('-p','--proyecto',type=Path,required=True); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
+    parser.add_argument('accion',choices=['biblioteca','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
+    parser.add_argument('subaccion',nargs='?',choices=['buscar','candidatos','descargar','evaluar','aceptar','rechazar','publicar','auditar'])
+    parser.add_argument('-p','--proyecto',type=Path); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
     parser.add_argument('--compacto',action='store_true'); parser.add_argument('--desde',type=Path); parser.add_argument('--operaciones',type=Path); parser.add_argument('--toma',action='append')
     parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final','piloto_fotografico','fotografico_1080p']); parser.add_argument('--guion',type=Path)
+    parser.add_argument('--biblioteca-raiz',type=Path); parser.add_argument('--consulta'); parser.add_argument('--limite',type=int,default=20)
+    parser.add_argument('--entrada',type=Path); parser.add_argument('--id'); parser.add_argument('--archivo',type=Path); parser.add_argument('--motivo')
+    parser.add_argument('--puntuacion-materiales',type=float); parser.add_argument('--puntuacion-geometria',type=float)
     args=parser.parse_args(argv)
     try:
+        if args.accion=='biblioteca':
+            from .library import (add_candidates, audit_library, default_root, init_library,
+                                  load_manifest, register_download, request_search, set_state,
+                                  write_yaml, find_asset, audit_asset, rebuild_public_catalog)
+            root=(args.biblioteca_raiz or default_root()).resolve(); action=args.subaccion
+            if not action: raise ValueError('Indica una acción de biblioteca.')
+            if action=='buscar':
+                if not args.consulta or not args.categoria: raise ValueError('Indica --consulta y --categoria.')
+                target=request_search(root,query=args.consulta,category=args.categoria,limit=args.limite,max_width=args.ancho_max)
+                print(json.dumps({'ok':True,'solicitud':str(target),'siguiente':'Ejecutar búsqueda mediante Blender MCP y guardar resultados con biblioteca candidatos.'},ensure_ascii=False)); return 0
+            if action=='candidatos':
+                if not args.entrada: raise ValueError('Indica --entrada JSON/YAML con resultados compactos de BlenderKit.')
+                raw=yaml.safe_load(args.entrada.read_text(encoding='utf-8')); candidates=raw.get('activos',raw) if isinstance(raw,dict) else raw
+                print(json.dumps(add_candidates(root,candidates),ensure_ascii=False)); return 0
+            init_library(root)
+            if action=='auditar':
+                report=audit_library(root); print(json.dumps(report,ensure_ascii=False,indent=2)); return 0 if report['ok'] else 1
+            if not args.id: raise ValueError('Indica --id de BlenderKit.')
+            if action=='descargar':
+                if not args.archivo: raise ValueError('Indica --archivo descargado por BlenderKit.')
+                item=register_download(root,args.id,args.archivo.resolve()); print(json.dumps(item,ensure_ascii=False)); return 0
+            if action in {'aceptar','rechazar'}:
+                item=set_state(root,args.id,'aceptado' if action=='aceptar' else 'rechazado',args.motivo)
+                print(json.dumps(item,ensure_ascii=False)); return 0
+            if action=='evaluar':
+                if not args.entrada: raise ValueError('Indica --entrada con el informe generado dentro de Blender.')
+                data=load_manifest(root); item=find_asset(data,args.id); report=yaml.safe_load(args.entrada.read_text(encoding='utf-8'))
+                item['dimensiones']=report.get('dimensiones',item.get('dimensiones'))
+                dimensions=report.get('dimensiones',[])
+                item['auditoria']={**item.get('auditoria',{}),**report,
+                    'escala_valida':len(dimensions)==3 and all(0<x<20 for x in dimensions),
+                    'texturas_completas':not report.get('texturas_ausentes'),
+                    'memoria_standard_mb':report.get('memoria_estimada_mb',float('inf')),
+                    'puntuacion_materiales':args.puntuacion_materiales or item.get('auditoria',{}).get('puntuacion_materiales',0),
+                    'puntuacion_geometria':args.puntuacion_geometria or item.get('auditoria',{}).get('puntuacion_geometria',0)}
+                write_yaml(root/'catalogo_biblioteca.yaml',data); issues=audit_asset(item,root)
+                print(json.dumps({'ok':not issues,'auditoria':item['auditoria'],'diagnosticos':issues},ensure_ascii=False)); return 0 if not issues else 1
+            if action=='publicar':
+                data=load_manifest(root); item=find_asset(data,args.id)
+                if item.get('estado') not in {'aceptado','publicado'}: raise ValueError('El activo debe aceptarse antes de publicarse.')
+                issues=[x for x in audit_asset(item,root) if x['codigo']!='NIVELES']
+                if issues: print(json.dumps({'ok':False,'diagnosticos':issues},ensure_ascii=False)); return 1
+                original=Path(item['archivos']['original']['ruta']); out=root/'publicados'/args.id; report=out/'niveles.json'
+                blender=os.path.expanduser(os.environ.get('XIXOVA_BLENDER','~/Aplicaciones/blender-4.5/blender'))
+                cmd=[blender,'--background',str(original),'--python-exit-code','1','--python',str(ROOT/'normalize_library_asset.py'),'--','--id',args.id,'--salida',str(out)]
+                subprocess.run(cmd,check=True,stdout=sys.stderr); levels=json.loads(report.read_text())
+                item['niveles']=levels['niveles']; item['dimensiones']=levels['dimensiones']; item['apoyo']='suelo'; item['holgura']=.04
+                item['estado']='publicado'; write_yaml(root/'catalogo_biblioteca.yaml',data); catalog=rebuild_public_catalog(root,data)
+                print(json.dumps({'ok':True,'provider_id':args.id,'catalogo':str(catalog)},ensure_ascii=False)); return 0
+        if not args.proyecto: raise ValueError('Indica -p/--proyecto.')
         if args.accion=='sincronizar':
             if not args.captura: raise ValueError('Falta --captura JSON exportado desde Blender.')
             from .sync import synchronize
@@ -96,10 +151,79 @@ def main(argv=None):
             print(json.dumps(report,indent=2,ensure_ascii=False)); return 0 if report['ok'] else 1
         b,errors=load(args.proyecto,args.variante)
         if b is None: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
+        compiler_actions={'mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo'}
+        if args.accion in compiler_actions:
+            from .realism_compiler import compile_bundle, compact_report, correct_exposure
+            compiled,compilation=compile_bundle(b); base=Path(b['archivo']).parent; selected=args.variante or next(iter(b['proyecto']['variantes']))
+            if args.accion=='enriquecer-arquitectura':
+                print(json.dumps({'ok':True,'capa':'ENRIQUECIMIENTO','reglas':['uv_metricas','exterior','difusores_fisicos','biseles'],'arquitectura_modificada':False},ensure_ascii=False,separators=(',',':'))); return 0
+            if args.accion=='asignar-activos':
+                if args.aplicar:
+                    target=base/b['proyecto']['variantes'][selected]; atomic_yaml=target.with_suffix(target.suffix+'.tmp'); atomic_yaml.write_text(yaml.safe_dump(compiled['interiorismo'],sort_keys=False,allow_unicode=True),encoding='utf-8'); os.replace(atomic_yaml,target)
+                print(json.dumps({'ok':True,'aplicado':args.aplicar,'niveles':compilation['niveles'],'memoria_mb':compilation['memoria_activos_mb']},ensure_ascii=False,separators=(',',':'))); return 0
+            if args.accion=='resolver-iluminacion':
+                if args.aplicar:
+                    target=base/b['proyecto'].get('presentaciones',{}).get(selected,b['proyecto']['presentacion']); temp=target.with_suffix(target.suffix+'.tmp'); temp.write_text(yaml.safe_dump(compiled['presentacion'],sort_keys=False,allow_unicode=True),encoding='utf-8'); os.replace(temp,target)
+                print(json.dumps({'ok':True,'aplicado':args.aplicar,'ventanas':compilation['ventanas'],'cambios':compilation['iluminacion']},ensure_ascii=False,separators=(',',':'))); return 0
+            if args.accion=='resolver-camaras':
+                from .camera_planner import plan_cameras
+                script_path=args.guion or (base/b['proyecto'].get('guion_camara',''))
+                if script_path and Path(script_path).is_file():
+                    script=yaml.safe_load(Path(script_path).read_text(encoding='utf-8')); shots,planning,camera_issues=plan_cameras(compiled,script)
+                    if args.aplicar and not camera_issues:
+                        target=base/b['proyecto'].get('presentaciones',{}).get(selected,b['proyecto']['presentacion']); presentation=yaml.safe_load(target.read_text()); presentation['tomas']=shots; temp=target.with_suffix(target.suffix+'.tmp'); temp.write_text(yaml.safe_dump(presentation,sort_keys=False,allow_unicode=True)); os.replace(temp,target)
+                    print(json.dumps({'ok':not camera_issues,'aplicado':args.aplicar and not camera_issues,'tomas':planning,'diagnosticos':camera_issues},ensure_ascii=False,separators=(',',':'))); return 0 if not camera_issues else 1
+                existing=[{'toma':shot['id'],'lente':shot['lente'],'origen':'presentacion_existente','problemas':next((x['problemas'] for x in compilation['camaras'] if x['toma']==shot['id']),[])} for shot in compiled['presentacion']['tomas']]
+                print(json.dumps({'ok':not compilation['diagnosticos'],'aplicado':False,'tomas':existing,'diagnosticos':compilation['diagnosticos']},ensure_ascii=False,separators=(',',':'))); return 0 if not compilation['diagnosticos'] else 1
+            compiler_root=output(compiled)/'compilador_fotografico'; compiler_root.mkdir(parents=True,exist_ok=True)
+            if args.accion in {'auditar-realismo','informe-visual'}:
+                photo_path=compiler_root/'auditoria_fotografia.json'; photo=json.loads(photo_path.read_text()) if photo_path.is_file() else None
+                scene_audit_path=compiler_root/'auditoria_escena.json'; scene_audit=json.loads(scene_audit_path.read_text()) if scene_audit_path.is_file() else None
+                report=compact_report(compilation,photo,scene_audit); atomic(compiler_root/'informe_compacto.json',report); print(json.dumps(report,ensure_ascii=False,separators=(',',':'))); return 0
+            if args.accion=='corregir-realismo':
+                # Correcciones deterministas y acotadas: LOD, luz y parámetros de cámara.
+                interior_target=base/b['proyecto']['variantes'][selected]; presentation_target=base/b['proyecto'].get('presentaciones',{}).get(selected,b['proyecto']['presentacion'])
+                if args.aplicar:
+                    for target,value in ((interior_target,compiled['interiorismo']),(presentation_target,compiled['presentacion'])):
+                        temp=target.with_suffix(target.suffix+'.tmp'); temp.write_text(yaml.safe_dump(value,sort_keys=False,allow_unicode=True)); os.replace(temp,target)
+                report=compact_report(compilation); print(json.dumps({'ok':True,'aplicado':args.aplicar,**report},ensure_ascii=False,separators=(',',':'))); return 0
+            if args.accion=='aprobar-realismo':
+                if not args.revisor or not args.nota: raise ValueError('Especifica --revisor y --nota.')
+                report_path=compiler_root/'informe_compacto.json'
+                if not report_path.is_file(): raise ValueError('Ejecuta mejorar-realismo o auditar-realismo antes de aprobar.')
+                report=json.loads(report_path.read_text()); unresolved=report.get('diagnosticos',[])
+                if unresolved: raise ValueError('Persisten diagnósticos de realismo.')
+                atomic(compiler_root/'revision_realismo.json',{'hash':compilation['hash_compilado'],'revisor':args.revisor,'nota':args.nota}); print(compiler_root); return 0
+            # mejorar-realismo: resolver cámaras, construir derivado y renderizar tres pilotos por toma.
+            if errors: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
+            from .camera_planner import plan_cameras
+            script_path=base/b['proyecto'].get('guion_camara',''); camera_issues=[]
+            if script_path and script_path.is_file():
+                shots,_,camera_issues=plan_cameras(compiled,yaml.safe_load(script_path.read_text(encoding='utf-8')))
+                if not camera_issues: compiled['presentacion']['tomas']=shots; compiled,compilation=compile_bundle(compiled)
+            resolved,resolve_issues=resolve(compiled)
+            if camera_issues or resolve_issues: print(json.dumps({'ok':False,'diagnosticos':camera_issues+resolve_issues},ensure_ascii=False)); return 1
+            compiled['resueltos']=resolved; compiled['fotogramas']=[dict(toma=s,numero=f,posicion=p,objetivo=t) for s,f,p,t in camera_frames(compiled['presentacion'])]
+            compiled['proyecto']['produccion']['perfiles']['compilador_piloto']={'resolucion':[640,360],'muestras':24,'motor':'CYCLES','denoise':True,'umbral_adaptativo':.04,'max_rebotes':6,'rebotes_difusos':2,'rebotes_brillantes':2,'rebotes_transmision':4,'clamp_indirecto':8,'profundidad_color':'8'}
+            datafile=compiler_root/'resuelto.json'; atomic(datafile,compiled); scene=compiler_root/'escena.blend'
+            run_blender(compiled,'blender_build.py',['--datos',datafile,'--salida',scene],log=compiler_root/'logs'/'construccion.log')
+            run_blender(compiled,'realism_scene_audit.py',['--datos',datafile,'--salida',compiler_root/'auditoria_escena.json'],scene,compiler_root/'logs'/'auditoria_escena.log')
+            frames=[]; offset=0
+            for shot in compiled['presentacion']['tomas']: frames.extend((offset+1,offset+(shot['fotogramas']+1)//2,offset+shot['fotogramas'])); offset+=shot['fotogramas']
+            run_blender(compiled,'render.py',['--datos',datafile,'--salida',compiler_root/'pilotos','--perfil','compilador_piloto','--frames',','.join(map(str,sorted(set(frames))))],scene,compiler_root/'logs'/'pilotos.log')
+            run_blender(compiled,'photography_audit.py',['--datos',datafile,'--imagenes',compiler_root/'pilotos','--salida',compiler_root/'auditoria_fotografia.json'],scene,compiler_root/'logs'/'auditoria.log')
+            photo=json.loads((compiler_root/'auditoria_fotografia.json').read_text()); exposure_changes=correct_exposure(compiled,photo); pilot_folder=compiler_root/'pilotos'
+            if exposure_changes:
+                pilot_folder=compiler_root/'pilotos_ronda2'; atomic(datafile,compiled)
+                run_blender(compiled,'render.py',['--datos',datafile,'--salida',pilot_folder,'--perfil','compilador_piloto','--frames',','.join(map(str,sorted(set(frames))))],scene,compiler_root/'logs'/'pilotos_ronda2.log')
+                run_blender(compiled,'photography_audit.py',['--datos',datafile,'--imagenes',pilot_folder,'--salida',compiler_root/'auditoria_fotografia.json'],scene,compiler_root/'logs'/'auditoria_ronda2.log'); photo=json.loads((compiler_root/'auditoria_fotografia.json').read_text())
+            compilation['correcciones_exposicion']=exposure_changes; previews=sorted(pilot_folder.glob('frame_*.png')); rows=max(1,(len(previews)+4)//5)
+            if previews: subprocess.run(['ffmpeg','-v','error','-y','-pattern_type','glob','-i',str(pilot_folder/'frame_*.png'),'-vf',f'scale=256:-1,tile=5x{rows}','-frames:v','1',str(compiler_root/'contacto.jpg')],check=True)
+            scene_audit=json.loads((compiler_root/'auditoria_escena.json').read_text()); report=compact_report(compilation,photo,scene_audit); report['rondas']=2 if exposure_changes else 1; atomic(compiler_root/'informe_compacto.json',report)
+            print(json.dumps({'ok':not report['diagnosticos'],'salida':str(compiler_root),**report},ensure_ascii=False,separators=(',',':'))); return 0 if not report['diagnosticos'] else 1
         root=output(b)
         if args.accion=='planificar-camaras':
             from .camera_planner import plan_cameras
-            import yaml
             source=args.guion or (args.proyecto.parent/b['proyecto'].get('guion_camara',''))
             if not source or not Path(source).is_file(): raise ValueError('Indica --guion o guion_camara en proyecto.yaml.')
             script=yaml.safe_load(Path(source).read_text(encoding='utf-8'))

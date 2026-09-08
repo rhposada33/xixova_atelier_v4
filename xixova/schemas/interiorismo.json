@@ -240,6 +240,9 @@
           "material": {
             "type": "string",
             "minLength": 1
+          },
+          "nivel_detalle": {
+            "enum": ["proxy", "standard", "hero"]
           }
         },
         "required": [

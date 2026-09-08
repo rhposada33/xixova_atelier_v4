@@ -1,0 +1,66 @@
+schema: 1
+identidad: lujo_editorial_calido
+activos:
+- provider: blenderkit
+  provider_id: 48fc2eae-d95a-4952-9f5a-ca1dc696020c
+  nombre: Luxury Leather modular sofa
+  url: https://www.blendkit.com/asset-gallery-detail/48fc2eae-d95a-4952-9f5a-ca1dc696020c/
+  autor: Attila Pelsoczy
+  licencia: Royalty Free
+  categoria: asientos
+  tags:
+  - luxury
+  - leather
+  - couch
+  - gold
+  - modular
+  - sofa
+  quality_publica: 280
+  estado: publicado
+  fecha_descarga: '2026-09-08'
+  archivos:
+    original:
+      ruta: /home/rafa/RenderCasa/xixova_atelier_v4/biblioteca/originales/48fc2eae-d95a-4952-9f5a-ca1dc696020c/original.blend
+      sha256: ea84c63cd370b464f83997d2effe8e05b1c395c60df9e6c3297b332adf200596
+  auditoria:
+    schema: 1
+    provider_id: 48fc2eae-d95a-4952-9f5a-ca1dc696020c
+    objetos: 14
+    mallas: 14
+    triangulos: 224264
+    materiales: 4
+    imagenes: 6
+    texturas_ausentes: []
+    uv_validado: true
+    normales_validas: true
+    dimensiones:
+    - 3.0524
+    - 1.7307
+    - 0.8482
+    memoria_estimada_mb: 106.27
+    cycles_compatible: true
+    escala_valida: true
+    texturas_completas: true
+    memoria_standard_mb: 106.27
+    puntuacion_materiales: 8.2
+    puntuacion_geometria: 8.6
+  dimensiones:
+  - 3.05238
+  - 1.73074
+  - 0.84824
+  motivo: Aprobado tras ficha neutral y golden hour
+  niveles:
+    hero:
+      ruta: /home/rafa/RenderCasa/xixova_atelier_v4/biblioteca/publicados/48fc2eae-d95a-4952-9f5a-ca1dc696020c/hero.blend
+      sha256: a36a080823f212c96d537fa5bb34341a59ea33be1d7bc69f1e36f65a7e447c12
+      coleccion: XIXOVA_ASSET
+    standard:
+      ruta: /home/rafa/RenderCasa/xixova_atelier_v4/biblioteca/publicados/48fc2eae-d95a-4952-9f5a-ca1dc696020c/standard.blend
+      sha256: bdc88b9ddd208d32198d48d44aa0cf110373572def9eabe68dad3cbbc0722356
+      coleccion: XIXOVA_ASSET
+    proxy:
+      ruta: /home/rafa/RenderCasa/xixova_atelier_v4/biblioteca/publicados/48fc2eae-d95a-4952-9f5a-ca1dc696020c/proxy.blend
+      sha256: 8fc30209f3cf4a34c8572e7592bf7509b0fdbc8756f2f8ecb02183021c48a555
+      coleccion: XIXOVA_ASSET
+  apoyo: suelo
+  holgura: 0.04

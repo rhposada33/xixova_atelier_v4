@@ -1,0 +1,17 @@
+schema: 1
+id: lujo_editorial_golden_hour
+version: 1
+paleta: [marfil, roble_natural, piedra_clara, cuero, bouclé, laton_envejecido]
+temperatura_practicas_k: 2900
+exposicion_limites: [-1.5, 0.8]
+altura_camara_m: [1.30, 1.55]
+densidad_decoracion: media
+recetas:
+  sala: {lente_mm: [32, 40], necesarios: [asientos, mesas, textiles_decoracion, luminarias, plantas]}
+  comedor: {lente_mm: [32, 40], necesarios: [mesas, asientos, luminarias]}
+  cocina: {lente_mm: [28, 35], necesarios: [cocina_comedor, luminarias]}
+  dormitorio: {lente_mm: [28, 35], necesarios: [dormitorio_almacenamiento, textiles_decoracion, luminarias]}
+  bano: {lente_mm: [24, 32], necesarios: [bano, luminarias]}
+  circulacion: {lente_mm: [28, 35], necesarios: [luminarias, textiles_decoracion]}
+  terraza: {lente_mm: [32, 40], necesarios: [asientos, mesas, plantas, luminarias]}
+  detalle: {lente_mm: [50, 70], necesarios: []}

@@ -96,6 +96,33 @@ uv run --with pyyaml --with jsonschema --with shapely python -m unittest discove
 
 Contratos: `xixova/schemas/`. Instrucciones para interpretar planos y corregir proyectos: [guía de agentes](../docs/agentes/GUIA.md). Crédito del sofá importado: `CREDITOS.md`; el catálogo conserva autor y licencia. No se han descargado activos nuevos.
 
+## Biblioteca curada
+
+La biblioteca global conserva originales de BlenderKit localmente y publica copias normalizadas `hero`, `standard` y `proxy`. El flujo habitual es:
+
+```bash
+uv run xixova_cli.py biblioteca buscar --consulta "luxury editorial sofa" --categoria asientos
+uv run xixova_cli.py biblioteca candidatos --entrada resultados_blenderkit.json
+uv run xixova_cli.py biblioteca descargar --id ID --archivo /ruta/descarga.blend
+uv run xixova_cli.py biblioteca evaluar --id ID --entrada auditoria.json --puntuacion-materiales 8 --puntuacion-geometria 8
+uv run xixova_cli.py biblioteca aceptar --id ID
+uv run xixova_cli.py biblioteca publicar --id ID
+uv run xixova_cli.py biblioteca auditar
+```
+
+`XIXOVA_BIBLIOTECA` cambia la raíz (por defecto `biblioteca/`) y `XIXOVA_BLENDER` indica el ejecutable usado al crear niveles. Los resultados extensos de Blender se guardan en archivos; el catálogo común sólo contiene metadatos y hashes.
+
+## Compilador fotográfico
+
+Todos los proyectos pueden usar el perfil `lujo_editorial_golden_hour` y el flujo completo con un único comando:
+
+```bash
+uv run xixova_cli.py mejorar-realismo -p proyectos/apartamento_compacto/proyecto.yaml --variante natural_lila
+uv run xixova_cli.py auditar-realismo -p proyectos/apartamento_compacto/proyecto.yaml --compacto
+```
+
+Los comandos `enriquecer-arquitectura`, `asignar-activos`, `resolver-iluminacion`, `resolver-camaras`, `corregir-realismo`, `informe-visual` y `aprobar-realismo` permiten ejecutar cada etapa por separado. El ensamblador conserva la arquitectura confirmada y crea los detalles en `ENRIQUECIMIENTO`. Las correcciones deterministas usan hasta dos rondas; sólo los diagnósticos restantes pasan al agente.
+
 ## Informe de las entregas
 
 Después de producir los cuatro recorridos, se puede regenerar la comparación local:

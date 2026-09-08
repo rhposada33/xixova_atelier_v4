@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xixova.local/schemas/v1/biblioteca.json",
+  "type": "object",
+  "required": ["schema", "identidad", "activos"],
+  "properties": {
+    "schema": {"const": 1},
+    "identidad": {"const": "lujo_editorial_calido"},
+    "activos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["provider", "provider_id", "nombre", "url", "autor", "licencia", "categoria", "estado", "archivos", "auditoria"],
+        "properties": {
+          "provider": {"const": "blenderkit"},
+          "provider_id": {"type": "string", "minLength": 1},
+          "nombre": {"type": "string", "minLength": 1},
+          "url": {"type": "string", "minLength": 1},
+          "autor": {"type": "string", "minLength": 1},
+          "licencia": {"enum": ["CC0", "Royalty Free", ""]},
+          "categoria": {"type": "string", "minLength": 1},
+          "estado": {"enum": ["candidato", "aceptado", "publicado", "rechazado"]},
+          "archivos": {"type": "object"},
+          "auditoria": {"type": "object"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -47,7 +47,13 @@ def load(path, variant=None):
     selected = variant or next(iter(p['variantes']))
     presentation_path = p.get('presentaciones', {}).get(selected, p['presentacion'])
     s = read(base / presentation_path)
-    c = read(base / p['produccion']['catalogo'])
+    catalog_paths = [base / p['produccion']['catalogo']]
+    catalog_paths += [(base / os.path.expanduser(os.path.expandvars(value))).resolve() for value in p['produccion'].get('bibliotecas', [])]
+    common_catalog=Path(os.path.expanduser(os.path.expandvars(os.environ.get('XIXOVA_CATALOGO_COMUN',str(ROOT.parent/'biblioteca'/'catalogo_xixova.yaml'))))).resolve()
+    if common_catalog.is_file() and common_catalog not in [Path(value).resolve() for value in catalog_paths]: catalog_paths.append(common_catalog)
+    c = read(catalog_paths[0])
+    for library_path in catalog_paths[1:]:
+        extra = read(library_path); c['activos'].extend(extra['activos'])
     for obj, kind in [(a, 'arquitectura'), (i, 'interiorismo'), (s, 'presentacion'), (c, 'catalogo')]:
         errors += contract(obj, kind)
     if errors:
@@ -62,7 +68,7 @@ def load(path, variant=None):
     bundle = dict(proyecto=p, arquitectura=a, interiorismo=i, presentacion=s, catalogo=c,
                   archivo=str(path), arquitectura_hash=digest(a))
     paths = [path, base / p['arquitectura'], base / p['variantes'][selected],
-             base / presentation_path, base / p['produccion']['catalogo']]
+             base / presentation_path, *catalog_paths]
     bundle['sincronizacion'] = dict(proyecto=str(path), variante=selected,
         archivos={str(f.resolve()): hashlib.sha256(f.read_bytes()).hexdigest() for f in paths})
     return bundle, validate(bundle)
@@ -192,6 +198,11 @@ def validate(b):
     environment = b['presentacion']['entorno'].get('archivo')
     if environment and not Path(environment).is_file(): errors.append(diagnostic('RECURSO_AUSENTE','entorno',environment))
     assets = {v['id']:v for v in b['catalogo']['activos']}
+    referenced_ids={item['activo'] for item in i['elementos']}
+    estimated_mb=sum(assets[asset_id].get('memoria_estimada_mb',0) for asset_id in referenced_ids if asset_id in assets)
+    budget_mb=b['proyecto']['produccion']['gpu_vram_gb']*1024*.8
+    if estimated_mb>budget_mb:
+        errors.append(diagnostic('MEMORIA_GPU','catalogo',f'Activos estimados en {estimated_mb:.0f} MB; presupuesto conservador {budget_mb:.0f} MB.'))
     for item in i['elementos']:
         if item.get('material') and item['material'] not in mats: errors.append(diagnostic('REFERENCIA',item['id'],'Material inexistente.'))
         asset = assets.get(item['activo'])
