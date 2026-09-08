@@ -4,6 +4,7 @@ arquitectura: arquitectura.yaml
 variantes:
   natural_lila: natural_lila.yaml
 presentacion: presentacion.yaml
+guion_camara: guion_camara.yaml
 produccion:
   catalogo: catalogo.yaml
   blender: ~/Aplicaciones/blender-4.5/blender

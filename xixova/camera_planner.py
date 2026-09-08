@@ -31,7 +31,7 @@ def _subject(scene, placements, room):
     return [x, y, _clamp(z, .65, 1.35)], chosen
 
 
-def _candidates(room, target, height, obstacles, ignored):
+def _candidates(room, target, height, obstacles, ignored, direction=None):
     minx, miny, maxx, maxy = room.bounds
     candidates = []
     step = .35
@@ -44,6 +44,9 @@ def _candidates(room, target, height, obstacles, ignored):
                 distance = math.dist(p[:2], target[:2])
                 clearance = room.boundary.distance(Point(x, y))
                 score = -abs(distance - 3.0) + min(clearance, 1.2) * .7
+                directional = {'norte': (y-miny)/(maxy-miny), 'sur': (maxy-y)/(maxy-miny),
+                               'este': (x-minx)/(maxx-minx), 'oeste': (maxx-x)/(maxx-minx)}
+                if direction: score += directional[direction] * 4
                 candidates.append((score, p))
             y += step
         x += step
@@ -104,7 +107,7 @@ def plan_cameras(bundle, script):
         result = _subject(scene, placements, room)
         target, chosen = result
         ignored = set(scene['mostrar'])
-        candidates = _candidates(room, target, script.get('altura', 1.55), obstacles, ignored)
+        candidates = _candidates(room, target, script.get('altura', 1.55), obstacles, ignored, scene.get('desde'))
         if not candidates:
             issues.append(diagnostic('CAMARA_SIN_SOLUCION', scene.get('id', str(index)), 'No hay posición visible y libre en la estancia.')); continue
         requested_kind = scene['movimiento']; points = None

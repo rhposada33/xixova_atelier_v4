@@ -1,0 +1,39 @@
+schema: 1
+duracion_segundos: 20
+estilo: inmobiliario_suave
+altura: 1.55
+escenas:
+- id: sala_presentacion
+  espacio: social
+  mostrar:
+  - sofa_social
+  - mesa_social
+  movimiento: desplazamiento_lateral
+  duracion: 4
+- id: cocina_comedor
+  espacio: social
+  mostrar:
+  - comedor_social
+  - cocina_lineal
+  movimiento: orbita_suave
+  duracion: 4
+- id: dormitorio_derecho
+  espacio: dormitorio_derecho
+  mostrar:
+  - cama_derecha
+  - mesita_derecha
+  movimiento: revelar_desde_puerta
+  duracion: 4
+- id: dormitorio_izquierdo
+  espacio: dormitorio_izquierdo
+  mostrar:
+  - cama_izquierda
+  movimiento: desplazamiento_lateral
+  desde: norte
+  duracion: 4
+- id: bano_central
+  espacio: bano_central
+  mostrar:
+  - bano_central_equipo
+  movimiento: revelar_desde_puerta
+  duracion: 4

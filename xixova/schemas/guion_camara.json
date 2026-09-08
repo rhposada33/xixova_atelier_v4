@@ -17,6 +17,7 @@
           "espacio": {"type": "string"},
           "mostrar": {"type": "array", "items": {"type": "string"}, "minItems": 1},
           "movimiento": {"enum": ["estatica", "aproximacion", "retroceso", "desplazamiento_lateral", "orbita_suave", "revelar_desde_puerta"]},
+          "desde": {"enum": ["norte", "sur", "este", "oeste"]},
           "duracion": {"type": "number", "exclusiveMinimum": 0},
           "lente": {"type": "number", "minimum": 18, "maximum": 70}
         },
