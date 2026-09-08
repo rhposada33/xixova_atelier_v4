@@ -149,6 +149,20 @@ La interfaz pública incluye `/api/project`, `/api/scene.glb`, `/api/script`,
 `/api/context` devuelve el contexto compacto para una IA, normalmente muy por
 debajo de 4 KB.
 
+`Validar toma` abre sus fotogramas inicial, central y final dentro de Director a
+medida que Blender los termina. El panel permite ampliar, descargar, volver a
+renderizar e ir al frame correspondiente. `Validar guion visualmente` genera los
+tres fotogramas representativos de cada toma y una hoja de contactos. Los archivos
+se sirven únicamente desde la carpeta aislada del trabajo mediante
+`/api/jobs/{id}/artifacts`.
+
+`Crear recorrido automático` abre un asistente para seleccionar áreas desde la
+planta, elegir `Visita completa`, `Editorial`, `Recorrido rápido`, `Zona social` o
+`Zona privada`, y reproducir la propuesta WebGL antes de guardarla. El generador
+ordena las áreas desde el acceso, asigna 3–5 segundos por espacio, elige un
+protagonista y alterna movimientos. La propuesta se guarda como un guion nuevo y
+no reemplaza el activo.
+
 ## Informe de las entregas
 
 Después de producir los cuatro recorridos, se puede regenerar la comparación local:

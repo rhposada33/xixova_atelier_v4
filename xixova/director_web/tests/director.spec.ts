@@ -26,3 +26,24 @@ test('la vista libre orbita con el botón central',async({page})=>{
  const after=await page.evaluate(()=>(window as any).__XIXOVA_DIRECTOR__.free.position.toArray());
  expect(after).not.toEqual(before);
 });
+
+test('abre el panel integrado de Validar toma',async({page})=>{
+ await page.route('**/api/preview/shot',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({id:'demo',tipo:'shot',toma:'sala_presentacion',estado:'ejecutando',progreso:.2,artefactos:[]})}));
+ await page.goto('/');
+ await page.getByRole('button',{name:'Validar toma'}).click();
+ await expect(page.getByRole('heading',{name:'Validar toma'})).toBeVisible();
+ await expect(page.getByText('Renderizando imágenes…')).toBeVisible();
+});
+
+test('propone un recorrido por todas las áreas sin cambiar el guion',async({page})=>{
+ await page.goto('/');const title=await page.locator('.scriptpicker b').textContent();
+ await page.getByRole('button',{name:/Crear recorrido automático/}).click();
+ await expect(page.getByRole('heading',{name:'¿Qué áreas mostramos?'})).toBeVisible();
+ await page.getByRole('button',{name:'Continuar'}).click();
+ await expect(page.getByText(/áreas · aproximadamente/)).toBeVisible();
+ await page.getByRole('button',{name:'Generar propuesta'}).click();
+ await expect(page.getByRole('heading',{name:/Propuesta/})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Guardar como guion'})).toBeEnabled();
+ await page.getByRole('button',{name:'×'}).click();
+ await expect(page.locator('.scriptpicker b')).toHaveText(title||'');
+});

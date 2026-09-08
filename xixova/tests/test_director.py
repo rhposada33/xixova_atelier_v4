@@ -8,6 +8,7 @@ from pathlib import Path
 from xixova.core import load
 from xixova.director import apply_command, compile_script, context, import_legacy, sample, validate_script
 from xixova.director_server import DirectorSession
+from xixova.tour import PRESETS, propose_tour
 
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -58,6 +59,22 @@ class DirectorTests(unittest.TestCase):
             copy_id=session.create_script('Otra versión',session.script)
             session.archive(copy_id)
             self.assertTrue((session.director_root/'archivados'/f'{copy_id}.yaml').is_file())
+
+    def test_automatic_tour_is_deterministic_and_complete(self):
+        first=propose_tour(self.bundle); second=propose_tour(self.bundle)
+        self.assertEqual(first,second)
+        self.assertTrue(first['ok'])
+        self.assertEqual(first['areas'][0],'circulacion')
+        self.assertEqual(set(first['areas']),{x['id'] for x in self.bundle['arquitectura']['espacios']})
+        self.assertEqual(len(first['areas']),len(first['guion']['tomas']))
+        self.assertTrue(all(3<=x['duracion']<=5 for x in first['informe']))
+
+    def test_tour_presets_filter_areas(self):
+        social=propose_tour(self.bundle,preset='zona_social')
+        private=propose_tour(self.bundle,preset='zona_privada')
+        self.assertEqual(social['areas'],['social'])
+        self.assertNotIn('social',private['areas'])
+        self.assertEqual(set(social['areas'])|set(private['areas']),{x['id'] for x in self.bundle['arquitectura']['espacios']})
 
 
 if __name__=='__main__':unittest.main()

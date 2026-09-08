@@ -3,12 +3,13 @@ from __future__ import annotations
 import asyncio, copy, json, os, re, subprocess, sys, threading, time, uuid, webbrowser
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from .core import digest
-from .director import apply_command, atomic_yaml, compile_script, context, import_legacy, read_or_import, scene_payload, validate_script
+from .director import apply_command, atomic_yaml, compile_script, context, import_legacy, read_or_import, sample, scene_payload, validate_script
 from .director_glb import make_glb
+from .tour import PRESETS, propose_tour
 
 class DirectorSession:
     def __init__(self,project,variant):
@@ -19,7 +20,7 @@ class DirectorSession:
         if self.meta_path.is_file():
             import yaml
             self.meta=yaml.safe_load(self.meta_path.read_text()) or {}
-        self.undo=[]; self.redo=[]; self.jobs={}; self.lock=threading.Lock(); self.project_sources=dict(self.bundle.get('sincronizacion',{}).get('archivos',{}))
+        self.undo=[]; self.redo=[]; self.jobs={}; self.proposals={}; self.lock=threading.Lock(); self.project_sources=dict(self.bundle.get('sincronizacion',{}).get('archivos',{}))
     def sources_current(self):
         import hashlib
         return all(Path(path).is_file() and hashlib.sha256(Path(path).read_bytes()).hexdigest()==value for path,value in self.project_sources.items())
@@ -87,13 +88,34 @@ class DirectorSession:
         command=[blender,'--background','--factory-startup','--disable-autoexec']
         if scene:command.append(str(scene))
         return command+['--python-exit-code','1','--python',str(Path(__file__).parent/script),'--',*map(str,args)]
+    def artifacts(self,record):
+        root=Path(record.get('_root',''))
+        if not root.is_dir():return []
+        frames=record.get('_frames',[]); labels=record.get('_labels',{}); scan=Path(record.get('_folder',root))
+        result=[]
+        for path in sorted(scan.glob('frame_*.png')):
+            try:frame=int(path.stem.split('_')[-1])
+            except ValueError:frame=None
+            if frames and frame not in frames:continue
+            relative=path.relative_to(root).as_posix(); result.append({'id':relative,'tipo':'imagen','nombre':path.name,'frame':frame,'rol':labels.get(frame,'fotograma'),'url':f"/api/jobs/{record['id']}/artifacts/{relative}",'descarga':f"/api/jobs/{record['id']}/artifacts/{relative}?download=1"})
+        for path in sorted(scan.glob('*.mp4')):
+            relative=path.relative_to(root).as_posix();result.append({'id':relative,'tipo':'video','nombre':path.name,'url':f"/api/jobs/{record['id']}/artifacts/{relative}",'descarga':f"/api/jobs/{record['id']}/artifacts/{relative}?download=1"})
+        for path in sorted(scan.glob('contacto.jpg')):
+            relative=path.relative_to(root).as_posix();result.append({'id':relative,'tipo':'contacto','nombre':path.name,'rol':'hoja de contactos','url':f"/api/jobs/{record['id']}/artifacts/{relative}",'descarga':f"/api/jobs/{record['id']}/artifacts/{relative}?download=1"})
+        for item in result:
+            if item.get('frame'):
+                cut=next((x for x in self.script['tomas'] if round(x['inicio']*self.script['fps'])+1<=item['frame']<=round((x['inicio']+x['duracion'])*self.script['fps'])),None)
+                item['toma']=cut['id'] if cut else None; item['tiempo']=round((item['frame']-1)/self.script['fps'],3)
+                if cut:
+                    track=next((x for x in self.script['pistas'] if x['objetivo']==cut['camara'] and x['propiedad']=='lente'),None); item['lente']=sample(track,item['tiempo']) if track else None
+        return result
     def job(self,kind,shot=None,frame=None):
-        identifier=uuid.uuid4().hex; record={'id':identifier,'tipo':kind,'estado':'pendiente','inicio':time.time(),'progreso':0,'log':''}; self.jobs[identifier]=record
+        identifier=uuid.uuid4().hex; record={'id':identifier,'tipo':kind,'toma':shot,'frame':frame,'estado':'pendiente','inicio':time.time(),'progreso':0,'log':''}; self.jobs[identifier]=record
         def run():
             record['estado']='ejecutando'; record['progreso']=.02
             try:
                 compiled=compile_script(self.bundle,self.script); identity=digest({'direccion':self.script,'arquitectura':self.bundle['arquitectura_hash'],'interiorismo':self.bundle['interiorismo']})[:20]
-                root=self.draft.parent/'trabajos'/identity; root.mkdir(parents=True,exist_ok=True); datafile=root/'resuelto.json'; datafile.write_text(json.dumps(compiled,ensure_ascii=False))
+                root=self.draft.parent/'trabajos'/identity; root.mkdir(parents=True,exist_ok=True); record['_root']=str(root); datafile=root/'resuelto.json'; datafile.write_text(json.dumps(compiled,ensure_ascii=False))
                 scene=root/'escena.blend'; log=root/(kind+'.log'); record['log']=str(log); record['salida']=str(root)
                 commands=[]
                 if not scene.exists():commands.append(self._command('blender_build.py',['--datos',datafile,'--salida',scene]))
@@ -103,8 +125,18 @@ class DirectorSession:
                     cut=next((x for x in self.script['tomas'] if x['id']==shot or x['camara']==shot),None)
                     if not cut:raise ValueError('Toma inexistente.')
                     first=round(cut['inicio']*fps)+1; last=min(total,round((cut['inicio']+cut['duracion'])*fps)); frames=[first,(first+last)//2,last]; profile='piloto_fotografico'
+                elif kind=='script':
+                    frames=[]
+                    for cut in self.script['tomas']:
+                        first=round(cut['inicio']*fps)+1; last=min(total,round((cut['inicio']+cut['duracion'])*fps)); frames.extend([first,(first+last)//2,last])
+                    profile='piloto_fotografico'
                 else:frames=[]; profile='animatica' if kind=='animatic' else ('fotografico_1080p' if 'fotografico_1080p' in compiled['proyecto']['produccion']['perfiles'] else 'final')
-                folder=root/profile; render_args=['--datos',datafile,'--salida',folder,'--perfil',profile]
+                record['_frames']=sorted(set(frames))
+                labels={}
+                for cut in self.script['tomas']:
+                    first=round(cut['inicio']*fps)+1; last=min(total,round((cut['inicio']+cut['duracion'])*fps)); middle=(first+last)//2
+                    labels.update({first:'inicio',middle:'centro',last:'final'})
+                record['_labels']=labels; folder=root/profile; record['_folder']=str(folder); render_args=['--datos',datafile,'--salida',folder,'--perfil',profile]
                 if frames:render_args+=['--frames',','.join(map(str,sorted(set(frames))))]
                 commands.append(self._command('render.py',render_args,scene))
                 for index,command in enumerate(commands):
@@ -113,8 +145,12 @@ class DirectorSession:
                         while process.poll() is None:
                             if record['estado']=='cancelado':process.terminate(); process.wait(timeout=10); return
                             produced=len(list(folder.glob('frame_*.png'))) if folder.exists() else 0
+                            record['artefactos']=self.artifacts(record)
                             expected=len(frames) if frames else total; record['progreso']=min(.96,(index+produced/max(1,expected))/len(commands)); time.sleep(.35)
                     if process.returncode:raise RuntimeError('Blender terminó con código '+str(process.returncode))
+                if kind=='script':
+                    previews=sorted(folder.glob('frame_*.png')); rows=max(1,(len(previews)+2)//3)
+                    if previews:subprocess.run(['ffmpeg','-v','error','-y','-pattern_type','glob','-i',str(folder/'frame_*.png'),'-vf',f'scale=320:-1,tile=3x{rows}','-frames:v','1',str(folder/'contacto.jpg')],check=True)
                 if kind in {'animatic','render'}:
                     from .production import ffmpeg_args
                     target=folder/'recorrido.mp4'; temp=folder/'recorrido.tmp.mp4'; encoded={**compiled['proyecto']['produccion']['perfiles'][profile],'postproduccion':compiled['presentacion'].get('postproduccion',{})}
@@ -125,18 +161,22 @@ class DirectorSession:
                             time.sleep(.25)
                     if process.returncode:raise RuntimeError('FFmpeg terminó con código '+str(process.returncode))
                     os.replace(temp,target); record['video']=str(target)
-                record['estado']='completo'; record['progreso']=1
-            except Exception as exc:record.update(estado='error',progreso=1,log=str(exc))
+                record['artefactos']=self.artifacts(record); record['estado']='completo'; record['progreso']=1
+            except Exception as exc:record.update(estado='error',progreso=1,error=str(exc),artefactos=self.artifacts(record))
             record['fin']=time.time()
         threading.Thread(target=run,daemon=True).start(); return record
 
 def create_app(project,variant=None):
-    session=DirectorSession(project,variant); app=FastAPI(title='Xixova Director',version='0.1.0')
+    session=DirectorSession(project,variant); app=FastAPI(title='Xixova Director',version='0.1.0'); app.state.session=session
     @app.get('/api/project')
     def project_state():
         issues=validate_script(session.script,session.bundle); return {'contexto':context(session.bundle,session.script,issues=issues),'script_hash':session.hash,'arquitectura':session.bundle['arquitectura_hash'],'draft':str(session.draft),'source':str(session.source)}
     @app.get('/api/context')
-    def director_context():return context(session.bundle,session.script,issues=validate_script(session.script,session.bundle))
+    def director_context():
+        value=context(session.bundle,session.script,issues=validate_script(session.script,session.bundle))
+        if getattr(session,'last_proposal',None):
+            proposal=session.last_proposal['value']; value['recorrido_propuesto']={'id':session.last_proposal['id'],'preset':proposal['preset'],'areas':proposal['areas'],'duracion':proposal['duracion'],'diagnosticos':proposal['diagnosticos']}
+        return value
     @app.get('/api/scene')
     def scene(): return scene_payload(session.bundle,session.script)
     @app.get('/api/scene.glb')
@@ -199,10 +239,48 @@ def create_app(project,variant=None):
     def preview_frame(body:dict):return session.job('frame',body.get('toma'),body.get('frame'))
     @app.post('/api/preview/shot')
     def preview_shot(body:dict):return session.job('shot',body.get('toma'))
+    @app.post('/api/preview/script')
+    def preview_script():return session.job('script')
     @app.post('/api/animatic')
     def animatic():return session.job('animatic')
     @app.post('/api/render')
     def render():return session.job('render')
+    @app.get('/api/jobs/{job_id}')
+    def get_job(job_id:str):
+        job=session.jobs.get(job_id)
+        if not job:raise HTTPException(404,'Trabajo inexistente.')
+        job['artefactos']=session.artifacts(job); return {k:v for k,v in job.items() if not k.startswith('_')}
+    @app.get('/api/jobs/{job_id}/artifacts')
+    def get_artifacts(job_id:str):
+        job=session.jobs.get(job_id)
+        if not job:raise HTTPException(404,'Trabajo inexistente.')
+        return {'artefactos':session.artifacts(job)}
+    @app.get('/api/jobs/{job_id}/artifacts/{artifact:path}')
+    def get_artifact(job_id:str,artifact:str,download:bool=False):
+        job=session.jobs.get(job_id)
+        if not job or not job.get('_root'):raise HTTPException(404,'Trabajo inexistente.')
+        root=Path(job['_root']).resolve(); target=(root/artifact).resolve()
+        if root not in target.parents or not target.is_file():raise HTTPException(404,'Artefacto inexistente.')
+        return FileResponse(target,filename=target.name if download else None)
+    @app.get('/api/jobs/{job_id}/log')
+    def get_job_log(job_id:str):
+        job=session.jobs.get(job_id); path=Path(job.get('log','')) if job else None
+        if not path or not path.is_file():raise HTTPException(404,'Log inexistente.')
+        return PlainTextResponse(path.read_text(errors='replace')[-20000:])
+    @app.get('/api/tour-presets')
+    def tour_presets():return {'presets':[{'id':key,**value} for key,value in PRESETS.items()],'areas':[{'id':x['id'],'tipo':__import__('xixova.tour',fromlist=['room_kind']).room_kind(x['id'])} for x in session.bundle['arquitectura']['espacios']]}
+    @app.post('/api/tours/propose')
+    def propose(body:dict):
+        try:value=propose_tour(session.bundle,body.get('areas'),body.get('preset','visita_completa'),body.get('orden','natural'))
+        except ValueError as exc:raise HTTPException(422,str(exc))
+        identifier=uuid.uuid4().hex[:12]; session.proposals[identifier]={'hash':session.hash,'value':value,'created':time.time()}; session.last_proposal={'id':identifier,**session.proposals[identifier]}; return {'proposal_id':identifier,**value}
+    @app.post('/api/tours/{proposal_id}/apply')
+    def apply_tour(proposal_id:str,body:dict):
+        proposal=session.proposals.get(proposal_id)
+        if not proposal:raise HTTPException(404,'Propuesta inexistente o vencida.')
+        if body.get('hash')!=session.hash or proposal['hash']!=session.hash:raise HTTPException(409,'El guion cambió; genera nuevamente la propuesta.')
+        if not proposal['value']['ok']:raise HTTPException(422,proposal['value']['diagnosticos'])
+        identifier=session.create_script(body.get('nombre','Recorrido automático'),proposal['value']['guion']); return {'ok':True,'id':identifier,'guiones':session.library()}
     @app.delete('/api/jobs/{job_id}')
     def cancel(job_id:str):
         job=session.jobs.get(job_id)
