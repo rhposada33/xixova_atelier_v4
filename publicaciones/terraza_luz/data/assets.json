@@ -1,0 +1,21 @@
+{
+  "activos": [
+    "cama_secundaria",
+    "cama_suite",
+    "cocina_integrada",
+    "comedor_cuatro",
+    "jardinera_1",
+    "jardinera_2",
+    "jardinera_3",
+    "jardinera_4",
+    "jardinera_5",
+    "jardinera_6",
+    "jardinera_7",
+    "mesa_social",
+    "mesa_terraza"
+  ],
+  "caras_fuente": 19532,
+  "ratio": 1,
+  "archivo": "assets.glb",
+  "bytes": 3128564
+}

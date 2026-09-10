@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "proyecto": "terraza_luz",
+  "variante": "editorial_jardin",
+  "hash": "3946b7b71c1a95f150bc3cb3d39de02c8848c89de575d6c8e063242a02c77262",
+  "escena": "data/scene.json",
+  "glb": "data/scene.glb",
+  "activos_glb": "data/assets.glb",
+  "miniatura": "data/miniatura.svg",
+  "auditoria": "data/auditoria.json",
+  "atribuciones": "data/atribuciones.json",
+  "capacidades": [
+    "paredes_inteligentes",
+    "puertas",
+    "espacios",
+    "puntos_interes",
+    "captura",
+    "tour",
+    "estudio_solar"
+  ]
+}

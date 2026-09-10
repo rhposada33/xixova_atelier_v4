@@ -1,0 +1,300 @@
+schema: 1
+id: editorial_jardin
+arquitectura:
+  id: terraza_luz
+  version: 0.1-borrador
+  hash: 566bf96760dde9868aaeb8b1e8f109b954d8a6903016b4e306324f70ef69c48f
+materiales:
+  yeso_calido:
+    color:
+    - 0.74
+    - 0.72
+    - 0.68
+    rugosidad: 0.72
+    escala_m: 0.3
+    normal_fuerza: 0.2
+    microdetalle: 0.2
+    proyeccion: uv
+    normal_convencion: OpenGL
+  nogal:
+    color:
+    - 0.25
+    - 0.12
+    - 0.055
+    rugosidad: 0.42
+    escala_m: 2.0
+    normal_fuerza: 0.35
+    microdetalle: 0.08
+    mapas:
+      color: ../../cache/pbr/wood_floor/wood_floor_base_color_1k.jpg
+      roughness: ../../cache/pbr/wood_floor/wood_floor_roughness_1k.jpg
+      normal: ../../cache/pbr/wood_floor/wood_floor_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
+  piedra_crema:
+    color:
+    - 0.67
+    - 0.62
+    - 0.53
+    rugosidad: 0.36
+    escala_m: 1.5
+    normal_fuerza: 0.22
+    microdetalle: 0.05
+    mapas:
+      color: ../../cache/pbr/marble_01/marble_01_base_color_1k.jpg
+      roughness: ../../cache/pbr/marble_01/marble_01_roughness_1k.jpg
+      normal: ../../cache/pbr/marble_01/marble_01_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
+  metal_oscuro:
+    color:
+    - 0.035
+    - 0.03
+    - 0.025
+    rugosidad: 0.25
+    metalico: 0.8
+    microdetalle: 0.02
+    proyeccion: uv
+    normal_convencion: OpenGL
+  textil_greige:
+    color:
+    - 0.38
+    - 0.34
+    - 0.31
+    rugosidad: 0.82
+    escala_m: 1
+    normal_fuerza: 0.12
+    microdetalle: 0.08
+    mapas:
+      color: ../../cache/pbr/rough_linen/rough_linen_base_color_1k.jpg
+      roughness: ../../cache/pbr/rough_linen/rough_linen_roughness_1k.jpg
+      normal: ../../cache/pbr/rough_linen/rough_linen_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
+    tinte:
+    - 0.62
+    - 0.7
+    - 0.78
+  techo:
+    color:
+    - 0.84
+    - 0.82
+    - 0.78
+    rugosidad: 0.84
+    microdetalle: 0.12
+    proyeccion: uv
+    normal_convencion: OpenGL
+acabados:
+  fachada_sur: yeso_calido
+  fachada_oeste: yeso_calido
+  fachada_norte: yeso_calido
+  fachada_este: yeso_calido
+  division_oeste: yeso_calido
+  division_servicios: yeso_calido
+  division_lavado: yeso_calido
+  division_social: yeso_calido
+  division_privada: yeso_calido
+  division_suite: yeso_calido
+  division_bano_suite: yeso_calido
+  division_bano_vertical: yeso_calido
+  terraza_jardin:piso: piedra_crema
+  terraza_jardin:techo: techo
+  entrada:piso: piedra_crema
+  entrada:techo: techo
+  lavanderia:piso: piedra_crema
+  lavanderia:techo: techo
+  bano_social:piso: piedra_crema
+  bano_social:techo: techo
+  cocina:piso: nogal
+  cocina:techo: techo
+  dormitorio_secundario:piso: nogal
+  dormitorio_secundario:techo: techo
+  circulacion:piso: nogal
+  circulacion:techo: techo
+  bano_suite:piso: piedra_crema
+  bano_suite:techo: techo
+  suite:piso: nogal
+  suite:techo: techo
+  sala_comedor:piso: nogal
+  sala_comedor:techo: techo
+elementos:
+- id: cocina_integrada
+  activo: XVA3_Cocina_premium
+  espacio: cocina
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 1.1
+    - 5.5
+    - 0
+    rotacion: 90
+  escala: 0.7
+  nivel_detalle: hero
+- id: sofa_social
+  activo: sofa_recto
+  espacio: sala_comedor
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 6.0
+    - 1.45
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: hero
+- id: mesa_social
+  activo: mesa_centro
+  espacio: sala_comedor
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 6.0
+    - 0.55
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard
+- id: comedor_cuatro
+  activo: comedor
+  espacio: sala_comedor
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.25
+    - 1.25
+    - 0
+    rotacion: 0
+  escala: 0.78
+  nivel_detalle: hero
+- id: cama_suite
+  activo: XVA3_Cama_king
+  espacio: suite
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 7.75
+    - 5.55
+    - 0
+    rotacion: 90
+  escala: 0.92
+  nivel_detalle: hero
+- id: cama_secundaria
+  activo: XVA3_Cama_doble
+  espacio: dormitorio_secundario
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 4.5
+    - 5.8
+    - 0
+    rotacion: 0
+  escala: 0.9
+  nivel_detalle: hero
+- id: sofa_terraza
+  activo: sofa_recto
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 10.25
+    - 3.8
+    - 0
+    rotacion: 90
+  escala: 0.85
+  nivel_detalle: standard
+- id: mesa_terraza
+  activo: mesa_centro
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 10.3
+    - 2.55
+    - 0
+    rotacion: 0
+  escala: 0.85
+  nivel_detalle: standard
+- id: jardinera_1
+  activo: XVA_Planter_Editorial
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 10.5
+    - 0.2
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard
+- id: jardinera_2
+  activo: XVA_Planter_Editorial
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 10.5
+    - 1.4
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard
+- id: jardinera_3
+  activo: XVA_Planter_Editorial
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 10.5
+    - 5.2
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard
+- id: jardinera_4
+  activo: XVA_Planter_Editorial
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 10.5
+    - 6.5
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard
+- id: jardinera_5
+  activo: XVA_Planter_Editorial
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 3
+    - -0.8
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard
+- id: jardinera_6
+  activo: XVA_Planter_Editorial
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 4.2
+    - -0.8
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard
+- id: jardinera_7
+  activo: XVA_Planter_Editorial
+  espacio: terraza_jardin
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.8
+    - -0.8
+    - 0
+    rotacion: 0
+  escala: 1
+  nivel_detalle: standard

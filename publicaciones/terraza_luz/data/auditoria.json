@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "ok": true,
+  "hash": "3946b7b71c1a95f150bc3cb3d39de02c8848c89de575d6c8e063242a02c77262",
+  "metricas": {
+    "triangulos_estimados": 39208,
+    "limite_movil": 200000,
+    "activos": 15,
+    "espacios": 10,
+    "caras_activos_fuente": 19532
+  },
+  "diagnosticos": [
+    {
+      "codigo": "MAQUETA_SOLAR_DEMO",
+      "gravedad": "aviso",
+      "elemento": "solar",
+      "explicacion": "Ubicación y norte de demostración; el resultado es una estimación por calibrar."
+    },
+    {
+      "codigo": "MAQUETA_PROXY_LICENCIA",
+      "gravedad": "aviso",
+      "elemento": "sofa_social",
+      "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."
+    },
+    {
+      "codigo": "MAQUETA_PROXY_LICENCIA",
+      "gravedad": "aviso",
+      "elemento": "sofa_terraza",
+      "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+schema: 1
+id: terraza_luz
+arquitectura: arquitectura.yaml
+variantes:
+  editorial_jardin: editorial_jardin.yaml
+presentacion: presentacion.yaml
+realismo:
+  perfil: lujo_editorial_golden_hour
+  calidad: fotografica
+  semilla: 1974
+  hora_solar: '18:10'
+  densidad_decoracion: media
+produccion:
+  catalogo: catalogo.yaml
+  bibliotecas:
+  - ../../biblioteca/catalogo_xixova.yaml
+  blender: ~/Aplicaciones/blender-4.5/blender
+  salidas: ../../resultados/terraza_luz
+  fps: 24
+  gpu_vram_gb: 6
+  ram_gb: 16
+  licencias_permitidas:
+  - propia
+  - CC0
+  - CC Attribution
+  - Royalty Free
+  perfiles:
+    previa:
+      resolucion:
+      - 640
+      - 360
+      muestras: 12
+      motor: CYCLES
+      denoise: true
+    animatica:
+      resolucion:
+      - 480
+      - 270
+      muestras: 1
+      motor: BLENDER_WORKBENCH
+      denoise: false
+      crf: 20
+      preset: medium
+    final:
+      resolucion:
+      - 746
+      - 420
+      muestras: 32
+      motor: CYCLES
+      denoise: true
+      crf: 18
+      preset: slow
+    piloto_fotografico:
+      resolucion:
+      - 960
+      - 540
+      muestras: 64
+      motor: CYCLES
+      denoise: true
+      umbral_adaptativo: 0.025
+      max_rebotes: 8
+      rebotes_difusos: 3
+      rebotes_brillantes: 3
+      rebotes_transmision: 6
+      clamp_indirecto: 8
+      profundidad_color: '8'
+    fotografico_1080p:
+      resolucion:
+      - 1920
+      - 1080
+      muestras: 128
+      motor: CYCLES
+      denoise: true
+      umbral_adaptativo: 0.015
+      max_rebotes: 8
+      rebotes_difusos: 3
+      rebotes_brillantes: 3
+      rebotes_transmision: 6
+      clamp_indirecto: 8
+      profundidad_color: '16'
+      crf: 16
+      preset: slow
