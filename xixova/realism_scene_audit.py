@@ -24,12 +24,12 @@ for shot in data['presentacion']['tomas']:
     marker=next((m for m in scene.timeline_markers if m.frame==offset+1),None); offset+=shot['fotogramas']
     if not marker or not marker.camera: add('CAMARA_AUSENTE',shot['id'],'No existe cámara para la toma.'); continue
     camera=marker.camera; focus=next((o for o in scene.objects if o.get('xixova_sync_role')=='elemento' and o.get('xixova_id')==shot.get('foco')),None)
-    for frame in (marker.frame,marker.frame+(shot['fotogramas']-1)//2,marker.frame+shot['fotogramas']-1):
+    for frame in range(marker.frame,marker.frame+shot['fotogramas']):
         scene.frame_set(frame)
         origin=camera.matrix_world.translation
         for direction in (Vector((1,0,0)),Vector((-1,0,0)),Vector((0,1,0)),Vector((0,-1,0))):
             hit,loc,normal,index,obj,matrix=scene.ray_cast(deps,origin,direction,distance=.12)
-            if hit and obj.get('xixova_capa')=='ARQUITECTURA':add('CAMARA_EN_GEOMETRIA',shot['id'],f'Cámara sin margen en fotograma {frame}.'); break
+            if hit and obj.get('xixova_capa') in {'ARQUITECTURA','INTERIORISMO'}:add('CAMARA_SIN_MARGEN',shot['id'],f'{obj.name} a menos de 12 cm en fotograma {frame}.'); break
         if focus:
             target=focus.matrix_world.translation+Vector((0,0,.5)); vector=target-origin; distance=vector.length
             if distance>.01:

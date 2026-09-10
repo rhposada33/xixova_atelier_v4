@@ -1,0 +1,169 @@
+"""Exporta una representación editorial y segura para el navegador."""
+from __future__ import annotations
+
+import json
+import math
+import copy
+import os
+import shutil
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+from .core import digest, resolve
+from .director_glb import make_glb
+
+KNOWN_LICENSES = {"propia", "CC0", "CC Attribution", "Royalty Free"}
+DIRECT_LICENSES = {"propia", "CC0"}
+DEFAULTS = {
+    "perfil": "editorial_calido",
+    "camara": "isometrica",
+    "fondo": "cielo_suave",
+    "techo_visible": False,
+    "paredes": {"modo": "inteligentes", "transicion_ms": 220},
+    "etiquetas": {"espacios": True, "superficies": True, "objetos": "seleccionables"},
+    "interaccion": {"puertas": True, "filtros_espacios": True, "puntos_interes": True},
+    "semilla": 1842,
+}
+
+
+def _polygon_centroid(points):
+    twice_area = 0.0; x = 0.0; y = 0.0
+    for a, b in zip(points, points[1:] + points[:1]):
+        cross = a[0] * b[1] - b[0] * a[1]
+        twice_area += cross; x += (a[0] + b[0]) * cross; y += (a[1] + b[1]) * cross
+    if abs(twice_area) < 1e-8:
+        return [sum(p[0] for p in points) / len(points), sum(p[1] for p in points) / len(points)]
+    return [x / (3 * twice_area), y / (3 * twice_area)]
+
+
+def _room_for(point, rooms):
+    from shapely.geometry import Point, Polygon
+    return next((room["id"] for room in rooms if Polygon(room["contorno"]).buffer(.01).contains(Point(point[:2]))), None)
+
+
+def config(bundle):
+    value = json.loads(json.dumps(DEFAULTS))
+    declared = bundle["presentacion"].get("maqueta", {})
+    for key, child in declared.items():
+        if isinstance(child, dict) and isinstance(value.get(key), dict): value[key].update(child)
+        else: value[key] = child
+    value["semilla"] = declared.get("semilla", bundle["proyecto"].get("realismo", {}).get("semilla", 1842))
+    return value
+
+
+def build_payload(bundle):
+    elements, issues = resolve(bundle)
+    if issues: raise ValueError("; ".join(x["explicacion"] for x in issues))
+    assets = {x["id"]: x for x in bundle["catalogo"]["activos"]}
+    rooms = []
+    for room in bundle["arquitectura"]["espacios"]:
+        center = _polygon_centroid(room["contorno"])
+        rooms.append({**room, "centro": [round(center[0], 4), round(center[1], 4), .12],
+                      "nombre": room["id"].replace("_", " ").title()})
+    web_elements = []
+    for item in elements:
+        asset = assets[item["activo"]]; license_name = asset.get("licencia", "desconocida")
+        # v1 deliberately never exposes catalog source meshes. Even direct-compatible
+        # assets use a generated proxy until the optimized Blender exporter is audited.
+        mode = "optimizado_propio" if license_name in DIRECT_LICENSES else "procedural_proxy"
+        web_elements.append({
+            "id": item["id"], "activo": item["activo"], "categoria": asset["categoria"],
+            "espacio": item["espacio"], "posicion": item["posicion"], "rotacion": item["rotacion"],
+            "dimensiones": item["dimensiones"], "licencia": license_name,
+            "nivel_web": mode,
+            "nombre": item["id"].replace("_", " ").title(),
+            "acabado": next(iter(item.get("materiales_partes", {}).values()), item.get("material", "original")),
+        })
+    openings = []
+    for wall in bundle["arquitectura"]["paredes"]:
+        length = math.dist(wall["a"], wall["b"]); dx = (wall["b"][0]-wall["a"][0])/length; dy = (wall["b"][1]-wall["a"][1])/length
+        for opening in wall["aberturas"]:
+            middle = opening["distancia"] + opening["ancho"] / 2
+            openings.append({**opening, "pared": wall["id"], "posicion": [wall["a"][0]+dx*middle, wall["a"][1]+dy*middle, opening["antepecho"]], "rotacion": math.degrees(math.atan2(dy, dx))})
+    points = bundle["presentacion"].get("maqueta", {}).get("puntos_interes") or [
+        {"id": "area_"+room["id"], "nombre": room["nombre"], "espacio": room["id"], "posicion": room["centro"]}
+        for room in rooms
+    ]
+    walls = []
+    for wall in bundle["arquitectura"]["paredes"]:
+        length=math.dist(wall["a"],wall["b"]); dx=(wall["b"][0]-wall["a"][0])/length; dy=(wall["b"][1]-wall["a"][1])/length
+        middle=[(wall["a"][0]+wall["b"][0])/2,(wall["a"][1]+wall["b"][1])/2]
+        probes=[[middle[0]-dy*.2,middle[1]+dx*.2],[middle[0]+dy*.2,middle[1]-dx*.2]]
+        sides=sum(_room_for(point,rooms) is not None for point in probes)
+        walls.append({**wall,"exterior":sides<2})
+    project = bundle["proyecto"]
+    return {
+        "schema": 1, "proyecto": project["id"], "nombre": project["id"].replace("_", " ").title(),
+        "variante": bundle["interiorismo"]["id"], "arquitectura_hash": bundle["arquitectura_hash"],
+        "configuracion": config(bundle), "espacios": rooms, "paredes": walls,
+        "aberturas": openings, "elementos": web_elements, "puntos_interes": points, "activos_glb": False,
+    }
+
+
+def audit(bundle, payload=None):
+    payload = payload or build_payload(bundle); problems = []; warnings = []
+    for item in payload["elementos"]:
+        if item["licencia"] not in KNOWN_LICENSES:
+            problems.append({"codigo": "MAQUETA_LICENCIA", "gravedad": "error", "elemento": item["id"], "explicacion": "Licencia desconocida; se bloquea la publicación."})
+        elif item["licencia"] not in DIRECT_LICENSES:
+            warnings.append({"codigo": "MAQUETA_PROXY_LICENCIA", "gravedad": "aviso", "elemento": item["id"], "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."})
+    triangles = len(payload["paredes"]) * 12 + len(payload["elementos"]) * 180 + len(payload["espacios"]) * 8
+    budget = 200_000
+    if triangles > budget:
+        problems.append({"codigo": "MAQUETA_POLIGONOS", "gravedad": "error", "elemento": "escena", "explicacion": f"{triangles} triángulos estimados superan el presupuesto móvil {budget}."})
+    return {"schema": 1, "ok": not problems, "hash": digest(payload), "metricas": {"triangulos_estimados": triangles, "limite_movil": budget, "activos": len(payload["elementos"]), "espacios": len(payload["espacios"])}, "diagnosticos": problems + warnings}
+
+
+def export(bundle, destination):
+    payload = build_payload(bundle); report = audit(bundle, payload)
+    if not report["ok"]: raise ValueError("; ".join(x["explicacion"] for x in report["diagnosticos"] if x["gravedad"] == "error"))
+    destination = Path(destination).resolve(); source = Path(__file__).parent / "maquette_web" / "dist"
+    if not (source / "index.html").is_file(): raise ValueError("Compila xixova/maquette_web antes de exportar.")
+    destination.mkdir(parents=True, exist_ok=True)
+    # Hashed Vite bundles change name on every build. Remove only the generated
+    # assets directory so an incremental export cannot retain obsolete clients.
+    generated_assets = destination / "assets"
+    if generated_assets.is_dir(): shutil.rmtree(generated_assets)
+    for child in source.iterdir():
+        target = destination / child.name
+        if child.is_dir(): shutil.copytree(child, target, dirs_exist_ok=True)
+        else: shutil.copy2(child, target)
+    data = destination / "data"; data.mkdir(exist_ok=True)
+    if os.environ.get('XIXOVA_MAQUETA_SIN_BLENDER')!='1':
+        from .cli import run_blender
+        from .core import camera_frames
+        cache=Path(bundle['archivo']).parent/'.maqueta'/'cache'/report['hash'][:20];cache.mkdir(parents=True,exist_ok=True)
+        resolved,issues=resolve(bundle)
+        if issues:raise ValueError('; '.join(x['explicacion'] for x in issues))
+        compiled=copy.deepcopy(bundle);compiled['resueltos']=resolved;compiled['fotogramas']=[dict(toma=s,numero=f,posicion=p,objetivo=t) for s,f,p,t in camera_frames(compiled['presentacion'])]
+        datafile=cache/'resuelto.json';datafile.write_text(json.dumps(compiled,ensure_ascii=False))
+        scene=cache/'escena.blend'
+        if not scene.is_file():run_blender(compiled,'blender_build.py',['--datos',datafile,'--salida',scene],log=cache/'construccion.log')
+        assets_glb=data/'assets.glb';run_blender(compiled,'maquette_blender_export.py',['--datos',datafile,'--salida',assets_glb],scene,cache/'exportacion.log')
+        binary=assets_glb.read_bytes()
+        if any(marker in binary for marker in (b'/home/',b'\\Users\\',b'.blend',b'xixova_sync_base')):
+            raise ValueError('El GLB contiene metadatos o rutas locales; publicación bloqueada.')
+        payload['activos_glb']=assets_glb.is_file()
+        asset_report=json.loads(assets_glb.with_suffix('.json').read_text())
+        report['metricas']['triangulos_estimados']=len(payload['paredes'])*12+round(asset_report['caras_fuente']*asset_report['ratio'])*2
+        report['metricas']['caras_activos_fuente']=asset_report['caras_fuente']
+    (data / "scene.json").write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
+    (data / "scene.glb").write_bytes(make_glb(payload))
+    points=[p for room in payload["espacios"] for p in room["contorno"]]; xs=[p[0] for p in points]; ys=[p[1] for p in points]; lo,hi,bot,top=min(xs),max(xs),min(ys),max(ys)
+    polygons=''.join(f'<polygon points="{" ".join(f"{(p[0]-lo)/(hi-lo)*560+20:.1f},{(top-p[1])/(top-bot)*360+20:.1f}" for p in room["contorno"])}"/>' for room in payload["espacios"])
+    (data/"miniatura.svg").write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><rect width="600" height="400" fill="#e8e0d4"/><g fill="#ceb99c" stroke="#675d51" stroke-width="2">{polygons}</g></svg>')
+    manifest = {"schema": 1, "proyecto": payload["proyecto"], "variante": payload["variante"], "hash": report["hash"], "escena": "data/scene.json", "glb": "data/scene.glb", "activos_glb": "data/assets.glb" if (data/'assets.glb').is_file() else None, "miniatura": "data/miniatura.svg", "auditoria": "data/auditoria.json", "atribuciones": "data/atribuciones.json", "capacidades": ["paredes_inteligentes", "puertas", "espacios", "puntos_interes", "captura", "tour"]}
+    (destination / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+"\n")
+    (data / "auditoria.json").write_text(json.dumps(report, ensure_ascii=False, indent=2)+"\n")
+    attributions = [{"activo": x["activo"], "licencia": x["licencia"]} for x in payload["elementos"] if x["licencia"] not in {"propia"}]
+    (data / "atribuciones.json").write_text(json.dumps(attributions, ensure_ascii=False, indent=2)+"\n")
+    size=sum(x.stat().st_size for x in destination.rglob("*") if x.is_file())
+    if size>30*1024*1024: raise ValueError(f"La publicación ocupa {size/1024/1024:.1f} MB y supera el límite de 30 MB.")
+    return {**report, "salida": str(destination), "url": "index.html", "bytes": size, "limite_bytes": 30*1024*1024}
+
+
+def serve(directory, host="127.0.0.1", port=8877):
+    directory = Path(directory).resolve()
+    if not (directory / "index.html").is_file(): raise ValueError("La salida no contiene index.html.")
+    handler = lambda *args, **kwargs: SimpleHTTPRequestHandler(*args, directory=str(directory), **kwargs)
+    ThreadingHTTPServer((host, port), handler).serve_forever()

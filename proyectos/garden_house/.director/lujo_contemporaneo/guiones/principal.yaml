@@ -1,0 +1,343 @@
+schema: 1
+fps: 24
+duracion: 20.0
+semilla: 2408
+tomas:
+- id: entrada_social
+  inicio: 0.0
+  duracion: 4.0
+  camara: camara_entrada_social
+  transicion: corte
+- id: cocina_comedor
+  inicio: 4.0
+  duracion: 4.0
+  camara: camara_cocina_comedor
+  transicion: corte
+- id: aproximacion_veranda
+  inicio: 8.0
+  duracion: 4.0
+  camara: camara_aproximacion_veranda
+  transicion: corte
+- id: zona_privada
+  inicio: 12.0
+  duracion: 4.0
+  camara: camara_zona_privada
+  transicion: corte
+- id: suite_detalle
+  inicio: 16.0
+  duracion: 4.0
+  camara: camara_suite_detalle
+  transicion: corte
+pistas:
+- id: camara_entrada_social:posicion
+  tipo: camara
+  objetivo: camara_entrada_social
+  propiedad: posicion
+  claves:
+  - id: camara_entrada_social_posicion_a
+    tiempo: 0.0
+    valor:
+    - 1.78
+    - 1.15
+    - 1.45
+    interpolacion: ease_in_out
+  - id: camara_entrada_social_posicion_b
+    tiempo: 4.0
+    valor:
+    - 2.08
+    - 1.25
+    - 1.45
+    interpolacion: ease_in_out
+- id: camara_entrada_social:objetivo
+  tipo: camara
+  objetivo: camara_entrada_social
+  propiedad: objetivo
+  claves:
+  - id: camara_entrada_social_objetivo_a
+    tiempo: 0.0
+    valor: &id001
+    - 3.45
+    - 3.62
+    - 0.72
+    interpolacion: ease_in_out
+  - id: camara_entrada_social_objetivo_b
+    tiempo: 4.0
+    valor: *id001
+    interpolacion: ease_in_out
+- id: camara_entrada_social:lente
+  tipo: camara
+  objetivo: camara_entrada_social
+  propiedad: lente
+  claves:
+  - id: camara_entrada_social_lente_a
+    tiempo: 0.0
+    valor: 30
+    interpolacion: ease_in_out
+  - id: camara_entrada_social_lente_b
+    tiempo: 4.0
+    valor: 30
+    interpolacion: ease_in_out
+- id: camara_entrada_social:apertura
+  tipo: camara
+  objetivo: camara_entrada_social
+  propiedad: apertura
+  claves:
+  - id: camara_entrada_social_apertura_a
+    tiempo: 0.0
+    valor: 5.6
+    interpolacion: ease_in_out
+  - id: camara_entrada_social_apertura_b
+    tiempo: 4.0
+    valor: 5.6
+    interpolacion: ease_in_out
+- id: camara_cocina_comedor:posicion
+  tipo: camara
+  objetivo: camara_cocina_comedor
+  propiedad: posicion
+  claves:
+  - id: camara_cocina_comedor_posicion_a
+    tiempo: 4.0
+    valor: &id002
+    - 4.35
+    - 4.7
+    - 1.45
+    interpolacion: ease_in_out
+  - id: camara_cocina_comedor_posicion_b
+    tiempo: 8.0
+    valor: *id002
+    interpolacion: ease_in_out
+- id: camara_cocina_comedor:objetivo
+  tipo: camara
+  objetivo: camara_cocina_comedor
+  propiedad: objetivo
+  claves:
+  - id: camara_cocina_comedor_objetivo_a
+    tiempo: 4.0
+    valor: &id003
+    - 1.0
+    - 2.35
+    - 0.75
+    interpolacion: ease_in_out
+  - id: camara_cocina_comedor_objetivo_b
+    tiempo: 8.0
+    valor: *id003
+    interpolacion: ease_in_out
+- id: camara_cocina_comedor:lente
+  tipo: camara
+  objetivo: camara_cocina_comedor
+  propiedad: lente
+  claves:
+  - id: camara_cocina_comedor_lente_a
+    tiempo: 4.0
+    valor: 32
+    interpolacion: ease_in_out
+  - id: camara_cocina_comedor_lente_b
+    tiempo: 8.0
+    valor: 32
+    interpolacion: ease_in_out
+- id: camara_cocina_comedor:apertura
+  tipo: camara
+  objetivo: camara_cocina_comedor
+  propiedad: apertura
+  claves:
+  - id: camara_cocina_comedor_apertura_a
+    tiempo: 4.0
+    valor: 5.6
+    interpolacion: ease_in_out
+  - id: camara_cocina_comedor_apertura_b
+    tiempo: 8.0
+    valor: 5.6
+    interpolacion: ease_in_out
+- id: camara_aproximacion_veranda:posicion
+  tipo: camara
+  objetivo: camara_aproximacion_veranda
+  propiedad: posicion
+  claves:
+  - id: camara_aproximacion_veranda_posicion_a
+    tiempo: 8.0
+    valor:
+    - 4.95
+    - 6.25
+    - 1.4
+    interpolacion: ease_in_out
+  - id: camara_aproximacion_veranda_posicion_b
+    tiempo: 12.0
+    valor:
+    - 5.25
+    - 6.25
+    - 1.4
+    interpolacion: ease_in_out
+- id: camara_aproximacion_veranda:objetivo
+  tipo: camara
+  objetivo: camara_aproximacion_veranda
+  propiedad: objetivo
+  claves:
+  - id: camara_aproximacion_veranda_objetivo_a
+    tiempo: 8.0
+    valor: &id004
+    - 7.55
+    - 6.3
+    - 0.68
+    interpolacion: ease_in_out
+  - id: camara_aproximacion_veranda_objetivo_b
+    tiempo: 12.0
+    valor: *id004
+    interpolacion: ease_in_out
+- id: camara_aproximacion_veranda:lente
+  tipo: camara
+  objetivo: camara_aproximacion_veranda
+  propiedad: lente
+  claves:
+  - id: camara_aproximacion_veranda_lente_a
+    tiempo: 8.0
+    valor: 35
+    interpolacion: ease_in_out
+  - id: camara_aproximacion_veranda_lente_b
+    tiempo: 12.0
+    valor: 35
+    interpolacion: ease_in_out
+- id: camara_aproximacion_veranda:apertura
+  tipo: camara
+  objetivo: camara_aproximacion_veranda
+  propiedad: apertura
+  claves:
+  - id: camara_aproximacion_veranda_apertura_a
+    tiempo: 8.0
+    valor: 5.6
+    interpolacion: ease_in_out
+  - id: camara_aproximacion_veranda_apertura_b
+    tiempo: 12.0
+    valor: 5.6
+    interpolacion: ease_in_out
+- id: camara_zona_privada:posicion
+  tipo: camara
+  objetivo: camara_zona_privada
+  propiedad: posicion
+  claves:
+  - id: camara_zona_privada_posicion_a
+    tiempo: 12.0
+    valor:
+    - 5.25
+    - 6.35
+    - 1.42
+    interpolacion: ease_in_out
+  - id: camara_zona_privada_posicion_b
+    tiempo: 16.0
+    valor:
+    - 5.55
+    - 6.3
+    - 1.42
+    interpolacion: ease_in_out
+- id: camara_zona_privada:objetivo
+  tipo: camara
+  objetivo: camara_zona_privada
+  propiedad: objetivo
+  claves:
+  - id: camara_zona_privada_objetivo_a
+    tiempo: 12.0
+    valor: &id005
+    - 6.15
+    - 4.13
+    - 0.7
+    interpolacion: ease_in_out
+  - id: camara_zona_privada_objetivo_b
+    tiempo: 16.0
+    valor: *id005
+    interpolacion: ease_in_out
+- id: camara_zona_privada:lente
+  tipo: camara
+  objetivo: camara_zona_privada
+  propiedad: lente
+  claves:
+  - id: camara_zona_privada_lente_a
+    tiempo: 12.0
+    valor: 24
+    interpolacion: ease_in_out
+  - id: camara_zona_privada_lente_b
+    tiempo: 16.0
+    valor: 24
+    interpolacion: ease_in_out
+- id: camara_zona_privada:apertura
+  tipo: camara
+  objetivo: camara_zona_privada
+  propiedad: apertura
+  claves:
+  - id: camara_zona_privada_apertura_a
+    tiempo: 12.0
+    valor: 5.6
+    interpolacion: ease_in_out
+  - id: camara_zona_privada_apertura_b
+    tiempo: 16.0
+    valor: 5.6
+    interpolacion: ease_in_out
+- id: camara_suite_detalle:posicion
+  tipo: camara
+  objetivo: camara_suite_detalle
+  propiedad: posicion
+  claves:
+  - id: camara_suite_detalle_posicion_a
+    tiempo: 16.0
+    valor:
+    - 9.65
+    - 6.32
+    - 1.42
+    interpolacion: ease_in_out
+  - id: camara_suite_detalle_posicion_b
+    tiempo: 20.0
+    valor:
+    - 9.35
+    - 6.28
+    - 1.42
+    interpolacion: ease_in_out
+- id: camara_suite_detalle:objetivo
+  tipo: camara
+  objetivo: camara_suite_detalle
+  propiedad: objetivo
+  claves:
+  - id: camara_suite_detalle_objetivo_a
+    tiempo: 16.0
+    valor: &id006
+    - 8.82
+    - 3.76
+    - 0.72
+    interpolacion: ease_in_out
+  - id: camara_suite_detalle_objetivo_b
+    tiempo: 20.0
+    valor: *id006
+    interpolacion: ease_in_out
+- id: camara_suite_detalle:lente
+  tipo: camara
+  objetivo: camara_suite_detalle
+  propiedad: lente
+  claves:
+  - id: camara_suite_detalle_lente_a
+    tiempo: 16.0
+    valor: 24
+    interpolacion: ease_in_out
+  - id: camara_suite_detalle_lente_b
+    tiempo: 20.0
+    valor: 24
+    interpolacion: ease_in_out
+- id: camara_suite_detalle:apertura
+  tipo: camara
+  objetivo: camara_suite_detalle
+  propiedad: apertura
+  claves:
+  - id: camara_suite_detalle_apertura_a
+    tiempo: 16.0
+    valor: 5.6
+    interpolacion: ease_in_out
+  - id: camara_suite_detalle_apertura_b
+    tiempo: 20.0
+    valor: 5.6
+    interpolacion: ease_in_out
+marcadores:
+- id: inicio
+  tiempo: 0
+  texto: Entrada y revelado social
+- id: cierre
+  tiempo: 16
+  texto: Cierre editorial en suite
+revision:
+  estado: borrador
+  arquitectura_hash: 91fe04f7ea0fa22c061c5932db3250a7052883cff5afdd838bc14f03c99b5ddc

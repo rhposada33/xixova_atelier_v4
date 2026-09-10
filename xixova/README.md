@@ -163,6 +163,24 @@ ordena las áreas desde el acceso, asigna 3–5 segundos por espacio, elige un
 protagonista y alterna movimientos. La propuesta se guarda como un guion nuevo y
 no reemplaza el activo.
 
+## Xixova Maqueta
+
+La maqueta convierte el mismo proyecto en una experiencia 2.5D estática para
+clientes. Conserva medidas e IDs, oculta el techo, abre puertas, recorta paredes
+según la vista y usa proxies editoriales que no contienen las mallas originales:
+
+```bash
+uv run xixova_cli.py preparar-maqueta -p proyectos/garden_house/proyecto.yaml --variante lujo_contemporaneo
+uv run xixova_cli.py exportar-maqueta -p proyectos/garden_house/proyecto.yaml --variante lujo_contemporaneo --salida publicaciones/garden_house
+uv run xixova_cli.py servir-maqueta -p proyectos/garden_house/proyecto.yaml --variante lujo_contemporaneo --salida publicaciones/garden_house --port 8877
+```
+
+`auditar-maqueta --compacto` comprueba licencias y presupuesto móvil. La salida
+contiene `index.html`, `manifest.json`, la escena compacta, un GLB auxiliar,
+atribuciones y auditoría; puede copiarse directamente a un hosting estático.
+Director ofrece `Vista maqueta` y los endpoints `/api/maqueta/manifest`,
+`/api/maqueta/export` y `/api/maqueta/status/{job_id}`.
+
 ## Informe de las entregas
 
 Después de producir los cuatro recorridos, se puede regenerar la comparación local:

@@ -166,7 +166,9 @@ def compile_script(bundle,script):
         lens=sample(tracks.get((camera,'lente'),{'claves':[{'tiempo':0,'valor':35}]}),cut['inicio'])
         aperture=sample(tracks.get((camera,'apertura'),{'claves':[{'tiempo':0,'valor':7.1}]}),cut['inicio'])
         exposure=sample(tracks.get((camera,'exposicion'),{'claves':[{'tiempo':0,'valor':out['presentacion']['exposicion']}]}),cut['inicio'])
-        shots.append({'id':cut['id'],'lente':lens,'fotogramas':frames,'interpolacion':'lineal','apertura_f':aperture,'exposicion':exposure,'puntos':points,'_director_camera':camera,'_director_inicio':cut['inicio']})
+        original=next((s for s in bundle['presentacion']['tomas'] if s['id']==cut['id']),{})
+        inherited={k:original[k] for k in ('foco','cortes_paredes','sensor_mm') if k in original}
+        shots.append({**inherited,'id':cut['id'],'lente':lens,'fotogramas':frames,'interpolacion':'lineal','apertura_f':aperture,'exposicion':exposure,'puntos':points,'_director_camera':camera,'_director_inicio':cut['inicio']})
     out['presentacion']['tomas']=shots; out['proyecto']['produccion']['fps']=script['fps']; out['direccion']=copy.deepcopy(script)
     resolved,issues=resolve(out)
     if issues:raise ValueError('; '.join(x['explicacion'] for x in issues))

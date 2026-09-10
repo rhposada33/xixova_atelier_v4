@@ -4,6 +4,7 @@ import copy, json, math, random
 from pathlib import Path
 import yaml
 from shapely.geometry import LineString, Point, Polygon
+from shapely.ops import unary_union
 from .core import ROOT, digest, footprint, resolve, solid_volumes
 
 def profile(name):
@@ -19,12 +20,17 @@ def room_kind(identifier):
 
 def window_summary(architecture):
     result=[]
+    indoor=unary_union([Polygon(r['contorno']) for r in architecture['espacios'] if r.get('cubierto',True)])
     for wall in architecture['paredes']:
         dx,dy=wall['b'][0]-wall['a'][0],wall['b'][1]-wall['a'][1]; length=math.hypot(dx,dy)
         for opening in wall['aberturas']:
             if opening['tipo']=='ventana':
+                normal=[-dy/length,dx/length] if length else [0,0]
+                t=opening['distancia']+opening['ancho']/2
+                center=[wall['a'][0]+dx*t/length,wall['a'][1]+dy*t/length]
+                if indoor.covers(Point(center[0]+normal[0]*.3,center[1]+normal[1]*.3)): normal=[-x for x in normal]
                 result.append({'id':opening['id'],'pared':wall['id'],'area_m2':round(opening['ancho']*opening['alto'],3),
-                  'direccion':[round(-dy/length,4),round(dx/length,4)] if length else [0,0]})
+                  'direccion':[round(x,4) for x in normal]})
     return sorted(result,key=lambda x:x['area_m2'],reverse=True)
 
 def assign_levels(bundle):
@@ -82,6 +88,8 @@ def compile_bundle(bundle):
     levels,memory=assign_levels(result); windows=window_summary(result['arquitectura'])
     lighting=solve_lighting(result,windows)
     for shot in result['presentacion']['tomas']:
+        base_exposure=result['presentacion']['exposicion']
+        shot['exposicion']=max(base_exposure-.5,min(base_exposure+.5,shot.get('exposicion',base_exposure)))
         inferred=next((x['espacio'] for x in result['interiorismo']['elementos'] if x['id']==shot.get('foco')),shot['id'])
         kind='detalle' if 'detalle' in shot['id'].lower() else room_kind(inferred)
         low,high=style['recetas'][kind]['lente_mm']; shot['lente']=max(low,min(high,shot['lente'])); shot['apertura_f']=max(4,min(8,shot.get('apertura_f',5.6)))
@@ -111,6 +119,6 @@ def correct_exposure(bundle, photo):
         if not rows:continue
         mean=sum(x['luminancia_media'] for x in rows)/len(rows); clipped=max(x['altas_recortadas'] for x in rows); delta=.35 if mean<.22 else (-.35 if mean>.75 or clipped>.03 else 0)
         if delta:
-            before=shot.get('exposicion',bundle['presentacion']['exposicion']); shot['exposicion']=round(max(-1.5,min(.8,before+delta)),2)
+            base=bundle['presentacion']['exposicion']; before=shot.get('exposicion',base); shot['exposicion']=round(max(base-.5,min(base+.5,before+delta)),2)
             if shot['exposicion']!=before:changes.append({'toma':shot['id'],'antes':before,'despues':shot['exposicion']})
     return changes

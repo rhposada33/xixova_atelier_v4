@@ -32,17 +32,27 @@ def material(name, spec):
     maps=spec.get('mapas',{}); normal_socket=None
     if maps:
         coords=nodes.new('ShaderNodeTexCoord'); mapping=nodes.new('ShaderNodeMapping'); scale=1/spec.get('escala_m',1)
-        mapping.inputs['Scale'].default_value=(scale,scale,scale); links.new(coords.outputs['Object'],mapping.inputs['Vector'])
+        projection=spec.get('proyeccion','uv')
+        mapping.inputs['Scale'].default_value=(scale,scale,scale); links.new(coords.outputs['UV' if projection=='uv' else 'Object'],mapping.inputs['Vector'])
         textures={}
         for role,path in maps.items():
             image=bpy.data.images.load(path,check_existing=True)
             if role!='color': image.colorspace_settings.name='Non-Color'
-            tex=nodes.new('ShaderNodeTexImage'); tex.image=image; tex.label=role; links.new(mapping.outputs['Vector'],tex.inputs['Vector']); textures[role]=tex
-        if 'color' in textures: links.new(textures['color'].outputs['Color'],bs.inputs['Base Color'])
+            tex=nodes.new('ShaderNodeTexImage'); tex.image=image; tex.label=role
+            if projection=='triplanar': tex.projection='BOX'; tex.projection_blend=.2
+            links.new(mapping.outputs['Vector'],tex.inputs['Vector']); textures[role]=tex
+        if 'color' in textures:
+            tint=nodes.new('ShaderNodeMixRGB'); tint.blend_type='MULTIPLY'; tint.inputs[0].default_value=1
+            tint.inputs[2].default_value=(*spec.get('tinte',[1,1,1]),1)
+            links.new(textures['color'].outputs['Color'],tint.inputs[1]); links.new(tint.outputs[0],bs.inputs['Base Color'])
         if 'roughness' in textures: links.new(textures['roughness'].outputs['Color'],bs.inputs['Roughness'])
         if 'normal' in textures:
             normal=nodes.new('ShaderNodeNormalMap'); normal.inputs['Strength'].default_value=spec.get('normal_fuerza',.35)
-            links.new(textures['normal'].outputs['Color'],normal.inputs['Color']); normal_socket=normal.outputs['Normal']
+            source=textures['normal'].outputs['Color']
+            if spec.get('normal_convencion','OpenGL')=='DirectX':
+                split=nodes.new('ShaderNodeSeparateXYZ'); combine=nodes.new('ShaderNodeCombineXYZ'); invert=nodes.new('ShaderNodeMath'); invert.operation='SUBTRACT'; invert.inputs[0].default_value=1
+                links.new(source,split.inputs[0]); links.new(split.outputs['X'],combine.inputs['X']); links.new(split.outputs['Y'],invert.inputs[1]); links.new(invert.outputs[0],combine.inputs['Y']); links.new(split.outputs['Z'],combine.inputs['Z']); source=combine.outputs[0]
+            links.new(source,normal.inputs['Color']); normal_socket=normal.outputs['Normal']
         if 'height' in textures:
             bump=nodes.new('ShaderNodeBump'); bump.inputs['Strength'].default_value=.25; bump.inputs['Distance'].default_value=spec.get('height_fuerza_m',.001)
             links.new(textures['height'].outputs['Color'],bump.inputs['Height'])
@@ -57,9 +67,20 @@ def material(name, spec):
     if normal_socket: links.new(normal_socket,bs.inputs['Normal'])
     return m
 
+def metric_uv(obj):
+    """Project each face into its local metric plane, preserving UVs on assets."""
+    uv=obj.data.uv_layers.active or obj.data.uv_layers.new(name='UVMap')
+    for face in obj.data.polygons:
+        axis=max(range(3),key=lambda j:abs(face.normal[j]))
+        axes=((1,2),(0,2),(0,1))[axis]
+        for index in face.loop_indices:
+            co=obj.data.vertices[obj.data.loops[index].vertex_index].co
+            uv.data[index].uv=(co[axes[0]],co[axes[1]])
+
 def box(c,id,pos,dims,mat,angle=0,bevel=.006):
     bpy.ops.mesh.primitive_cube_add(size=1,location=pos); o=move(bpy.context.object,c,id); o.name=id
     o.dimensions=dims; bpy.ops.object.transform_apply(location=False,rotation=False,scale=True); o.rotation_euler.z=angle
+    metric_uv(o)
     if mat: o.data.materials.append(mat)
     if bevel:
         mod=o.modifiers.new('Bisel físico','BEVEL'); mod.width=min(bevel,min(dims)/4); mod.segments=3
@@ -71,9 +92,7 @@ def slab(c,id,points,z,thickness,mat):
     faces=[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(j,(j+1)%n,(j+1)%n+n,j+n) for j in range(n)]
     mesh=bpy.data.meshes.new(id); mesh.from_pydata(vertices,[],faces); mesh.update()
     o=bpy.data.objects.new(id,mesh); c.objects.link(o); o['xixova_id']=id; o['xixova_capa']=c.name; o.data.materials.append(mat)
-    uv=mesh.uv_layers.new(name='UVMap')
-    for loop in mesh.loops:
-        vertex=mesh.vertices[loop.vertex_index].co; uv.data[loop.index].uv=(vertex.x,vertex.y)
+    metric_uv(o)
     # Blender tessellates concave n-gons for render.
     return o
 
@@ -157,6 +176,9 @@ def build(data,out,architecture_only=False):
     exterior=box(enrichment,'exterior:suelo',((min(xs)+max(xs))/2,(min(ys)+max(ys))/2,-.16),(max(xs)-min(xs)+24,max(ys)-min(ys)+24,.08),neutral,bevel=0)
     exterior['xixova_regenerable']=True
     if not architecture_only:
+        sys.path.insert(0,str(Path(__file__).resolve().parent))
+        from window_details import build_windows
+        build_windows(data,enrichment,box,material)
         assets={x['id']:x for x in data['catalogo']['activos']}
         for item in data['resueltos']:
             asset=assets[item['activo']]
@@ -165,14 +187,33 @@ def build(data,out,architecture_only=False):
             with bpy.data.libraries.load(asset_path,link=False) as (src,dst):
                 if asset_collection not in src.collections: raise RuntimeError('Colección ausente: '+asset_collection)
                 dst.collections=[asset_collection]
+                source_names=list(src.materials); dst.materials=list(source_names)
+            for source_name, imported_material in zip(source_names,dst.materials):
+                if imported_material: imported_material['xixova_source_material']=source_name
             imported=dst.collections[0]; decor.children.link(imported)
             parent=bpy.data.objects.new(item['id'],None); decor.objects.link(parent); parent['xixova_id']=item['id']; parent['xixova_capa']='INTERIORISMO'
             objects=list(imported.all_objects)
+            replacements={}
+            for part, target in item.get('materiales_partes',{}).items():
+                for slot in asset.get('partes_materiales',{}).get(part,[]):
+                    if slot in replacements and replacements[slot]!=target: raise RuntimeError('Slot ambiguo: '+slot)
+                    replacements[slot]=target
+            found=set()
             for o in objects:
                 o['xixova_id']=item['id']; o['xixova_capa']='INTERIORISMO'
                 if o.parent not in objects: o.parent=parent
                 if item.get('material') and o.type=='MESH':
                     o.data=o.data.copy(); o.data.materials.clear(); o.data.materials.append(mats[item['material']])
+                elif o.type=='MESH':
+                    for slot in o.material_slots:
+                        if not slot.material: continue
+                        original=slot.material; name=original.get('xixova_source_material',original.name)
+                        slot.link='OBJECT'
+                        if name in replacements:
+                            slot.material=mats[replacements[name]]; found.add(name)
+                        else:
+                            slot.material=original.copy(); slot.material['xixova_source_material']=name
+            if set(replacements)-found: raise RuntimeError('Slots de material ausentes: '+', '.join(sorted(set(replacements)-found)))
             parent.location=item['posicion']; parent.rotation_euler.z=math.radians(item['rotacion']); parent.scale=(item.get('escala',1),)*3
             parent['xixova_sync_role']='elemento'
     p=data['presentacion']; world=bpy.data.worlds.new('Entorno'); scene.world=world; world.use_nodes=True
@@ -222,9 +263,9 @@ def build(data,out,architecture_only=False):
                         else:cam.dof.use_dof=True; cam.dof.aperture_fstop=value; cam.dof.keyframe_insert('aperture_fstop',frame=offset+local+1)
         # Corte arquitectónico fotográfico: oculta sólo durante esta toma los muros
         # que contienen la cámara o bloquean la línea al protagonista.
-        hidden=[]
+        hidden=list(shot.get('cortes_paredes',[]))
         for wall in a['paredes']:
-            if any(segment_distance(point['posicion'],wall['a'],wall['b'])<.28 or segments_cross(point['posicion'],point['objetivo'],wall['a'],wall['b']) for point in shot['puntos']): hidden.append(wall['id'])
+            if 'cortes_paredes' not in shot and any(segment_distance(point['posicion'],wall['a'],wall['b'])<.28 or segments_cross(point['posicion'],point['objetivo'],wall['a'],wall['b']) for point in shot['puntos']): hidden.append(wall['id'])
         shot_ranges.append((shot['id'],offset+1,offset+shot['fotogramas'],hidden))
         offset+=shot['fotogramas']
     # Pistas de objetos, puertas y luces. Se hornean para que Blender y WebGL

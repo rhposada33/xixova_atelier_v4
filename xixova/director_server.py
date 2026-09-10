@@ -21,6 +21,20 @@ class DirectorSession:
             import yaml
             self.meta=yaml.safe_load(self.meta_path.read_text()) or {}
         self.undo=[]; self.redo=[]; self.jobs={}; self.proposals={}; self.lock=threading.Lock(); self.project_sources=dict(self.bundle.get('sincronizacion',{}).get('archivos',{}))
+        self.restore_render_history()
+
+    def restore_render_history(self):
+        """Discover persisted CLI output without rewriting project or render files."""
+        from .cli import output
+        current=output(self.bundle)
+        for root in sorted(current.parent.glob('*')):
+            if not root.is_dir() or not (root/'resuelto.json').is_file(): continue
+            for profile in ('piloto_fotografico','previa','animatica'):
+                folder=root/profile
+                if not folder.is_dir() or not any(folder.glob('frame_*.png')): continue
+                identifier='cli_'+root.name+'_'+profile
+                record={'id':identifier,'tipo':'script','estado':'completo','progreso':1,'origen':'CLI','historico':root!=current,'perfil':profile,'inicio':folder.stat().st_mtime,'_root':str(root),'_folder':str(folder),'log':str(root/'logs'/f'{profile}.log')}
+                record['artefactos']=self.artifacts(record); self.jobs[identifier]=record
     def sources_current(self):
         import hashlib
         return all(Path(path).is_file() and hashlib.sha256(Path(path).read_bytes()).hexdigest()==value for path,value in self.project_sources.items())
@@ -114,8 +128,13 @@ class DirectorSession:
         def run():
             record['estado']='ejecutando'; record['progreso']=.02
             try:
-                compiled=compile_script(self.bundle,self.script); identity=digest({'direccion':self.script,'arquitectura':self.bundle['arquitectura_hash'],'interiorismo':self.bundle['interiorismo']})[:20]
+                from .cli import output
+                compiled=compile_script(self.bundle,self.script); identity=digest({'direccion':self.script,'produccion':str(output(compiled))})[:20]
                 root=self.draft.parent/'trabajos'/identity; root.mkdir(parents=True,exist_ok=True); record['_root']=str(root); datafile=root/'resuelto.json'; datafile.write_text(json.dumps(compiled,ensure_ascii=False))
+                if kind=='render':
+                    audit=root/'auditoria_fotografia.json'; review=root/'revision_visual.json'
+                    if not audit.is_file() or not json.loads(audit.read_text()).get('auditoria_fotografica',False) or not review.is_file() or json.loads(review.read_text()).get('hash')!=identity:
+                        raise ValueError('Render final bloqueado: falta auditoría fotográfica y revisión visual para este guion.')
                 scene=root/'escena.blend'; log=root/(kind+'.log'); record['log']=str(log); record['salida']=str(root)
                 commands=[]
                 if not scene.exists():commands.append(self._command('blender_build.py',['--datos',datafile,'--salida',scene]))
@@ -168,6 +187,7 @@ class DirectorSession:
 
 def create_app(project,variant=None):
     session=DirectorSession(project,variant); app=FastAPI(title='Xixova Director',version='0.1.0'); app.state.session=session
+    maquette_preview=session.director_root/'maqueta_preview'; maquette_preview.mkdir(parents=True,exist_ok=True)
     @app.get('/api/project')
     def project_state():
         issues=validate_script(session.script,session.bundle); return {'contexto':context(session.bundle,session.script,issues=issues),'script_hash':session.hash,'arquitectura':session.bundle['arquitectura_hash'],'draft':str(session.draft),'source':str(session.source)}
@@ -177,6 +197,24 @@ def create_app(project,variant=None):
         if getattr(session,'last_proposal',None):
             proposal=session.last_proposal['value']; value['recorrido_propuesto']={'id':session.last_proposal['id'],'preset':proposal['preset'],'areas':proposal['areas'],'duracion':proposal['duracion'],'diagnosticos':proposal['diagnosticos']}
         return value
+    @app.get('/api/maqueta/manifest')
+    def maquette_manifest():
+        from .maquette import audit, build_payload
+        payload=build_payload(session.bundle); return {'escena':payload,'auditoria':audit(session.bundle,payload)}
+    @app.post('/api/maqueta/export')
+    def maquette_export(body:dict={}):
+        from .maquette import export
+        identifier='maqueta_'+uuid.uuid4().hex[:10]; session.jobs[identifier]={'id':identifier,'tipo':'maqueta','estado':'ejecutando','progreso':.1,'inicio':time.time()}
+        try:
+            result=export(session.bundle,maquette_preview); session.jobs[identifier].update(estado='completo',progreso=1,fin=time.time(),resultado=result)
+        except Exception as exc:
+            session.jobs[identifier].update(estado='error',progreso=1,fin=time.time(),error=str(exc))
+        return {**session.jobs[identifier],'url':'/maqueta-publica/index.html' if session.jobs[identifier]['estado']=='completo' else None}
+    @app.get('/api/maqueta/status/{job_id}')
+    def maquette_status(job_id:str):
+        job=session.jobs.get(job_id)
+        if not job or job.get('tipo')!='maqueta':raise HTTPException(404,'Exportación de maqueta inexistente.')
+        return {k:v for k,v in job.items() if not k.startswith('_')}
     @app.get('/api/scene')
     def scene(): return scene_payload(session.bundle,session.script)
     @app.get('/api/scene.glb')
@@ -294,6 +332,7 @@ def create_app(project,variant=None):
         try:
             while True:await socket.send_json([{k:v for k,v in x.items() if not k.startswith('_')} for x in session.jobs.values()]); await asyncio.sleep(.5)
         except Exception:return
+    app.mount('/maqueta-publica',StaticFiles(directory=maquette_preview,html=True),name='maqueta-publica')
     static=Path(__file__).resolve().parent/'director_web'/'dist'
     if static.is_dir():app.mount('/',StaticFiles(directory=static,html=True),name='director')
     return app

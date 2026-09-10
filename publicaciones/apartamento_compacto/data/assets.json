@@ -1,0 +1,16 @@
+{
+  "activos": [
+    "bano_central_equipo",
+    "bano_social_equipo",
+    "cama_derecha",
+    "cama_izquierda",
+    "cocina_lineal",
+    "comedor_social",
+    "mesa_social",
+    "mesita_derecha"
+  ],
+  "caras_fuente": 24346,
+  "ratio": 1,
+  "archivo": "assets.glb",
+  "bytes": 3130700
+}

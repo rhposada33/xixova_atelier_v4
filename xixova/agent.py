@@ -44,9 +44,16 @@ def agent_context(bundle, issues, output_root):
                       "referenciados": sorted({item["activo"] for item in bundle["interiorismo"]["elementos"]})},
     }
     fingerprints = {key: digest(value) for key, value in sections.items()}
+    from .maquette import build_payload, audit as audit_maquette
+    maquette_payload=build_payload(bundle); maquette_report=audit_maquette(bundle,maquette_payload)
+    maquette={"hash":maquette_report["hash"],"perfil":maquette_payload["configuracion"]["perfil"],
+              "espacios":[x["id"] for x in maquette_payload["espacios"]],
+              "puntos_interes":[x["id"] for x in maquette_payload["puntos_interes"]],
+              "diagnosticos":[x for x in maquette_report["diagnosticos"] if x["gravedad"]=="error"]}
     return {"schema": 1,
             "proyecto": {"id": bundle["proyecto"]["id"], "variante": bundle["interiorismo"]["id"]},
             "fingerprints": fingerprints, **sections,
+            "maqueta": maquette,
             "diagnosticos": issues,
             "archivos": {"fuentes": sorted(files), "salida": str(output_root),
                          "escena": (output_root/"escena.blend").is_file(),

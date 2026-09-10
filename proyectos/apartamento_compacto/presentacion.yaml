@@ -236,3 +236,6 @@ tomas:
     - 2.25
     - 0.925
   exposicion: -0.6
+detalles_ventanas:
+  activo: true
+  cobertura_lateral: 0.15

@@ -83,7 +83,7 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['director','biblioteca','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
+    parser.add_argument('accion',choices=['director','biblioteca','preparar-maqueta','exportar-maqueta','auditar-maqueta','servir-maqueta','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
     parser.add_argument('subaccion',nargs='?',choices=['buscar','candidatos','descargar','evaluar','aceptar','rechazar','publicar','auditar'])
     parser.add_argument('-p','--proyecto',type=Path); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
@@ -93,6 +93,7 @@ def main(argv=None):
     parser.add_argument('--entrada',type=Path); parser.add_argument('--id'); parser.add_argument('--archivo',type=Path); parser.add_argument('--motivo')
     parser.add_argument('--puntuacion-materiales',type=float); parser.add_argument('--puntuacion-geometria',type=float)
     parser.add_argument('--port',type=int,default=8765); parser.add_argument('--no-browser',action='store_true')
+    parser.add_argument('--salida',type=Path)
     args=parser.parse_args(argv)
     try:
         if args.accion=='biblioteca':
@@ -155,6 +156,16 @@ def main(argv=None):
             print(json.dumps(report,indent=2,ensure_ascii=False)); return 0 if report['ok'] else 1
         b,errors=load(args.proyecto,args.variante)
         if b is None: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
+        if args.accion in {'preparar-maqueta','auditar-maqueta','exportar-maqueta','servir-maqueta'}:
+            from .maquette import audit as audit_maquette, build_payload, export as export_maquette, serve as serve_maquette
+            if errors: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
+            destination=(args.salida or (Path(b['archivo']).parent/'publicacion_maqueta')).resolve()
+            if args.accion=='servir-maqueta':
+                serve_maquette(destination,port=args.port); return 0
+            payload=build_payload(b); report=audit_maquette(b,payload)
+            if args.accion in {'preparar-maqueta','auditar-maqueta'}:
+                print(json.dumps(report,ensure_ascii=False,separators=(',',':') if args.compacto else None,indent=None if args.compacto else 2)); return 0 if report['ok'] else 1
+            result=export_maquette(b,destination); print(json.dumps(result,ensure_ascii=False,indent=2)); return 0
         compiler_actions={'mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo'}
         if args.accion in compiler_actions:
             from .realism_compiler import compile_bundle, compact_report, correct_exposure
@@ -214,6 +225,15 @@ def main(argv=None):
             run_blender(compiled,'realism_scene_audit.py',['--datos',datafile,'--salida',compiler_root/'auditoria_escena.json'],scene,compiler_root/'logs'/'auditoria_escena.log')
             frames=[]; offset=0
             for shot in compiled['presentacion']['tomas']: frames.extend((offset+1,offset+(shot['fotogramas']+1)//2,offset+shot['fotogramas'])); offset+=shot['fotogramas']
+            run_blender(compiled,'visibility_pass.py',['--datos',datafile,'--salida',compiler_root/'visibilidad','--frames',','.join(map(str,frames))],scene,compiler_root/'logs'/'visibilidad.log')
+            blocked=[]
+            for path in sorted((compiler_root/'visibilidad').glob('frame_*.json')):
+                measurement=json.loads(path.read_text())
+                if measurement.get('ocupacion_visible') is not None and measurement['ocupacion_visible']<.02:
+                    blocked.append(diagnostic('PROTAGONISTA_OCULTO',measurement['toma'],f"Fotograma {measurement['frame']}: menos del 2 % visible en pase opaco; revisar vidrio/cortinas si procede."))
+            if blocked:
+                atomic(compiler_root/'informe_compacto.json',{'ok':False,'diagnosticos':blocked,'etapa':'visibilidad_previa'})
+                print(json.dumps({'ok':False,'salida':str(compiler_root),'diagnosticos':blocked},ensure_ascii=False)); return 1
             run_blender(compiled,'render.py',['--datos',datafile,'--salida',compiler_root/'pilotos','--perfil','compilador_piloto','--frames',','.join(map(str,sorted(set(frames))))],scene,compiler_root/'logs'/'pilotos.log')
             run_blender(compiled,'photography_audit.py',['--datos',datafile,'--imagenes',compiler_root/'pilotos','--salida',compiler_root/'auditoria_fotografia.json'],scene,compiler_root/'logs'/'auditoria.log')
             photo=json.loads((compiler_root/'auditoria_fotografia.json').read_text()); exposure_changes=correct_exposure(compiled,photo); pilot_folder=compiler_root/'pilotos'
@@ -314,6 +334,10 @@ def main(argv=None):
                     target=root/'auditoria_calidad.json'; run_blender(b,'quality_audit.py',['--datos',datafile,'--salida',target],scene,root/'logs'/'auditoria_calidad.log'); print(target); return 0
                 if args.accion=='auditar-fotografia':
                     target=root/'auditoria_fotografia.json'; images=root/'piloto_fotografico'
+                    selected=[]; offset=0
+                    for shot in b['presentacion']['tomas']:
+                        selected.extend((offset+1,offset+(shot['fotogramas']+1)//2,offset+shot['fotogramas'])); offset+=shot['fotogramas']
+                    run_blender(b,'visibility_pass.py',['--datos',datafile,'--salida',root/'visibilidad','--frames',','.join(map(str,selected))],scene,root/'logs'/'visibilidad.log')
                     run_blender(b,'photography_audit.py',['--datos',datafile,'--imagenes',images,'--salida',target],scene,root/'logs'/'auditoria_fotografia.log'); print(target); return 0
                 if args.accion=='piloto-temporal':
                     profile='piloto_fotografico'; count=min(48,len(b['fotogramas'])); folder=root/'piloto_temporal'; frames=list(range(1,count+1))
@@ -332,10 +356,15 @@ def main(argv=None):
                 if args.toma and args.accion not in {'previas','pilotos-fotograficos'}: raise ValueError('--toma solo se admite con previas o pilotos-fotograficos.')
                 if args.accion=='confirmar-visual':
                     if not args.revisor or not args.nota: raise ValueError('Especifica --revisor y --nota tras inspeccionar previas y animática.')
+                    audit=root/'auditoria_fotografia.json'
+                    if not audit.is_file() or not json.loads(audit.read_text()).get('auditoria_fotografica',False):
+                        raise ValueError('Auditoría fotográfica pendiente o con incidencias; no se puede aprobar visualmente.')
                     if not (root/'animatica'/'recorrido.mp4').exists(): raise ValueError('Genera e inspecciona primero la animática.')
                     atomic(root/'revision_visual.json',{'escena':sha(scene),'revisor':args.revisor,'nota':args.nota}); print(root); return 0
                 profile={'previas':'previa','pilotos-fotograficos':'piloto_fotografico','animatica':'animatica','recorrido':args.perfil or ('fotografico_1080p' if 'fotografico_1080p' in b['proyecto']['produccion']['perfiles'] else 'final')}[args.accion]
                 if profile in {'final','fotografico_1080p'}:
+                    audit=root/'auditoria_fotografia.json'
+                    if not audit.is_file() or not json.loads(audit.read_text()).get('auditoria_fotografica',False): raise ValueError('Falta auditoría fotográfica satisfactoria para esta escena.')
                     review=root/'revision_visual.json'
                     if not review.exists() or json.loads(review.read_text())['escena']!=sha(scene): raise ValueError('Falta confirmar-visual para esta escena.')
                 frames=[]; offset=0

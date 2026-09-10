@@ -45,25 +45,57 @@
           "ocupacion_encuadre": {
             "type": "object",
             "properties": {
-              "minima": {"type": "number", "minimum": 0.1, "maximum": 0.9},
-              "maxima": {"type": "number", "minimum": 0.1, "maximum": 0.95}
+              "minima": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 0.9
+              },
+              "maxima": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 0.95
+              }
             },
-            "required": ["minima", "maxima"],
+            "required": [
+              "minima",
+              "maxima"
+            ],
             "additionalProperties": false
           },
           "niveles": {
             "type": "object",
             "properties": {
-              "proxy": {"$ref": "#/$defs/nivel"},
-              "standard": {"$ref": "#/$defs/nivel"},
-              "hero": {"$ref": "#/$defs/nivel"}
+              "proxy": {
+                "$ref": "#/$defs/nivel"
+              },
+              "standard": {
+                "$ref": "#/$defs/nivel"
+              },
+              "hero": {
+                "$ref": "#/$defs/nivel"
+              }
             },
-            "required": ["proxy", "standard", "hero"],
+            "required": [
+              "proxy",
+              "standard",
+              "hero"
+            ],
             "additionalProperties": false
           },
-          "memoria_estimada_mb": {"type": "number", "minimum": 0},
-          "puntuacion_materiales": {"type": "number", "minimum": 0, "maximum": 10},
-          "puntuacion_geometria": {"type": "number", "minimum": 0, "maximum": 10},
+          "memoria_estimada_mb": {
+            "type": "number",
+            "minimum": 0
+          },
+          "puntuacion_materiales": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "puntuacion_geometria": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          },
           "apoyo": {
             "const": "suelo"
           },
@@ -82,6 +114,52 @@
           "sha256": {
             "type": "string",
             "pattern": "^[0-9a-f]{64}$"
+          },
+          "partes_materiales": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          },
+          "ocupacion_visible": {
+            "type": "object",
+            "properties": {
+              "minima": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 0.9
+              },
+              "maxima": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 0.95
+              }
+            },
+            "required": [
+              "minima",
+              "maxima"
+            ],
+            "additionalProperties": false
+          },
+          "nivel_web": {
+            "type": "object",
+            "properties": {
+              "modo": {
+                "enum": ["procedural_proxy", "optimizado_propio", "optimizado_cc0"]
+              },
+              "ruta": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "triangulos": {"type": "integer", "minimum": 0},
+              "tamano_bytes": {"type": "integer", "minimum": 0}
+            },
+            "required": ["modo"],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -112,11 +190,24 @@
     "nivel": {
       "type": "object",
       "properties": {
-        "ruta": {"type": "string", "minLength": 1},
-        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "coleccion": {"type": "string", "minLength": 1}
+        "ruta": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "coleccion": {
+          "type": "string",
+          "minLength": 1
+        }
       },
-      "required": ["ruta", "sha256", "coleccion"],
+      "required": [
+        "ruta",
+        "sha256",
+        "coleccion"
+      ],
       "additionalProperties": false
     }
   }

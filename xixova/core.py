@@ -193,6 +193,8 @@ def validate(b):
     for surface, material in i['acabados'].items():
         if surface not in surfaces or material not in mats: errors.append(diagnostic('REFERENCIA',surface,'Superficie o material inexistente.'))
     for material, spec in mats.items():
+        if spec.get('proyeccion') == 'triplanar' and 'normal' in spec.get('mapas', {}):
+            errors.append(diagnostic('NORMAL_PROYECCION', material, 'Normal tangente requiere UV; usa height para proyección triplanar.'))
         for role, filename in spec.get('mapas', {}).items():
             if not Path(filename).is_file(): errors.append(diagnostic('RECURSO_AUSENTE',material,f'Mapa {role}: {filename}'))
     environment = b['presentacion']['entorno'].get('archivo')
@@ -204,6 +206,12 @@ def validate(b):
     if estimated_mb>budget_mb:
         errors.append(diagnostic('MEMORIA_GPU','catalogo',f'Activos estimados en {estimated_mb:.0f} MB; presupuesto conservador {budget_mb:.0f} MB.'))
     for item in i['elementos']:
+        asset = assets.get(item['activo'], {})
+        if item.get('material') and item.get('materiales_partes'):
+            errors.append(diagnostic('MATERIAL_AMBIGUO',item['id'],'No combinar sustitución global con partes.'))
+        for part, material_id in item.get('materiales_partes', {}).items():
+            if part not in asset.get('partes_materiales', {}) or material_id not in mats:
+                errors.append(diagnostic('PARTE_MATERIAL',item['id'],f'Parte o material inexistente: {part} / {material_id}.'))
         if item.get('material') and item['material'] not in mats: errors.append(diagnostic('REFERENCIA',item['id'],'Material inexistente.'))
         asset = assets.get(item['activo'])
         if asset and not Path(asset['archivo']).is_file(): errors.append(diagnostic('RECURSO_AUSENTE',item['id'],asset['archivo']))
@@ -245,4 +253,8 @@ def validate(b):
         for item in placements:
             if item['posicion'][2]-.05 < pos[2] < item['posicion'][2]+item['dimensiones'][2]+.05 and footprint(item).buffer(.05).covers(Point(pos[:2])): hit.append(item['id'])
         if hit: errors.append(diagnostic('CAMARA_OBSTRUIDA',shot,f'Fotograma {frame}: {", ".join(hit)}.'))
+    wall_ids={w['id'] for w in a['paredes']}
+    for shot in b['presentacion']['tomas']:
+        for identifier in shot.get('cortes_paredes',[]):
+            if identifier not in wall_ids: errors.append(diagnostic('CORTE_INEXISTENTE',shot['id'],identifier))
     return errors

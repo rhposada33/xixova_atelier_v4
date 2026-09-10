@@ -29,6 +29,13 @@ for shot,frame in frames:
         for child in roots[0].children_recursive:
             if child.type=='MESH': coords += [world_to_camera_view(scene,camera,child.matrix_world@Vector(c)) for c in child.bound_box]
         if coords: occupancy=max(0,min(1,max(c.x for c in coords))-max(0,min(c.x for c in coords)))*max(0,min(1,max(c.y for c in coords))-max(0,min(c.y for c in coords)))
+    mask_path=folder.parent/'visibilidad'/f'frame_{frame:04d}.json'
+    if mask_path.is_file():
+        visibility=json.loads(mask_path.read_text());occupancy=visibility.get('ocupacion_visible')
+        if visibility.get('pared_pantalla',0)>.65: warnings.append({'codigo':'EXCESO_PARED','toma':shot['id'],'fotograma':frame,'ratio':visibility['pared_pantalla']})
+    else:
+        occupancy=None
+        warnings.append({'codigo':'VISIBILIDAD_NO_MEDIDA','toma':shot['id'],'fotograma':frame})
     rows.append({'toma':shot['id'],'fotograma':frame,'luminancia_media':round(mean,4),'altas_recortadas':round(clipped,4),
                  'sombras_empastadas':round(crushed,4),'nitidez_aprox':round(sharp,5),'ocupacion_foco':round(occupancy,4) if occupancy is not None else None})
     if clipped>.08: warnings.append({'codigo':'ALTAS_RECORTADAS','toma':shot['id'],'fotograma':frame,'ratio':round(clipped,3)})
@@ -38,10 +45,12 @@ for shot,frame in frames:
     if occupancy is not None:
         asset_id=next((x['activo'] for x in data['interiorismo']['elementos'] if x['id']==focus_id),None)
         asset=next((x for x in data['catalogo']['activos'] if x['id']==asset_id),{})
-        limits=asset.get('ocupacion_encuadre',{'minima':.15,'maxima':.7})
+        # Raster coverage excludes background inside the bounding rectangle.
+        # Never reuse thresholds calibrated for bounding-box coverage.
+        limits=asset.get('ocupacion_visible',{'minima':.08,'maxima':.6})
         if occupancy<limits['minima'] or occupancy>limits['maxima']:
             warnings.append({'codigo':'OCUPACION_ENCUADRE','toma':shot['id'],'fotograma':frame,'valor':round(occupancy,3),'esperado':limits})
     bpy.data.images.remove(image)
-report={'schema':1,'ok':not any(x['codigo']=='PILOTO_AUSENTE' for x in warnings),'controles':rows,'avisos':warnings}
+report={'schema':2,'ok':not warnings,'integridad_tecnica':not any(x['codigo']=='PILOTO_AUSENTE' for x in warnings),'auditoria_fotografica':not warnings,'aprobacion_visual':'pendiente','controles':rows,'avisos':warnings}
 target=Path(a.salida); target.parent.mkdir(parents=True,exist_ok=True); target.write_text(json.dumps(report,indent=2,ensure_ascii=False)+'\n')
 print('FOTOGRAFIA='+json.dumps({'ok':report['ok'],'fotogramas':len(rows),'avisos':len(warnings)},ensure_ascii=False))

@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "proyecto": "apartamento_compacto",
+  "variante": "natural_lila",
+  "hash": "1495013b5b62fbb41d1d05eba448c1e4f57b76b4cbbba93025836c34bf980047",
+  "escena": "data/scene.json",
+  "glb": "data/scene.glb",
+  "activos_glb": "data/assets.glb",
+  "miniatura": "data/miniatura.svg",
+  "auditoria": "data/auditoria.json",
+  "atribuciones": "data/atribuciones.json",
+  "capacidades": [
+    "paredes_inteligentes",
+    "puertas",
+    "espacios",
+    "puntos_interes",
+    "captura",
+    "tour"
+  ]
+}

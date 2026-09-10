@@ -6,11 +6,14 @@ import bpy
 p=argparse.ArgumentParser(); p.add_argument('--datos',required=True); p.add_argument('--salida',required=True)
 a=p.parse_args(sys.argv[sys.argv.index('--')+1:]); data=json.loads(Path(a.datos).read_text()); scene=bpy.context.scene
 errors=[]; warnings=[]; texture_bytes=0; missing=[]
+for item in data['interiorismo']['elementos']:
+    if item.get('material'):
+        warnings.append({'codigo':'MATERIAL_GLOBAL_LEGACY','elemento':item['id'],'explicacion':'Sustitución global explícita; migrar a materiales_partes.'})
 for image in bpy.data.images:
     if image.source!='FILE': continue
     path=Path(bpy.path.abspath(image.filepath))
     if not path.is_file() and not image.packed_file: missing.append(str(path))
-    elif path.is_file(): texture_bytes += path.stat().st_size
+    texture_bytes += image.size[0]*image.size[1]*max(1,image.channels)*(4 if image.is_float else 1)
 if missing: errors.append({'codigo':'TEXTURA_AUSENTE','elementos':missing[:12]})
 environment=data['presentacion']['entorno'].get('archivo')
 if not environment: warnings.append('Presentación sin HDRI; se usará fondo uniforme.')

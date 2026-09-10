@@ -1,0 +1,17 @@
+{
+  "activos": [
+    "armario_dormitorio",
+    "armario_suite",
+    "bano_social_equipo",
+    "bano_suite_equipo",
+    "cama_dormitorio",
+    "cama_suite",
+    "cocina_lineal",
+    "comedor_seis",
+    "mesa_centro"
+  ],
+  "caras_fuente": 24504,
+  "ratio": 1,
+  "archivo": "assets.glb",
+  "bytes": 3333116
+}

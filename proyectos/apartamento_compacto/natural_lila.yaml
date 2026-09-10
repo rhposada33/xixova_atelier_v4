@@ -7,17 +7,15 @@ arquitectura:
 materiales:
   pared_lino:
     color:
+    - 0.74
     - 0.72
     - 0.68
-    - 0.65
     rugosidad: 0.75
     escala_m: 0.3
     normal_fuerza: 0.22
-    microdetalle: 0.12
-    mapas:
-      color: ../../cache/pbr/rough_linen/rough_linen_base_color_1k.jpg
-      roughness: ../../cache/pbr/rough_linen/rough_linen_roughness_1k.jpg
-      normal: ../../cache/pbr/rough_linen/rough_linen_normal_1k.jpg
+    microdetalle: 0.2
+    proyeccion: uv
+    normal_convencion: OpenGL
   roble_claro:
     color:
     - 0.55
@@ -31,6 +29,8 @@ materiales:
       color: ../../cache/pbr/wood_floor/wood_floor_base_color_1k.jpg
       roughness: ../../cache/pbr/wood_floor/wood_floor_roughness_1k.jpg
       normal: ../../cache/pbr/wood_floor/wood_floor_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
   baldosa:
     color:
     - 0.72
@@ -43,6 +43,8 @@ materiales:
       color: ../../cache/pbr/marble_01/marble_01_base_color_1k.jpg
       roughness: ../../cache/pbr/marble_01/marble_01_roughness_1k.jpg
       normal: ../../cache/pbr/marble_01/marble_01_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
   techo:
     color:
     - 0.84
@@ -50,6 +52,8 @@ materiales:
     - 0.8
     rugosidad: 0.82
     microdetalle: 0.16
+    proyeccion: uv
+    normal_convencion: OpenGL
 acabados:
   fachada_oeste: pared_lino
   fachada_sur: pared_lino

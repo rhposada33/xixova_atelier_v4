@@ -18,6 +18,12 @@ activos:
   ocupacion_encuadre:
     minima: 0.22
     maxima: 0.58
+  partes_materiales:
+    tapiceria:
+    - XVA3_Lino_natural.001
+    - XVA3_Lino_oliva.001
+    madera:
+    - XVA3_Roble_premium.001
 - id: XVA3_Cama_doble
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Cama_doble.blend
   coleccion: XVA3_Cama_doble
@@ -36,6 +42,12 @@ activos:
   ocupacion_encuadre:
     minima: 0.22
     maxima: 0.58
+  partes_materiales:
+    tapiceria:
+    - XVA3_Lino_natural.002
+    - XVA3_Lino_oliva.002
+    madera:
+    - XVA3_Roble_premium.002
 - id: XVA3_Mesita_L
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Mesita_L.blend
   coleccion: XVA3_Mesita_L
@@ -54,6 +66,9 @@ activos:
   ocupacion_encuadre:
     minima: 0.22
     maxima: 0.58
+  partes_materiales:
+    madera:
+    - XVA3_Roble_premium.003
 - id: XVA3_Mesita_R
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Mesita_R.blend
   coleccion: XVA3_Mesita_R
@@ -72,6 +87,9 @@ activos:
   ocupacion_encuadre:
     minima: 0.22
     maxima: 0.58
+  partes_materiales:
+    madera:
+    - XVA3_Roble_premium.004
 - id: XVA3_Armario_principal
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Armario_principal.blend
   coleccion: XVA3_Armario_principal
@@ -90,6 +108,9 @@ activos:
   ocupacion_encuadre:
     minima: 0.22
     maxima: 0.58
+  partes_materiales:
+    madera:
+    - XVA3_Roble_premium.005
 - id: XVA3_Cocina_premium
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Cocina_premium.blend
   coleccion: XVA3_Cocina_premium
@@ -108,6 +129,11 @@ activos:
   ocupacion_encuadre:
     minima: 0.18
     maxima: 0.52
+  partes_materiales:
+    piedra:
+    - XVA3_Piedra_crema.001
+    madera:
+    - XVA3_Roble_premium.006
 - id: XVA3_Bano_principal
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/XVA3_Bano_principal.blend
   coleccion: XVA3_Bano_principal
@@ -126,6 +152,11 @@ activos:
   ocupacion_encuadre:
     minima: 0.18
     maxima: 0.52
+  partes_materiales:
+    piedra:
+    - XVA3_Piedra_crema.002
+    madera:
+    - XVA3_Roble_premium.007
 - id: sofa_recto
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/sofa_recto.blend
   coleccion: sofa_recto
@@ -144,6 +175,12 @@ activos:
   ocupacion_encuadre:
     minima: 0.22
     maxima: 0.58
+  partes_materiales:
+    tapiceria:
+    - Black_and_White_Fabric
+    - Brown_Fabric
+    madera:
+    - Wood
 - id: comedor
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/comedor.blend
   coleccion: comedor
@@ -162,6 +199,11 @@ activos:
   ocupacion_encuadre:
     minima: 0.18
     maxima: 0.52
+  partes_materiales:
+    madera:
+    - Roble fotografiado
+    tapiceria:
+    - Tela lino marfil fotografiada
 - id: mesa_centro
   archivo: /home/rafa/RenderCasa/xixova_atelier_v4/cache/framework/activos/mesa_centro.blend
   coleccion: mesa_centro
@@ -180,3 +222,10 @@ activos:
   ocupacion_encuadre:
     minima: 0.22
     maxima: 0.58
+  partes_materiales:
+    piedra:
+    - Piedra fotografiada
+    madera:
+    - Roble fotografiado.001
+    tapiceria:
+    - Tela oliva fotografiada

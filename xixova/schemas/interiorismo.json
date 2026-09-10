@@ -80,12 +80,47 @@
           "mapas": {
             "type": "object",
             "properties": {
-              "color": {"type": "string", "minLength": 1},
-              "roughness": {"type": "string", "minLength": 1},
-              "normal": {"type": "string", "minLength": 1},
-              "height": {"type": "string", "minLength": 1}
+              "color": {
+                "type": "string",
+                "minLength": 1
+              },
+              "roughness": {
+                "type": "string",
+                "minLength": 1
+              },
+              "normal": {
+                "type": "string",
+                "minLength": 1
+              },
+              "height": {
+                "type": "string",
+                "minLength": 1
+              }
             },
             "additionalProperties": false
+          },
+          "proyeccion": {
+            "enum": [
+              "uv",
+              "triplanar",
+              "objeto_legacy"
+            ]
+          },
+          "normal_convencion": {
+            "enum": [
+              "OpenGL",
+              "DirectX"
+            ]
+          },
+          "tinte": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "minItems": 3,
+            "maxItems": 3
           }
         },
         "required": [
@@ -242,7 +277,18 @@
             "minLength": 1
           },
           "nivel_detalle": {
-            "enum": ["proxy", "standard", "hero"]
+            "enum": [
+              "proxy",
+              "standard",
+              "hero"
+            ]
+          },
+          "materiales_partes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
           }
         },
         "required": [

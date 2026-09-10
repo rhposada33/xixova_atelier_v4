@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "ok": true,
+  "hash": "f0d4f6d71985dced75b83d1aedb44f959412f37a022a6343b4253849a13368e9",
+  "metricas": {
+    "triangulos_estimados": 49140,
+    "limite_movil": 200000,
+    "activos": 11,
+    "espacios": 9,
+    "caras_activos_fuente": 24504
+  },
+  "diagnosticos": [
+    {
+      "codigo": "MAQUETA_PROXY_LICENCIA",
+      "gravedad": "aviso",
+      "elemento": "sofa_principal",
+      "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."
+    },
+    {
+      "codigo": "MAQUETA_PROXY_LICENCIA",
+      "gravedad": "aviso",
+      "elemento": "sofa_veranda",
+      "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."
+    }
+  ]
+}

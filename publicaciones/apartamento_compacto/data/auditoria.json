@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "ok": true,
+  "hash": "1495013b5b62fbb41d1d05eba448c1e4f57b76b4cbbba93025836c34bf980047",
+  "metricas": {
+    "triangulos_estimados": 48884,
+    "limite_movil": 200000,
+    "activos": 9,
+    "espacios": 6,
+    "caras_activos_fuente": 24346
+  },
+  "diagnosticos": [
+    {
+      "codigo": "MAQUETA_PROXY_LICENCIA",
+      "gravedad": "aviso",
+      "elemento": "sofa_social",
+      "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."
+    }
+  ]
+}

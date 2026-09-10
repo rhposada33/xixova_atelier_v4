@@ -7,6 +7,9 @@ import sys
 import time
 from pathlib import Path
 import bpy
+import hashlib
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from render_monitor import RenderMonitor
 
 def png_ok(path,w,h):
     try:
@@ -19,6 +22,13 @@ a=p.parse_args(sys.argv[sys.argv.index('--')+1:]); data=json.loads(Path(a.datos)
 scene=bpy.context.scene; engine=profile.get('motor','CYCLES'); scene.render.engine=engine
 scene.render.use_persistent_data=engine=='CYCLES'; w,h=profile['resolucion']; scene.render.resolution_x=w; scene.render.resolution_y=h; scene.render.resolution_percentage=100
 out=Path(a.salida); out.mkdir(parents=True,exist_ok=True); frames=list(map(int,a.frames.split(','))) if a.frames else range(scene.frame_start,scene.frame_end+1)
+identity=hashlib.sha256(json.dumps({'datos':data,'perfil':profile,'render':Path(__file__).read_text()},sort_keys=True).encode()).hexdigest()
+manifest=out/'dependencias.json'
+if manifest.exists() and json.loads(manifest.read_text()).get('hash')!=identity:
+    raise RuntimeError('Dependencias distintas: usa una salida aislada para este render.')
+if not manifest.exists():
+    if any(out.glob('frame_*.png')): raise RuntimeError('Secuencia sin identidad verificable: usa una salida nueva.')
+    temp=manifest.with_suffix('.tmp');temp.write_text(json.dumps({'hash':identity,'perfil':a.perfil}));os.replace(temp,manifest)
 # Device preferences are per process, not stored in the .blend.
 if engine=='CYCLES':
     scene.cycles.samples=profile['muestras']; scene.cycles.use_denoising=profile.get('denoise',True)
@@ -46,9 +56,11 @@ for frame in frames:
         for obj in architecture.all_objects:
             if obj is None: continue
             identifier=obj.get('xixova_id',''); obj.hide_render=any(identifier==wall or identifier.startswith(wall+':') for wall in cutaways)
+    bpy.context.view_layer.update()
     shot=next((x for x in data['presentacion']['tomas'] if x['id']==marker.camera.get('xixova_id')),None)
     scene.view_settings.exposure=shot.get('exposicion',data['presentacion']['exposicion']) if shot else data['presentacion']['exposicion']
-    tmp=out/f'frame_{frame:04d}.tmp.png'; scene.render.filepath=str(tmp); start=time.monotonic(); bpy.ops.render.render(write_still=True)
+    tmp=out/f'frame_{frame:04d}.tmp.png'; scene.render.filepath=str(tmp); start=time.monotonic()
+    with RenderMonitor() as monitor: bpy.ops.render.render(write_still=True)
     if not png_ok(tmp,w,h):raise RuntimeError(f'PNG inválido: {tmp}')
     os.replace(tmp,target)
-    with (out/'render.jsonl').open('a') as log: log.write(json.dumps({'frame':frame,'segundos':time.monotonic()-start,'estado':'ok'})+'\n')
+    with (out/'render.jsonl').open('a') as log: log.write(json.dumps({'frame':frame,'segundos':time.monotonic()-start,'estado':'ok',**monitor.report()})+'\n')

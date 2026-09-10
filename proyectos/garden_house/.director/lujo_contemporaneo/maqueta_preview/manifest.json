@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "proyecto": "garden_house",
+  "variante": "lujo_contemporaneo",
+  "hash": "f0d4f6d71985dced75b83d1aedb44f959412f37a022a6343b4253849a13368e9",
+  "escena": "data/scene.json",
+  "glb": "data/scene.glb",
+  "activos_glb": null,
+  "miniatura": "data/miniatura.svg",
+  "auditoria": "data/auditoria.json",
+  "atribuciones": "data/atribuciones.json",
+  "capacidades": [
+    "paredes_inteligentes",
+    "puertas",
+    "espacios",
+    "puntos_interes",
+    "captura",
+    "tour"
+  ]
+}
