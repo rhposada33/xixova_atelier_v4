@@ -97,6 +97,11 @@
           "cubierto": {
             "type": "boolean",
             "default": true
+          },
+          "muestras_solares": {
+            "type": "array",
+            "items": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+            "minItems": 1
           }
         },
         "required": [

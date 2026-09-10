@@ -222,3 +222,24 @@ tomas:
 detalles_ventanas:
   activo: true
   cobertura_lateral: 0.15
+maqueta:
+  perfil: editorial_calido
+  camara: isometrica
+  fondo: cielo_suave
+  techo_visible: false
+  solar:
+    enabled: true
+    calibrationStatus: demo_unverified
+    location:
+      latitude: -23.99
+      longitude: -46.41
+      timezone: America/Sao_Paulo
+    building:
+      northOffsetDegrees: 0
+      groundElevationMeters: 0
+    unit:
+      floorNumber: 1
+      elevationMeters: 3
+    exposureThreshold: 0.2
+    environment:
+      obstacles: []

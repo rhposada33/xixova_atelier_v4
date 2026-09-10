@@ -23,6 +23,7 @@ DEFAULTS = {
     "etiquetas": {"espacios": True, "superficies": True, "objetos": "seleccionables"},
     "interaccion": {"puertas": True, "filtros_espacios": True, "puntos_interes": True},
     "semilla": 1842,
+    "solar": {"enabled": False},
 }
 
 
@@ -39,6 +40,33 @@ def _polygon_centroid(points):
 def _room_for(point, rooms):
     from shapely.geometry import Point, Polygon
     return next((room["id"] for room in rooms if Polygon(room["contorno"]).buffer(.01).contains(Point(point[:2]))), None)
+
+
+def _solar_samples(contour, declared=None):
+    """Muestras interiores reutilizables; nunca dependen del nombre del espacio."""
+    if declared:
+        return declared
+    from shapely.geometry import Point, Polygon
+    polygon = Polygon(contour)
+    safe = polygon.buffer(-.25)
+    if safe.is_empty:
+        safe = polygon.buffer(-.05)
+    candidates = [safe.representative_point(), polygon.centroid]
+    minx, miny, maxx, maxy = safe.bounds
+    step = max(.55, min(maxx-minx, maxy-miny) / 3)
+    y = miny
+    while y <= maxy:
+        x = minx
+        while x <= maxx:
+            point = Point(x, y)
+            if safe.covers(point): candidates.append(point)
+            x += step
+        y += step
+    unique = []
+    for point in candidates:
+        xy = (round(point.x, 3), round(point.y, 3))
+        if xy not in unique: unique.append(xy)
+    return [[x, y, z] for x, y in unique[:12] for z in (.15, .8, 1.4)]
 
 
 def config(bundle):
@@ -59,7 +87,8 @@ def build_payload(bundle):
     for room in bundle["arquitectura"]["espacios"]:
         center = _polygon_centroid(room["contorno"])
         rooms.append({**room, "centro": [round(center[0], 4), round(center[1], 4), .12],
-                      "nombre": room["id"].replace("_", " ").title()})
+                      "nombre": room["id"].replace("_", " ").title(),
+                      "solarSamples": _solar_samples(room["contorno"], room.get("muestras_solares"))})
     web_elements = []
     for item in elements:
         asset = assets[item["activo"]]; license_name = asset.get("licencia", "desconocida")
@@ -97,11 +126,24 @@ def build_payload(bundle):
         "variante": bundle["interiorismo"]["id"], "arquitectura_hash": bundle["arquitectura_hash"],
         "configuracion": config(bundle), "espacios": rooms, "paredes": walls,
         "aberturas": openings, "elementos": web_elements, "puntos_interes": points, "activos_glb": False,
+        "solar": config(bundle).get("solar", {"enabled": False}),
     }
 
 
 def audit(bundle, payload=None):
     payload = payload or build_payload(bundle); problems = []; warnings = []
+    solar = payload.get("solar", {})
+    if solar.get("enabled"):
+        from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+        try:
+            ZoneInfo(solar.get("location", {}).get("timezone", ""))
+        except (ZoneInfoNotFoundError, ValueError):
+            problems.append({"codigo": "MAQUETA_SOLAR_ZONA", "gravedad": "error", "elemento": "solar.location.timezone", "explicacion": "Zona horaria IANA desconocida."})
+        if solar.get("calibrationStatus") == "demo_unverified":
+            warnings.append({"codigo": "MAQUETA_SOLAR_DEMO", "gravedad": "aviso", "elemento": "solar", "explicacion": "Ubicación y norte de demostración; el resultado es una estimación por calibrar."})
+        for room in payload["espacios"]:
+            if not room.get("solarSamples"):
+                problems.append({"codigo": "MAQUETA_SOLAR_MUESTRAS", "gravedad": "error", "elemento": room["id"], "explicacion": "La estancia no tiene muestras solares."})
     for item in payload["elementos"]:
         if item["licencia"] not in KNOWN_LICENSES:
             problems.append({"codigo": "MAQUETA_LICENCIA", "gravedad": "error", "elemento": item["id"], "explicacion": "Licencia desconocida; se bloquea la publicación."})
@@ -152,7 +194,7 @@ def export(bundle, destination):
     points=[p for room in payload["espacios"] for p in room["contorno"]]; xs=[p[0] for p in points]; ys=[p[1] for p in points]; lo,hi,bot,top=min(xs),max(xs),min(ys),max(ys)
     polygons=''.join(f'<polygon points="{" ".join(f"{(p[0]-lo)/(hi-lo)*560+20:.1f},{(top-p[1])/(top-bot)*360+20:.1f}" for p in room["contorno"])}"/>' for room in payload["espacios"])
     (data/"miniatura.svg").write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><rect width="600" height="400" fill="#e8e0d4"/><g fill="#ceb99c" stroke="#675d51" stroke-width="2">{polygons}</g></svg>')
-    manifest = {"schema": 1, "proyecto": payload["proyecto"], "variante": payload["variante"], "hash": report["hash"], "escena": "data/scene.json", "glb": "data/scene.glb", "activos_glb": "data/assets.glb" if (data/'assets.glb').is_file() else None, "miniatura": "data/miniatura.svg", "auditoria": "data/auditoria.json", "atribuciones": "data/atribuciones.json", "capacidades": ["paredes_inteligentes", "puertas", "espacios", "puntos_interes", "captura", "tour"]}
+    manifest = {"schema": 1, "proyecto": payload["proyecto"], "variante": payload["variante"], "hash": report["hash"], "escena": "data/scene.json", "glb": "data/scene.glb", "activos_glb": "data/assets.glb" if (data/'assets.glb').is_file() else None, "miniatura": "data/miniatura.svg", "auditoria": "data/auditoria.json", "atribuciones": "data/atribuciones.json", "capacidades": ["paredes_inteligentes", "puertas", "espacios", "puntos_interes", "captura", "tour"] + (["estudio_solar"] if payload["solar"].get("enabled") else [])}
     (destination / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+"\n")
     (data / "auditoria.json").write_text(json.dumps(report, ensure_ascii=False, indent=2)+"\n")
     attributions = [{"activo": x["activo"], "licencia": x["licencia"]} for x in payload["elementos"] if x["licencia"] not in {"propia"}]

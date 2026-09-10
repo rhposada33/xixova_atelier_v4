@@ -25,6 +25,17 @@ def test_payload_preserves_coordinates_and_uses_safe_proxies():
     assert all(item["nivel_web"] in {"procedural_proxy", "optimizado_propio"} for item in payload["elementos"])
     assert all(item["nivel_web"] == "procedural_proxy" for item in payload["elementos"] if item["licencia"] not in {"propia", "CC0"})
     assert not any("archivo" in item for item in payload["elementos"])
+    assert payload["solar"]["enabled"]
+    assert payload["solar"]["calibrationStatus"] == "demo_unverified"
+    assert all(room["solarSamples"] for room in payload["espacios"])
+
+
+def test_solar_audit_rejects_unknown_timezone():
+    bundle = copy.deepcopy(garden())
+    bundle["presentacion"]["maqueta"]["solar"]["location"]["timezone"] = "Mars/Olympus"
+    report = audit(bundle)
+    assert not report["ok"]
+    assert any(x["codigo"] == "MAQUETA_SOLAR_ZONA" for x in report["diagnosticos"])
 
 
 def test_unknown_license_blocks_publication():

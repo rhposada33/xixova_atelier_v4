@@ -36,3 +36,15 @@ test('funciona en móvil y no solicita recursos externos',async({page})=>{
  await page.locator('nav').getByRole('button',{name:'Suite',exact:true}).click();
  await expect(page).toHaveURL(/area=suite/);expect(external).toEqual([]);
 });
+
+test('estudio solar cambia fecha, hora, estación y trayectoria',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:/Estudio solar/}).click();
+ await expect(page.getByRole('heading',{name:'Iluminación natural'})).toBeVisible();
+ await expect(page.getByText(/Estimación solar/)).toBeVisible();
+ await expect(page.getByText('America/Sao_Paulo')).toBeVisible();
+ const slider=page.getByRole('slider',{name:'Hora local'});await slider.fill('720');
+ await page.getByRole('button',{name:'Atardecer'}).click();expect(+await slider.inputValue()).toBeGreaterThan(720);
+ await page.getByRole('button',{name:'Verano'}).click();await expect(page.locator('input[type=date]')).toHaveValue(/-12-21$/);
+ await page.getByLabel('Mostrar trayectoria solar').uncheck();
+ expect(await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.path.visible)).toBe(false);
+});

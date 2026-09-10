@@ -356,6 +356,51 @@
             "required": ["id", "nombre", "espacio", "posicion"],
             "additionalProperties": false
           }
+        },
+        "solar": {
+          "type": "object",
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "calibrationStatus": {"enum": ["verified", "demo_unverified"]},
+            "location": {
+              "type": "object",
+              "properties": {
+                "latitude": {"type": "number", "minimum": -90, "maximum": 90},
+                "longitude": {"type": "number", "minimum": -180, "maximum": 180},
+                "timezone": {"type": "string", "minLength": 1}
+              },
+              "required": ["latitude", "longitude", "timezone"], "additionalProperties": false
+            },
+            "building": {
+              "type": "object",
+              "properties": {
+                "northOffsetDegrees": {"type": "number", "minimum": -360, "maximum": 360},
+                "groundElevationMeters": {"type": "number"}
+              },
+              "required": ["northOffsetDegrees"], "additionalProperties": false
+            },
+            "unit": {
+              "type": "object",
+              "properties": {"floorNumber": {"type": "integer"}, "elevationMeters": {"type": "number", "minimum": 0}},
+              "additionalProperties": false
+            },
+            "exposureThreshold": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            "environment": {
+              "type": "object",
+              "properties": {"obstacles": {"type": "array", "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string", "minLength": 1}, "type": {"enum": ["box", "cylinder", "wall"]},
+                  "category": {"enum": ["internal_architecture", "external_structure", "vegetation"]},
+                  "position": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+                  "dimensions": {"type": "array", "items": {"type": "number", "exclusiveMinimum": 0}, "minItems": 3, "maxItems": 3},
+                  "rotationDegrees": {"type": "number"}
+                },
+                "required": ["id", "type", "category", "position", "dimensions"], "additionalProperties": false
+              }}}, "additionalProperties": false
+            }
+          },
+          "required": ["enabled"], "additionalProperties": false
         }
       },
       "additionalProperties": false

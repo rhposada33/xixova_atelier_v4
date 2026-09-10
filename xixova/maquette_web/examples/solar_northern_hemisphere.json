@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "calibrationStatus": "verified",
+  "location": {"latitude": 40.4168, "longitude": -3.7038, "timezone": "Europe/Madrid"},
+  "building": {"northOffsetDegrees": 18, "groundElevationMeters": 657},
+  "unit": {"floorNumber": 4, "elevationMeters": 12},
+  "exposureThreshold": 0.2,
+  "environment": {
+    "obstacles": [
+      {"id": "edificio_oeste", "type": "box", "category": "external_structure", "position": [-12, 3, 9], "dimensions": [8, 16, 18], "rotationDegrees": 5},
+      {"id": "arbol_sur", "type": "cylinder", "category": "vegetation", "position": [3, -8, 4], "dimensions": [4, 4, 8]}
+    ]
+  }
+}

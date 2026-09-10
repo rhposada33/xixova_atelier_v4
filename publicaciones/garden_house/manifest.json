@@ -2,7 +2,7 @@
   "schema": 1,
   "proyecto": "garden_house",
   "variante": "lujo_contemporaneo",
-  "hash": "f0d4f6d71985dced75b83d1aedb44f959412f37a022a6343b4253849a13368e9",
+  "hash": "35b3ae45b65559710825bfa2edbda1a52692addfbfa15b9db83fea21be6a1b87",
   "escena": "data/scene.json",
   "glb": "data/scene.glb",
   "activos_glb": "data/assets.glb",
@@ -15,6 +15,7 @@
     "espacios",
     "puntos_interes",
     "captura",
-    "tour"
+    "tour",
+    "estudio_solar"
   ]
 }
