@@ -37,6 +37,16 @@ def _polygon_centroid(points):
     return [x / (3 * twice_area), y / (3 * twice_area)]
 
 
+def _display_name(identifier):
+    words = {"area": "Área", "servicio": "servicio", "circulacion": "Circulación",
+             "bano": "Baño", "social": "social", "comedor": "comedor"}
+    return " ".join(words.get(word, word.capitalize()) for word in identifier.split("_"))
+
+
+def _polygon_area(points):
+    return abs(sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(points, points[1:] + points[:1]))) / 2
+
+
 def _room_for(point, rooms):
     from shapely.geometry import Point, Polygon
     return next((room["id"] for room in rooms if Polygon(room["contorno"]).buffer(.01).contains(Point(point[:2]))), None)
@@ -87,7 +97,7 @@ def build_payload(bundle):
     for room in bundle["arquitectura"]["espacios"]:
         center = _polygon_centroid(room["contorno"])
         rooms.append({**room, "centro": [round(center[0], 4), round(center[1], 4), .12],
-                      "nombre": room["id"].replace("_", " ").title(),
+                      "nombre": _display_name(room["id"]), "area_m2": round(_polygon_area(room["contorno"]), 2),
                       "solarSamples": _solar_samples(room["contorno"], room.get("muestras_solares"))})
     web_elements = []
     for item in elements:

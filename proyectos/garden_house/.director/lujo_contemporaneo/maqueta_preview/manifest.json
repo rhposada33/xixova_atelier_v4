@@ -2,7 +2,7 @@
   "schema": 1,
   "proyecto": "garden_house",
   "variante": "lujo_contemporaneo",
-  "hash": "35b3ae45b65559710825bfa2edbda1a52692addfbfa15b9db83fea21be6a1b87",
+  "hash": "2340c1e2e111c6816fe77d1a96bf85fdf83c23c1299447025d2b931d2b86a520",
   "escena": "data/scene.json",
   "glb": "data/scene.glb",
   "activos_glb": null,
