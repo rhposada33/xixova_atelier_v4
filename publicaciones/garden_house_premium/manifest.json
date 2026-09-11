@@ -1,0 +1,78 @@
+{
+  "schema": 2,
+  "proyecto": "garden_house",
+  "variante": "lujo_contemporaneo",
+  "hash": "af5549a498292d428df5cb9a238df3b905c6a12f865ec4045f8ea90e0378175b",
+  "escena": "data/scene.json",
+  "glb": "data/scene.glb",
+  "activos": {
+    "inicial": "mobile",
+    "objetivo": "premium",
+    "niveles": {
+      "mobile": {
+        "url": "data/assets-mobile.glb",
+        "bytes": 8647860,
+        "activos": [
+          "armario_dormitorio",
+          "armario_suite",
+          "bano_social_equipo",
+          "bano_suite_equipo",
+          "cama_dormitorio",
+          "cama_suite",
+          "cocina_lineal",
+          "comedor_seis",
+          "mesa_centro"
+        ]
+      },
+      "standard": {
+        "url": "data/assets-standard.glb",
+        "bytes": 10600128,
+        "activos": [
+          "armario_dormitorio",
+          "armario_suite",
+          "bano_social_equipo",
+          "bano_suite_equipo",
+          "cama_dormitorio",
+          "cama_suite",
+          "cocina_lineal",
+          "comedor_seis",
+          "mesa_centro"
+        ]
+      },
+      "premium": {
+        "url": "data/assets-premium.glb",
+        "bytes": 19106456,
+        "activos": [
+          "armario_dormitorio",
+          "armario_suite",
+          "bano_social_equipo",
+          "bano_suite_equipo",
+          "cama_dormitorio",
+          "cama_suite",
+          "cocina_lineal",
+          "comedor_seis",
+          "mesa_centro"
+        ]
+      }
+    },
+    "proxies": [
+      "sofa_principal",
+      "sofa_veranda"
+    ]
+  },
+  "iluminacion": "data/lighting.json",
+  "miniatura": "data/miniatura.svg",
+  "auditoria": "data/auditoria.json",
+  "atribuciones": "data/atribuciones.json",
+  "capacidades": [
+    "paredes_inteligentes",
+    "puertas",
+    "espacios",
+    "puntos_interes",
+    "captura",
+    "tour",
+    "carga_progresiva",
+    "materiales_pbr",
+    "estudio_solar"
+  ]
+}

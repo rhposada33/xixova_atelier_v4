@@ -39,6 +39,10 @@ def build_windows(data,collection,box,material):
                         verts.append((wall['a'][0]+ux*along+nx*(offset+fold),wall['a'][1]+uy*along+ny*(offset+fold),z))
                 for k in range(segments):faces.append((k,k+1,k+segments+2,k+segments+1))
                 mesh=bpy.data.meshes.new('visillo');mesh.from_pydata(verts,[],faces);mesh.update()
+                uv=mesh.uv_layers.new(name='UVMap')
+                row=segments+1
+                for loop in mesh.loops:
+                    vertex=loop.vertex_index;uv.data[loop.index].uv=((vertex%row)/segments,vertex//row)
                 obj=bpy.data.objects.new(opening['id']+':cortina:'+str(edge),mesh);collection.objects.link(obj);mesh.materials.append(fabric)
                 for face in mesh.polygons:face.use_smooth=True
                 solid=obj.modifiers.new('Espesor textil','SOLIDIFY');solid.thickness=.0005

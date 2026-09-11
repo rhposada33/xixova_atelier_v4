@@ -83,17 +83,18 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['director','biblioteca','preparar-maqueta','exportar-maqueta','auditar-maqueta','servir-maqueta','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
+    parser.add_argument('accion',choices=['director','biblioteca','preparar-maqueta','hornear-maqueta','exportar-maqueta','auditar-maqueta','servir-maqueta','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
     parser.add_argument('subaccion',nargs='?',choices=['buscar','candidatos','descargar','evaluar','aceptar','rechazar','publicar','auditar'])
     parser.add_argument('-p','--proyecto',type=Path); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
     parser.add_argument('--compacto',action='store_true'); parser.add_argument('--desde',type=Path); parser.add_argument('--operaciones',type=Path); parser.add_argument('--toma',action='append')
-    parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final','piloto_fotografico','fotografico_1080p']); parser.add_argument('--guion',type=Path)
+    parser.add_argument('--anterior',type=Path); parser.add_argument('--perfil',choices=['previa','animatica','final','piloto_fotografico','fotografico_1080p','mobile','standard','premium']); parser.add_argument('--guion',type=Path)
     parser.add_argument('--biblioteca-raiz',type=Path); parser.add_argument('--consulta'); parser.add_argument('--limite',type=int,default=20)
     parser.add_argument('--entrada',type=Path); parser.add_argument('--id'); parser.add_argument('--archivo',type=Path); parser.add_argument('--motivo')
     parser.add_argument('--puntuacion-materiales',type=float); parser.add_argument('--puntuacion-geometria',type=float)
     parser.add_argument('--port',type=int,default=8765); parser.add_argument('--no-browser',action='store_true')
     parser.add_argument('--salida',type=Path)
+    parser.add_argument('--calidad-visual',action='store_true')
     args=parser.parse_args(argv)
     try:
         if args.accion=='biblioteca':
@@ -156,16 +157,18 @@ def main(argv=None):
             print(json.dumps(report,indent=2,ensure_ascii=False)); return 0 if report['ok'] else 1
         b,errors=load(args.proyecto,args.variante)
         if b is None: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
-        if args.accion in {'preparar-maqueta','auditar-maqueta','exportar-maqueta','servir-maqueta'}:
-            from .maquette import audit as audit_maquette, build_payload, export as export_maquette, serve as serve_maquette
+        if args.accion in {'preparar-maqueta','hornear-maqueta','auditar-maqueta','exportar-maqueta','servir-maqueta'}:
+            from .maquette import audit as audit_maquette, bake as bake_maquette, build_payload, export as export_maquette, serve as serve_maquette
             if errors: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
             destination=(args.salida or (Path(b['archivo']).parent/'publicacion_maqueta')).resolve()
             if args.accion=='servir-maqueta':
                 serve_maquette(destination,port=args.port); return 0
-            payload=build_payload(b); report=audit_maquette(b,payload)
+            if args.accion=='hornear-maqueta':
+                print(json.dumps(bake_maquette(b,destination,args.perfil),ensure_ascii=False,indent=2)); return 0
+            payload=build_payload(b); report=audit_maquette(b,payload,args.calidad_visual)
             if args.accion in {'preparar-maqueta','auditar-maqueta'}:
                 print(json.dumps(report,ensure_ascii=False,separators=(',',':') if args.compacto else None,indent=None if args.compacto else 2)); return 0 if report['ok'] else 1
-            result=export_maquette(b,destination); print(json.dumps(result,ensure_ascii=False,indent=2)); return 0
+            result=export_maquette(b,destination,args.perfil); print(json.dumps(result,ensure_ascii=False,indent=2)); return 0
         compiler_actions={'mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo'}
         if args.accion in compiler_actions:
             from .realism_compiler import compile_bundle, compact_report, correct_exposure

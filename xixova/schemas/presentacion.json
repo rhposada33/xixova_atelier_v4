@@ -311,34 +311,70 @@
     "maqueta": {
       "type": "object",
       "properties": {
-        "perfil": {"const": "editorial_calido"},
-        "camara": {"const": "isometrica"},
-        "fondo": {"const": "cielo_suave"},
-        "techo_visible": {"type": "boolean"},
-        "semilla": {"type": "integer"},
+        "perfil": {
+          "const": "editorial_calido"
+        },
+        "camara": {
+          "const": "isometrica"
+        },
+        "fondo": {
+          "const": "cielo_suave"
+        },
+        "techo_visible": {
+          "type": "boolean"
+        },
+        "semilla": {
+          "type": "integer"
+        },
         "paredes": {
           "type": "object",
           "properties": {
-            "modo": {"enum": ["inteligentes", "todas", "exteriores", "ocultas"]},
-            "transicion_ms": {"type": "integer", "minimum": 0, "maximum": 2000}
+            "modo": {
+              "enum": [
+                "inteligentes",
+                "todas",
+                "exteriores",
+                "ocultas"
+              ]
+            },
+            "transicion_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2000
+            }
           },
           "additionalProperties": false
         },
         "etiquetas": {
           "type": "object",
           "properties": {
-            "espacios": {"type": "boolean"},
-            "superficies": {"type": "boolean"},
-            "objetos": {"enum": ["seleccionables", "ocultos"]}
+            "espacios": {
+              "type": "boolean"
+            },
+            "superficies": {
+              "type": "boolean"
+            },
+            "objetos": {
+              "enum": [
+                "seleccionables",
+                "ocultos"
+              ]
+            }
           },
           "additionalProperties": false
         },
         "interaccion": {
           "type": "object",
           "properties": {
-            "puertas": {"type": "boolean"},
-            "filtros_espacios": {"type": "boolean"},
-            "puntos_interes": {"type": "boolean"}
+            "puertas": {
+              "type": "boolean"
+            },
+            "filtros_espacios": {
+              "type": "boolean"
+            },
+            "puntos_interes": {
+              "type": "boolean"
+            }
           },
           "additionalProperties": false
         },
@@ -347,60 +383,227 @@
           "items": {
             "type": "object",
             "properties": {
-              "id": {"type": "string", "pattern": "^[a-zA-Z0-9_-]+$"},
-              "nombre": {"type": "string", "minLength": 1},
-              "espacio": {"type": "string", "minLength": 1},
-              "posicion": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
-              "descripcion": {"type": "string"}
+              "id": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_-]+$"
+              },
+              "nombre": {
+                "type": "string",
+                "minLength": 1
+              },
+              "espacio": {
+                "type": "string",
+                "minLength": 1
+              },
+              "posicion": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "descripcion": {
+                "type": "string"
+              }
             },
-            "required": ["id", "nombre", "espacio", "posicion"],
+            "required": [
+              "id",
+              "nombre",
+              "espacio",
+              "posicion"
+            ],
             "additionalProperties": false
           }
         },
         "solar": {
           "type": "object",
           "properties": {
-            "enabled": {"type": "boolean"},
-            "calibrationStatus": {"enum": ["verified", "demo_unverified"]},
+            "enabled": {
+              "type": "boolean"
+            },
+            "calibrationStatus": {
+              "enum": [
+                "verified",
+                "demo_unverified"
+              ]
+            },
             "location": {
               "type": "object",
               "properties": {
-                "latitude": {"type": "number", "minimum": -90, "maximum": 90},
-                "longitude": {"type": "number", "minimum": -180, "maximum": 180},
-                "timezone": {"type": "string", "minLength": 1}
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "timezone": {
+                  "type": "string",
+                  "minLength": 1
+                }
               },
-              "required": ["latitude", "longitude", "timezone"], "additionalProperties": false
+              "required": [
+                "latitude",
+                "longitude",
+                "timezone"
+              ],
+              "additionalProperties": false
             },
             "building": {
               "type": "object",
               "properties": {
-                "northOffsetDegrees": {"type": "number", "minimum": -360, "maximum": 360},
-                "groundElevationMeters": {"type": "number"}
+                "northOffsetDegrees": {
+                  "type": "number",
+                  "minimum": -360,
+                  "maximum": 360
+                },
+                "groundElevationMeters": {
+                  "type": "number"
+                }
               },
-              "required": ["northOffsetDegrees"], "additionalProperties": false
+              "required": [
+                "northOffsetDegrees"
+              ],
+              "additionalProperties": false
             },
             "unit": {
               "type": "object",
-              "properties": {"floorNumber": {"type": "integer"}, "elevationMeters": {"type": "number", "minimum": 0}},
+              "properties": {
+                "floorNumber": {
+                  "type": "integer"
+                },
+                "elevationMeters": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
               "additionalProperties": false
             },
-            "exposureThreshold": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+            "exposureThreshold": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            },
             "environment": {
               "type": "object",
-              "properties": {"obstacles": {"type": "array", "items": {
-                "type": "object",
-                "properties": {
-                  "id": {"type": "string", "minLength": 1}, "type": {"enum": ["box", "cylinder", "wall"]},
-                  "category": {"enum": ["internal_architecture", "external_structure", "vegetation"]},
-                  "position": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
-                  "dimensions": {"type": "array", "items": {"type": "number", "exclusiveMinimum": 0}, "minItems": 3, "maxItems": 3},
-                  "rotationDegrees": {"type": "number"}
-                },
-                "required": ["id", "type", "category", "position", "dimensions"], "additionalProperties": false
-              }}}, "additionalProperties": false
+              "properties": {
+                "obstacles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "type": {
+                        "enum": [
+                          "box",
+                          "cylinder",
+                          "wall"
+                        ]
+                      },
+                      "category": {
+                        "enum": [
+                          "internal_architecture",
+                          "external_structure",
+                          "vegetation"
+                        ]
+                      },
+                      "position": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "dimensions": {
+                        "type": "array",
+                        "items": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "minItems": 3,
+                        "maxItems": 3
+                      },
+                      "rotationDegrees": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "category",
+                      "position",
+                      "dimensions"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
             }
           },
-          "required": ["enabled"], "additionalProperties": false
+          "required": [
+            "enabled"
+          ],
+          "additionalProperties": false
+        },
+        "calidad_web": {
+          "type": "object",
+          "properties": {
+            "perfil": {
+              "enum": [
+                "mobile",
+                "standard",
+                "premium_editorial"
+              ]
+            },
+            "presupuesto_mb": {
+              "type": "integer",
+              "minimum": 8,
+              "maximum": 100
+            },
+            "carga_inicial_mb": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            },
+            "nivel_inicial": {
+              "enum": [
+                "mobile"
+              ]
+            },
+            "nivel_objetivo": {
+              "enum": [
+                "mobile",
+                "standard",
+                "premium"
+              ]
+            },
+            "lightmaps": {
+              "type": "boolean"
+            },
+            "reflejos_entorno": {
+              "type": "boolean"
+            },
+            "sombras_contacto": {
+              "type": "boolean"
+            },
+            "vegetacion": {
+              "enum": [
+                "baja",
+                "media",
+                "alta"
+              ]
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

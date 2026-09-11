@@ -1,11 +1,12 @@
 {
-  "schema": 1,
+  "schema": 2,
   "proyecto": "garden_house",
   "variante": "lujo_contemporaneo",
-  "hash": "2340c1e2e111c6816fe77d1a96bf85fdf83c23c1299447025d2b931d2b86a520",
+  "hash": "af5549a498292d428df5cb9a238df3b905c6a12f865ec4045f8ea90e0378175b",
   "escena": "data/scene.json",
   "glb": "data/scene.glb",
-  "activos_glb": null,
+  "activos": {},
+  "iluminacion": null,
   "miniatura": "data/miniatura.svg",
   "auditoria": "data/auditoria.json",
   "atribuciones": "data/atribuciones.json",
@@ -16,6 +17,8 @@
     "puntos_interes",
     "captura",
     "tour",
+    "carga_progresiva",
+    "materiales_pbr",
     "estudio_solar"
   ]
 }

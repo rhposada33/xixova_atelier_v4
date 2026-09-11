@@ -66,6 +66,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Contexto local de iteración visual Dream Loop
+.dream-loop/
+
 # Revisiones locales del framework (vinculadas al contenido y al equipo)
 /proyectos/*/.revisiones/
 /proyectos/*/.director/**/trabajos/

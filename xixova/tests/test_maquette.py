@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from xixova.core import load
 from xixova.director_server import create_app
-from xixova.maquette import audit, build_payload, export
+from xixova.maquette import audit, bake, build_payload, export
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -28,6 +28,18 @@ def test_payload_preserves_coordinates_and_uses_safe_proxies():
     assert payload["solar"]["enabled"]
     assert payload["solar"]["calibrationStatus"] == "demo_unverified"
     assert all(room["solarSamples"] for room in payload["espacios"])
+    assert payload["configuracion"]["calidad_web"]["nivel_objetivo"] == "premium"
+    assert payload["luces"]
+
+
+def test_premium_ambient_contract_is_separate_from_project():
+    bundle = garden()
+    with tempfile.TemporaryDirectory() as directory:
+        before = bundle["arquitectura_hash"]
+        result = bake(bundle, directory, "premium")
+        lighting = json.loads(Path(result["archivo"]).read_text())
+        assert result["ok"] and set(lighting["estados"]) == {"dia", "atardecer", "noche"}
+        assert bundle["arquitectura_hash"] == before
 
 
 def test_solar_audit_rejects_unknown_timezone():

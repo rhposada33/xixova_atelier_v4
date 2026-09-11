@@ -243,3 +243,13 @@ maqueta:
     exposureThreshold: 0.2
     environment:
       obstacles: []
+  calidad_web:
+    perfil: premium_editorial
+    presupuesto_mb: 60
+    carga_inicial_mb: 8
+    nivel_inicial: mobile
+    nivel_objetivo: premium
+    lightmaps: true
+    reflejos_entorno: true
+    sombras_contacto: true
+    vegetacion: alta
