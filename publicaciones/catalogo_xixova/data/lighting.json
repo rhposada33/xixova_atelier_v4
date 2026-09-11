@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "metodo": "ambiente_pbr_mas_sol_dinamico",
+  "lightmaps": true,
+  "estados": {
+    "dia": {
+      "exposicion": 1.0,
+      "ambiente": 1.0,
+      "temperatura_k": 6100
+    },
+    "atardecer": {
+      "exposicion": 0.9,
+      "ambiente": 0.68,
+      "temperatura_k": 4400
+    },
+    "noche": {
+      "exposicion": 0.52,
+      "ambiente": 0.18,
+      "temperatura_k": 3000
+    }
+  }
+}
