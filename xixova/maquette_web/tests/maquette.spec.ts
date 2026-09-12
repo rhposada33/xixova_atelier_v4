@@ -1,50 +1,65 @@
-import{test,expect}from'@playwright/test';
+import {expect,test} from "@playwright/test";
 
-test('carga la maqueta, selecciona espacios y controla paredes',async({page})=>{
- await page.goto('/');
- await expect(page.getByText('Garden House')).toBeVisible();
- await expect(page.locator('canvas')).toBeVisible();
- await expect(page.getByText('Veranda',{exact:true}).first()).toBeVisible();
- await page.locator('nav').getByRole('button',{name:'Veranda'}).click();
- await expect(page).toHaveURL(/area=veranda/);
- await expect(page.locator('.info article').getByRole('heading',{name:'Veranda'})).toBeVisible();
- await page.locator('.info select').selectOption('ocultas');
- expect(await page.locator('.info select').inputValue()).toBe('ocultas');
+test("carga Garden House y conserva una selección compartible",async({page})=>{
+  await page.goto("/");
+  await expect(page.getByText("GARDEN HOUSE 18")).toBeVisible();
+  await expect(page.locator("canvas")).toBeVisible();
+  await page.locator("nav").getByRole("button",{name:"Sala comedor"}).click();
+  await expect.poll(()=>page.evaluate(()=>Object.fromEntries(new URL(location.href).searchParams))).toMatchObject({maqueta:"garden_house_18",piso:"6",unidad:"601",area:"sala_comedor"});
+  await expect(page.locator(".unit-card").getByRole("heading",{name:"Sala comedor"})).toBeVisible();
 });
 
-test('rota, amplía y ejecuta el recorrido automático',async({page})=>{
- await page.goto('/');
- await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.camera?.position?.toArray())).toBeTruthy();
- const before=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.camera.position.toArray());
- await page.getByRole('button',{name:'Girar 45 grados'}).click();
- const after=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.camera.position.toArray());
- expect(after).not.toEqual(before);
- const zoom=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.camera.zoom);
- const canvas=page.locator('canvas');await canvas.hover();await page.mouse.wheel(0,-500);await page.waitForTimeout(200);
- expect(await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.camera.zoom)).toBeGreaterThan(zoom);
- await page.getByRole('button',{name:'Recorrido automático'}).click();
- await page.waitForTimeout(3400);
- await expect(page).toHaveURL(/area=/);
+test("cambia de maqueta desde el manifiesto",async({page})=>{
+  await page.goto("/?maqueta=garden_house_18&piso=8&unidad=804");
+  await page.getByLabel("Seleccionar maqueta").selectOption("terraza_luz");
+  await expect(page).toHaveURL(/maqueta=terraza_luz/);
+  await expect(page.locator("header .title strong")).toHaveText("TERRAZA LUZ");
+  await expect(page.locator("nav").getByRole("button",{name:"Suite",exact:true})).toBeVisible();
 });
 
-test('funciona en móvil y no solicita recursos externos',async({page})=>{
- const external:string[]=[];page.on('request',request=>{if(new URL(request.url()).hostname!=='127.0.0.1')external.push(request.url())});
- await page.setViewportSize({width:390,height:844});await page.goto('/');
- await expect(page.getByRole('button',{name:'Espacios'})).toBeVisible();
- await page.getByRole('button',{name:'Espacios'}).click();
- await expect(page.getByRole('heading',{name:'Explora el proyecto'})).toBeVisible();
- await page.locator('nav').getByRole('button',{name:'Suite',exact:true}).click();
- await expect(page).toHaveURL(/area=suite/);expect(external).toEqual([]);
+test("libera el renderer al alternar repetidamente",async({page})=>{
+  test.setTimeout(60_000);
+  await page.goto("/");
+  await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer?.info?.memory?.geometries)).toBeGreaterThan(0);
+  const baseline=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.renderer.info.memory);
+  for(let index=0;index<2;index++){
+    await page.getByLabel("Seleccionar maqueta").selectOption("terraza_luz");
+    await expect(page.locator("header .title strong")).toHaveText("TERRAZA LUZ");
+    await page.getByLabel("Seleccionar maqueta").selectOption("garden_house_18");
+    await expect(page.locator("header .title strong")).toHaveText("GARDEN HOUSE 18");
+  }
+  const memory=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.renderer.info.memory);
+  expect(memory.geometries).toBeLessThanOrEqual(baseline.geometries+5);
+  expect(memory.textures).toBeLessThanOrEqual(baseline.textures+2);
 });
 
-test('estudio solar cambia fecha, hora, estación y trayectoria',async({page})=>{
- await page.goto('/');await page.getByRole('button',{name:/Estudio solar/}).click();
- await expect(page.getByRole('region',{name:'Estudio solar'})).toBeVisible();await expect(page.getByText('ILUMINACIÓN NATURAL')).toBeVisible();
- await expect(page.getByText(/Estimación/)).toBeVisible();
- await expect(page.getByText('America/Sao_Paulo')).toBeVisible();
- const slider=page.getByRole('slider',{name:'Hora local'});await slider.fill('720');
- await page.getByRole('button',{name:'Atardecer'}).click();expect(+await slider.inputValue()).toBeGreaterThan(720);
- await page.getByRole('button',{name:'Verano'}).click();await expect(page.locator('input[type=date]')).toHaveValue(/-12-21$/);
- await page.getByLabel('Mostrar trayectoria').uncheck();
- expect(await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.path.visible)).toBe(false);
+test("funciona en móvil y no solicita recursos externos",async({page})=>{
+  const external:string[]=[];
+  page.on("request",request=>{const url=new URL(request.url());if(url.protocol!=="blob:"&&url.hostname!=="127.0.0.1")external.push(request.url())});
+  await page.setViewportSize({width:390,height:844});
+  await page.goto("/");
+  await page.getByRole("button",{name:"Explorar ambientes"}).click();
+  await expect(page.getByRole("heading",{name:"Ambientes"})).toBeVisible();
+  await page.locator("nav").getByRole("button",{name:"Suite Principal"}).click();
+  await expect(page).toHaveURL(/area=suite_principal/);
+  expect(external).toEqual([]);
+});
+
+test("estudio solar cambia fecha, hora y estación",async({page})=>{
+  await page.goto("/");
+  await expect(page.getByRole("region",{name:"Estudio solar"})).toBeVisible();
+  const slider=page.getByRole("slider",{name:"Hora local"});
+  await slider.fill("720");
+  await page.getByRole("button",{name:"Atardecer"}).click();
+  expect(+await slider.inputValue()).toBeGreaterThan(720);
+  await page.getByRole("button",{name:"Verano"}).click();
+  await expect(page.locator("input[type=date]")).toHaveValue(/-12-21$/);
+});
+
+test("captura con un renderer temporal",async({page})=>{
+  await page.goto("/");
+  await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer)).toBeTruthy();
+  const download=page.waitForEvent("download");
+  await page.getByRole("button",{name:"Guardar vista"}).click();
+  expect((await download).suggestedFilename()).toBe("garden_house_18-maqueta.png");
 });

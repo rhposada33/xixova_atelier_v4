@@ -1,0 +1,239 @@
+{
+  "schema": 1,
+  "id": "lujo_contemporaneo",
+  "arquitectura": {
+    "id": "garden_house_18",
+    "version": "1.0.0",
+    "hash": "03cbbfec0fabe4e575bdff2129f0c3cc948161ab5244702aeb317bbf327ef6de"
+  },
+  "materiales": {
+    "yeso_calido": {
+      "color": [
+        0.84,
+        0.81,
+        0.74
+      ],
+      "rugosidad": 0.76,
+      "microdetalle": 0.12,
+      "proyeccion": "uv",
+      "normal_convencion": "OpenGL"
+    },
+    "roble_claro": {
+      "color": [
+        0.72,
+        0.52,
+        0.3
+      ],
+      "rugosidad": 0.48,
+      "microdetalle": 0.08,
+      "proyeccion": "uv",
+      "normal_convencion": "OpenGL"
+    },
+    "piedra_crema": {
+      "color": [
+        0.82,
+        0.78,
+        0.68
+      ],
+      "rugosidad": 0.38,
+      "microdetalle": 0.05,
+      "proyeccion": "uv",
+      "normal_convencion": "OpenGL"
+    },
+    "textil_marfil": {
+      "color": [
+        0.88,
+        0.84,
+        0.76
+      ],
+      "rugosidad": 0.86,
+      "microdetalle": 0.1,
+      "proyeccion": "uv",
+      "normal_convencion": "OpenGL"
+    }
+  },
+  "acabados": {
+    "fachada_sur": "yeso_calido",
+    "fachada_este": "yeso_calido",
+    "fachada_norte": "yeso_calido",
+    "fachada_oeste_servicio": "yeso_calido",
+    "sala_comedor:piso": "roble_claro",
+    "cocina:piso": "piedra_crema",
+    "suite_principal:piso": "roble_claro",
+    "suite_2:piso": "roble_claro",
+    "suite_3:piso": "roble_claro",
+    "terraza_frente:piso": "piedra_crema",
+    "terraza_gourmet:piso": "piedra_crema",
+    "terraza_lateral:piso": "piedra_crema"
+  },
+  "elementos": [
+    {
+      "id": "comedor_ocho",
+      "activo": "comedor",
+      "espacio": "sala_comedor",
+      "colocacion": {
+        "tipo": "explicita",
+        "posicion": [
+          5.8,
+          4.2,
+          0
+        ],
+        "rotacion": 0
+      },
+      "escala": 1.15,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "sofa_social",
+      "activo": "sofa_recto",
+      "espacio": "sala_comedor",
+      "colocacion": {
+        "tipo": "explicita",
+        "posicion": [
+          9.2,
+          4.7,
+          0
+        ],
+        "rotacion": 0
+      },
+      "escala": 1.3,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "mesa_social",
+      "activo": "mesa_centro",
+      "espacio": "sala_comedor",
+      "colocacion": {
+        "tipo": "explicita",
+        "posicion": [
+          9.2,
+          3.7,
+          0
+        ],
+        "rotacion": 0
+      },
+      "escala": 1,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "cama_principal",
+      "activo": "XVA3_Cama_king",
+      "espacio": "suite_principal",
+      "colocacion": {
+        "tipo": "explicita",
+        "posicion": [
+          13.8,
+          6.6,
+          0
+        ],
+        "rotacion": 0
+      },
+      "escala": 1,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "cama_suite_2",
+      "activo": "XVA3_Cama_doble",
+      "espacio": "suite_2",
+      "colocacion": {
+        "tipo": "explicita",
+        "posicion": [
+          5.9,
+          11.2,
+          0
+        ],
+        "rotacion": 0
+      },
+      "escala": 1,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "sofa_terraza",
+      "activo": "sofa_recto",
+      "espacio": "terraza_frente",
+      "colocacion": {
+        "tipo": "explicita",
+        "posicion": [
+          7.2,
+          1.2,
+          0
+        ],
+        "rotacion": 0
+      },
+      "escala": 1.2,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "comedor_terraza",
+      "activo": "comedor",
+      "espacio": "terraza_gourmet",
+      "colocacion": {
+        "tipo": "explicita",
+        "posicion": [
+          14.8,
+          2.2,
+          0
+        ],
+        "rotacion": 0
+      },
+      "escala": 1.1,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "cocina_gourmet",
+      "activo": "XVA3_Cocina_premium",
+      "espacio": "cocina",
+      "colocacion": {"tipo": "explicita", "posicion": [2.15, 3.05, 0], "rotacion": 0},
+      "escala": 1,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "cama_suite_3",
+      "activo": "XVA3_Cama_doble",
+      "espacio": "suite_3",
+      "colocacion": {"tipo": "explicita", "posicion": [10.75, 11.55, 0], "rotacion": 0},
+      "escala": 0.92,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "armario_suite_principal",
+      "activo": "XVA3_Armario_principal",
+      "espacio": "suite_principal",
+      "colocacion": {"tipo": "explicita", "posicion": [12.9, 5.25, 0], "rotacion": 0},
+      "escala": 1,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "armario_suite_2",
+      "activo": "XVA3_Armario_principal",
+      "espacio": "suite_2",
+      "colocacion": {"tipo": "explicita", "posicion": [6.9, 12.55, 0], "rotacion": 0},
+      "escala": 0.9,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "bano_principal_mueble",
+      "activo": "XVA3_Bano_principal",
+      "espacio": "bano_principal",
+      "colocacion": {"tipo": "explicita", "posicion": [14.7, 9.8, 0], "rotacion": 0},
+      "escala": 0.9,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "bano_2_mueble",
+      "activo": "XVA3_Bano_principal",
+      "espacio": "bano_2",
+      "colocacion": {"tipo": "explicita", "posicion": [8.65, 11.65, 0], "rotacion": 0},
+      "escala": 0.88,
+      "nivel_detalle": "hero"
+    },
+    {
+      "id": "bano_3_mueble",
+      "activo": "XVA3_Bano_principal",
+      "espacio": "bano_3",
+      "colocacion": {"tipo": "explicita", "posicion": [14.45, 12, 0], "rotacion": 0},
+      "escala": 0.88,
+      "nivel_detalle": "hero"
+    }
+  ]
+}

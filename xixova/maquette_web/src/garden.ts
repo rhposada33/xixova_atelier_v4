@@ -240,7 +240,10 @@ export function gardenData(baseSolar: any) {
   };
 }
 
-export function gardenDetails(world: THREE.Scene) {
+export function gardenDetails(
+  world: THREE.Scene,
+  options: { surfaces?: boolean; furniture?: boolean } = {},
+) {
   const group = new THREE.Group();
   group.name = "Garden House · 18 × 13 m";
   world.add(group);
@@ -388,7 +391,7 @@ export function gardenDetails(world: THREE.Scene) {
         );
       }
   }
-  const furnitureStart = group.children.length;
+  const surfaceNodes = new Set(group.children);
   const cushion = (
     x: number,
     y: number,
@@ -613,9 +616,8 @@ export function gardenDetails(world: THREE.Scene) {
   chair(16.78, 9.65, -Math.PI / 2);
   box(16.85, 7.25, 0.16, 1.12, 2.75, 0.035, rug);
   cyl(16.8, 7.2, 0.57, 0.26, 0.07, stone);
-  group.children
-    .slice(furnitureStart)
-    .forEach((n) => (n.userData.gardenFurniture = true));
+  const furnitureNodes = group.children.filter((node) => !surfaceNodes.has(node));
+  furnitureNodes.forEach((node) => (node.userData.gardenFurniture = true));
   // Fine framed glass runs around both terrace edges and through the full-height sliders.
   const rail = (ax: number, ay: number, bx: number, by: number, h = 1) => {
     const len = Math.hypot(bx - ax, by - ay),
@@ -772,5 +774,9 @@ export function gardenDetails(world: THREE.Scene) {
     [17.15, 10.95, 0.86],
   ])
     palm(p[0], p[1], p[2]);
+  if (options.surfaces === false)
+    surfaceNodes.forEach((node) => group.remove(node));
+  if (options.furniture === false)
+    furnitureNodes.forEach((node) => group.remove(node));
   return group;
 }

@@ -1,0 +1,14 @@
+schema: 1
+projects:
+  - id: garden_house_18
+    name: Garden House
+    project: proyectos/garden_house_18/proyecto.yaml
+    variant: lujo_contemporaneo
+    floors: [6, 8, 10]
+    units: ['01', '04']
+  - id: terraza_luz
+    name: Terraza Luz
+    project: proyectos/terraza_luz/proyecto.yaml
+    variant: editorial_jardin
+    floors: [6, 8, 10]
+    units: ['01', '04']

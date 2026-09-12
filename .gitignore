@@ -6,6 +6,11 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 node_modules/
+xixova/maquette_web/tsconfig.tsbuildinfo
+/xixova/maquette_web/dist/
+/xixova/maquette_web/test-results/
+/xixova/maquette_web/playwright-report/
+/publicaciones/
 xixova/director_web/tsconfig.tsbuildinfo
 xixova/director_web/test-results/
 xixova/director_web/playwright-report/

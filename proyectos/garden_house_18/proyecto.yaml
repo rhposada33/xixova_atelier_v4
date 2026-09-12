@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "garden_house_18",
+  "arquitectura": "arquitectura.yaml",
+  "variantes": {
+    "lujo_contemporaneo": "lujo_contemporaneo.yaml"
+  },
+  "presentacion": "../garden_house/presentacion.yaml",
+  "realismo": {
+    "perfil": "lujo_editorial_golden_hour",
+    "calidad": "fotografica",
+    "semilla": 1813,
+    "hora_solar": "15:30",
+    "densidad_decoracion": "media"
+  },
+  "produccion": {
+    "catalogo": "../garden_house/catalogo.yaml",
+    "bibliotecas": [
+      "../../biblioteca/catalogo_xixova.yaml"
+    ],
+    "blender": "~/Aplicaciones/blender-4.5/blender",
+    "salidas": "../../resultados/garden_house_18",
+    "fps": 24,
+    "gpu_vram_gb": 6,
+    "ram_gb": 16,
+    "licencias_permitidas": [
+      "propia",
+      "CC0",
+      "CC Attribution",
+      "Royalty Free"
+    ],
+    "perfiles": {
+      "previa": {
+        "resolucion": [
+          640,
+          360
+        ],
+        "muestras": 12,
+        "motor": "CYCLES",
+        "denoise": true
+      },
+      "animatica": {
+        "resolucion": [
+          480,
+          270
+        ],
+        "muestras": 1,
+        "motor": "BLENDER_WORKBENCH",
+        "denoise": false
+      },
+      "final": {
+        "resolucion": [
+          746,
+          420
+        ],
+        "muestras": 32,
+        "motor": "CYCLES",
+        "denoise": true
+      },
+      "fotografico_1080p": {
+        "resolucion": [
+          1920,
+          1080
+        ],
+        "muestras": 128,
+        "motor": "CYCLES",
+        "denoise": true
+      }
+    }
+  }
+}

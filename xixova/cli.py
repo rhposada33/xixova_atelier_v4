@@ -83,7 +83,7 @@ def png_ok(path,w,h):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description='Xixova: arquitectura + interiorismo + presentación + producción')
-    parser.add_argument('accion',choices=['director','biblioteca','preparar-maqueta','hornear-maqueta','exportar-maqueta','auditar-maqueta','servir-maqueta','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
+    parser.add_argument('accion',choices=['director','biblioteca','preparar-maqueta','hornear-maqueta','exportar-maqueta','auditar-maqueta','servir-maqueta','exportar-catalogo','servir-catalogo','mejorar-realismo','enriquecer-arquitectura','asignar-activos','resolver-iluminacion','resolver-camaras','auditar-realismo','corregir-realismo','informe-visual','aprobar-realismo','validar','resolver','catalogo','arquitectura','confirmar-arquitectura','componer','comprobar','previas','animatica','confirmar-visual','recorrido','estado','capturar','sincronizar','contexto-agente','operar','preflight','auditar-calidad','comparar','planificar-camaras','preparar-realismo','pilotos-fotograficos','piloto-temporal','auditar-fotografia'])
     parser.add_argument('subaccion',nargs='?',choices=['buscar','candidatos','descargar','evaluar','aceptar','rechazar','publicar','auditar'])
     parser.add_argument('-p','--proyecto',type=Path); parser.add_argument('--variante'); parser.add_argument('--revisor'); parser.add_argument('--nota'); parser.add_argument('--categoria'); parser.add_argument('--ancho-max',type=float)
     parser.add_argument('--captura',type=Path); parser.add_argument('--escena',type=Path); parser.add_argument('--aplicar',action='store_true')
@@ -94,9 +94,17 @@ def main(argv=None):
     parser.add_argument('--puntuacion-materiales',type=float); parser.add_argument('--puntuacion-geometria',type=float)
     parser.add_argument('--port',type=int,default=8765); parser.add_argument('--no-browser',action='store_true')
     parser.add_argument('--salida',type=Path)
+    parser.add_argument('--catalogo-config',type=Path)
     parser.add_argument('--calidad-visual',action='store_true')
     args=parser.parse_args(argv)
     try:
+        if args.accion in {'exportar-catalogo','servir-catalogo'}:
+            from .catalog import export_catalog, serve
+            destination=(args.salida or Path('publicaciones/catalogo_xixova')).resolve()
+            if args.accion=='servir-catalogo':
+                serve(destination,port=args.port); return 0
+            result=export_catalog(destination,args.catalogo_config,args.perfil or 'premium')
+            print(json.dumps(result,ensure_ascii=False,indent=2)); return 0
         if args.accion=='biblioteca':
             from .library import (add_candidates, audit_library, default_root, init_library,
                                   load_manifest, register_download, request_search, set_state,

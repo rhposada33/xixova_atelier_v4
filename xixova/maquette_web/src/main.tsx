@@ -7,7 +7,6 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import "./style.css";
 import {
   validateSolarConfig,
-  type ProjectSolarConfig,
   type RoomSunlightResult,
 } from "./solar/types";
 import { SunlightAnalyzer } from "./solar/analyzer";
@@ -16,29 +15,10 @@ import { SolarEngine } from "./solar/engine";
 import { useSolarSimulation } from "./solar/state";
 import { SolarControls } from "./solar/SolarControls";
 import { editorialDetails } from "./editorial";
-import { gardenData, gardenDetails } from "./garden";
+import { gardenDetails } from "./garden";
+import type { CatalogManifest, CatalogProject, SceneData, SceneElement, WallMode } from "./contracts";
+import { loadCatalog, loadScene, selectionFromURL, updateSelection } from "./catalog";
 import "./atelier.css";
-type WallMode = "inteligentes" | "todas" | "exteriores" | "ocultas";
-type SceneData = {
-  proyecto: string;
-  nombre: string;
-  variante: string;
-  configuracion: any;
-  solar?: ProjectSolarConfig;
-  espacios: any[];
-  paredes: any[];
-  aberturas: any[];
-  elementos: any[];
-  puntos_interes: any[];
-  luces?: any[];
-  activos_glb: boolean;
-  web_assets?: {
-    inicial: string;
-    objetivo: string;
-    proxies: string[];
-    niveles: Record<string, { url: string; bytes: number; activos: string[] }>;
-  };
-};
 const runtime: { current: any } = { current: null };
 const color = (c: string) =>
   c.includes("cama")
@@ -48,7 +28,7 @@ const color = (c: string) =>
       : c.includes("luz")
         ? "#d5a75f"
         : "#a7825d";
-function proxy(item: any) {
+function proxy(item: SceneElement) {
   const [w, d, h] = item.dimensiones,
     g = new THREE.Group(),
     m = new THREE.MeshStandardMaterial({
@@ -221,7 +201,7 @@ function Viewer({
     const camera = new THREE.OrthographicCamera(-8, 8, 5, -5, 0.1, 100),
       renderer = new THREE.WebGLRenderer({
         antialias: true,
-        preserveDrawingBuffer: true,
+        preserveDrawingBuffer: false,
       });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1));
     renderer.localClippingEnabled = true;
@@ -267,7 +247,7 @@ function Viewer({
     world.environmentIntensity = 0.35;
     const editorialSun = editorialDetails(world, data);
     if (data.proyecto === "garden_house_18") {
-      gardenDetails(world);
+      gardenDetails(world, { surfaces: false, furniture: true });
       // The textured scene is already lit by the editorial sun and hemisphere.
       // Avoid a synchronous PMREM render during first paint on large plans.
       world.environmentIntensity = 0.55;
@@ -276,8 +256,6 @@ function Viewer({
       editorialSun.position.set(-7, -6, 24);
       editorialSun.target.position.set(9, 6, 0);
       renderer.toneMappingExposure = 1.38;
-      el.dataset.sceneReady = "true";
-      el.dataset.quality = "premium";
     }
     const walls: THREE.Mesh[] = [],
       blockers: THREE.Object3D[] = [],
@@ -413,6 +391,7 @@ function Viewer({
       if (segments[0]) objects.set(w.id, segments[0]);
     });
     data.elementos.forEach((x) => {
+      if (data.proyecto === "garden_house_18") return;
       const n = proxy(x);
       if (
         data.proyecto === "terraza_luz" &&
@@ -425,7 +404,7 @@ function Viewer({
       proxyRoots.set(x.id, n);
     });
     const loadedLevels: THREE.Object3D[] = [];
-    if (data.web_assets && data.proyecto !== "garden_house_18") {
+    if (data.web_assets) {
       const target = data.web_assets!.objetivo,
         order = ["mobile", target].filter(
           (x, i, a) => a.indexOf(x) === i && data.web_assets!.niveles[x],
@@ -445,7 +424,7 @@ function Viewer({
         Object.assign(new GLTFLoader(), {})
           .setMeshoptDecoder(MeshoptDecoder)
           .load(
-            "./" + entry.url,
+            entry.url,
             (g) => {
               if (disposed) {
                 g.scene.traverse((n: any) => {
@@ -459,6 +438,11 @@ function Viewer({
               g.scene.traverse((node: any) => {
                 const id = node.userData?.xixova_id,
                   capa = node.userData?.xixova_capa;
+                if (
+                  data.proyecto === "garden_house_18" &&
+                  capa === "MOBILIARIO"
+                )
+                  node.visible = false;
                 if (
                   data.proyecto === "terraza_luz" &&
                   ["cama_suite", "cama_secundaria"].some((x) =>
@@ -637,11 +621,22 @@ function Viewer({
         .applyAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 4)
         .add(controls.target);
     const capture = () => {
-      renderer.render(world, camera);
+      const captureRenderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: false,
+        preserveDrawingBuffer: true,
+      });
+      captureRenderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      captureRenderer.setSize(el.clientWidth, el.clientHeight, false);
+      captureRenderer.outputColorSpace = renderer.outputColorSpace;
+      captureRenderer.toneMapping = renderer.toneMapping;
+      captureRenderer.toneMappingExposure = renderer.toneMappingExposure;
+      captureRenderer.render(world, camera);
       const a = document.createElement("a");
-      a.href = renderer.domElement.toDataURL("image/png");
+      a.href = captureRenderer.domElement.toDataURL("image/png");
       a.download = `${data.proyecto}-maqueta.png`;
       a.click();
+      captureRenderer.dispose();
     };
     runtime.current = {
       world,
@@ -1054,13 +1049,12 @@ function MiniPlan({
 }
 
 function App() {
-  const [base, setBase] = useState<SceneData>(),
-    [project, setProject] = useState(
-      new URLSearchParams(location.search).get("maqueta") || "garden_house_18",
-    ),
+  const [catalog, setCatalog] = useState<CatalogManifest>(),
+    [project, setProject] = useState<CatalogProject>(),
+    [data, setData] = useState<SceneData>(),
     [floor, setFloor] = useState(8),
-    [unit, setUnit] = useState("804");
-  const [selected, setSelected] = useState(""),
+    [unit, setUnit] = useState("804"),
+    [selected, setSelected] = useState(new URLSearchParams(location.search).get("area") || ""),
     [wallMode, setWallMode] = useState<WallMode>("inteligentes"),
     [labels, setLabels] = useState(false),
     [tour, setTour] = useState(false),
@@ -1069,53 +1063,26 @@ function App() {
     [exposure, setExposure] = useState<RoomSunlightResult[]>([]),
     [error, setError] = useState("");
   useEffect(() => {
-    fetch("./data/scene.json")
-      .then((r) => {
-        if (!r.ok) throw Error("No se pudo abrir el proyecto");
-        return r.json();
-      })
-      .then(async (v: SceneData) => {
-        if (v.proyecto !== "terraza_luz") {
-          const response = await fetch(
-            "../terraza_luz_premium/data/scene.json",
-          );
-          if (!response.ok) throw Error("No se pudo abrir Terraza Luz");
-          v = await response.json();
-          if (v.web_assets)
-            Object.values(v.web_assets.niveles).forEach(
-              (level) => (level.url = "../terraza_luz_premium/" + level.url),
-            );
-        }
-        setBase(v);
-      })
-      .catch((e) => setError(e.message));
+    loadCatalog().then(value=>{
+      const initial=selectionFromURL(value);setCatalog(value);setProject(initial.project);setFloor(initial.floor);setUnit(initial.unit);
+      updateSelection({project:initial.project.id,floor:initial.floor,unit:initial.unit,area:selected});
+    }).catch((e:Error)=>setError(e.message));
   }, []);
-  const data = useMemo(() => {
-    if (!base) return;
-    const d = project === "garden_house_18" ? gardenData(base.solar) : base;
-    return {
-      ...d,
-      solar: d.solar
-        ? {
-            ...d.solar,
-            unit: { floorNumber: floor, elevationMeters: floor * 3 },
-          }
-        : undefined,
-    } as SceneData;
-  }, [base, project, floor]);
+  useEffect(()=>{if(!project)return;setData(undefined);loadScene(project).then(scene=>setData({...scene,solar:scene.solar?{...scene.solar,unit:{floorNumber:floor,elevationMeters:floor*3}}:undefined})).catch((e:Error)=>setError(e.message))},[project,floor]);
+  useEffect(()=>{
+    if(project)updateSelection({project:project.id,floor,unit,area:selected});
+  },[project,floor,unit,selected]);
   const choose = (id: string) => {
     setSelected(id);
-    const u = new URL(location.href);
-    id ? u.searchParams.set("area", id) : u.searchParams.delete("area");
-    history.replaceState(null, "", u);
+    updateSelection({project:project?.id,floor,unit,area:id});
   };
   const switchProject = (id: string) => {
-    setProject(id);
+    const next=catalog?.projects.find(item=>item.id===id);if(!next)return;
+    const nextFloor=next.floors[0],nextUnit=`${nextFloor}${next.units[0]}`;
+    setProject(next);setFloor(nextFloor);setUnit(nextUnit);
     choose("");
     setExposure([]);
-    const u = new URL(location.href);
-    u.searchParams.set("maqueta", id);
-    history.replaceState(null, "", u);
+    updateSelection({project:id,floor:nextFloor,unit:nextUnit,area:""});
   };
   useEffect(() => {
     if (!data || !tour) return;
@@ -1129,7 +1096,7 @@ function App() {
     }, 3200);
     return () => clearInterval(t);
   }, [data, tour]);
-  if (!data)
+  if (!data || !catalog || !project)
     return (
       <main className="loading">
         <b>XV</b>
@@ -1139,17 +1106,17 @@ function App() {
     );
   return (
     <Ready
-      key={project}
+      key={project.id}
       data={data}
-      project={project}
+      project={project.id}
+      projects={catalog.projects}
       switchProject={switchProject}
       floor={floor}
       setFloor={(v: number) => {
-        setFloor(v);
-        setUnit(v + "04");
+        const nextUnit=v+project.units[0];setFloor(v);setUnit(nextUnit);updateSelection({floor:v,unit:nextUnit});
       }}
       unit={unit}
-      setUnit={setUnit}
+      setUnit={(value:string)=>{setUnit(value);updateSelection({unit:value})}}
       selected={selected}
       choose={choose}
       wallMode={wallMode}
@@ -1252,6 +1219,7 @@ function Icon({ name }: { name: string }) {
 }
 function Ready(p: any) {
   const d = p.data,
+    activeProject = (p.projects as CatalogProject[]).find(item=>item.id===p.project)!,
     valid = d.solar?.enabled && !validateSolarConfig(d.solar).length,
     solar = valid ? useSolarSimulation(d.solar) : null;
   const [favorite, setFavorite] = useState(false),
@@ -1331,8 +1299,7 @@ function Ready(p: any) {
               value={p.project}
               onChange={(e) => p.switchProject(e.target.value)}
             >
-              <option value="garden_house_18">Garden House</option>
-              <option value="terraza_luz">Terraza Luz</option>
+              {(p.projects as CatalogProject[]).map(item=><option key={item.id} value={item.id}>{item.name}</option>)}
             </select>
           </label>
           <label>
@@ -1342,7 +1309,7 @@ function Ready(p: any) {
               value={p.floor}
               onChange={(e) => p.setFloor(+e.target.value)}
             >
-              {[6, 8, 10].map((n) => (
+              {activeProject.floors.map((n) => (
                 <option key={n} value={n}>
                   Piso {n}
                 </option>
@@ -1359,7 +1326,7 @@ function Ready(p: any) {
                 setNotice("Unidad " + e.target.value + " · misma tipología");
               }}
             >
-              {["01", "04"].map((n) => (
+              {activeProject.units.map((n) => (
                 <option key={n} value={p.floor + n}>
                   Unidad {p.floor + n}
                 </option>

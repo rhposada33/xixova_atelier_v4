@@ -1,0 +1,1215 @@
+{
+  "schema": 1,
+  "id": "garden_house_18",
+  "version": "1.0.0",
+  "unidades": "m",
+  "fuentes": [
+    {
+      "archivo": "plano_usuario_18x13.png",
+      "descripcion": "Planta amueblada y acotada aportada por el usuario."
+    }
+  ],
+  "cota_referencia": {
+    "valor_m": 18,
+    "descripcion": "Ancho exterior total rotulado 18,00 m.",
+    "fiable": true
+  },
+  "dudas": [
+    "Alturas y espesores inferidos para visualización; no constituye documentación constructiva."
+  ],
+  "espacios": [
+    {
+      "id": "sala_comedor",
+      "contorno": [
+        [
+          4.5,
+          2.4
+        ],
+        [
+          12,
+          2.4
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          4.5,
+          6
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          8.25,
+          4.2,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "cocina",
+      "contorno": [
+        [
+          0,
+          2.4
+        ],
+        [
+          4.5,
+          2.4
+        ],
+        [
+          4.5,
+          6
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          2.25,
+          4.2,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "suite_principal",
+      "contorno": [
+        [
+          12,
+          4.8
+        ],
+        [
+          15.6,
+          4.8
+        ],
+        [
+          15.6,
+          8.6
+        ],
+        [
+          12,
+          8.6
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          13.8,
+          6.699999999999999,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "suite_2",
+      "contorno": [
+        [
+          4,
+          9.2
+        ],
+        [
+          7.8,
+          9.2
+        ],
+        [
+          7.8,
+          13
+        ],
+        [
+          4,
+          13
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          5.9,
+          11.1,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "suite_3",
+      "contorno": [
+        [
+          9.5,
+          9.2
+        ],
+        [
+          12,
+          9.2
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          9.5,
+          13
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          11.4,
+          11.1,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "oficina",
+      "contorno": [
+        [
+          4.1,
+          6
+        ],
+        [
+          7.6,
+          6
+        ],
+        [
+          7.6,
+          8.1
+        ],
+        [
+          4.1,
+          8.1
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          5.85,
+          7.05,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "sala_tv",
+      "contorno": [
+        [
+          7.6,
+          6
+        ],
+        [
+          12,
+          6
+        ],
+        [
+          12,
+          8.5
+        ],
+        [
+          7.6,
+          8.5
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          9.8,
+          7.25,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "vestidor",
+      "contorno": [
+        [
+          12,
+          8.6
+        ],
+        [
+          13.8,
+          8.6
+        ],
+        [
+          13.8,
+          11
+        ],
+        [
+          12,
+          11
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          12.9,
+          9.799999999999999,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "bano_principal",
+      "contorno": [
+        [
+          13.8,
+          8.6
+        ],
+        [
+          15.600000000000001,
+          8.6
+        ],
+        [
+          15.600000000000001,
+          11
+        ],
+        [
+          13.8,
+          11
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          14.700000000000001,
+          9.799999999999999,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "bano_2",
+      "contorno": [
+        [
+          7.8,
+          9.2
+        ],
+        [
+          9.5,
+          9.2
+        ],
+        [
+          9.5,
+          13
+        ],
+        [
+          7.8,
+          13
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          8.65,
+          11.1,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "bano_3",
+      "contorno": [
+        [
+          13.3,
+          11
+        ],
+        [
+          15.600000000000001,
+          11
+        ],
+        [
+          15.600000000000001,
+          13
+        ],
+        [
+          13.3,
+          13
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          14.450000000000001,
+          12,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "bano_social",
+      "contorno": [
+        [
+          2.3,
+          6
+        ],
+        [
+          4.1,
+          6
+        ],
+        [
+          4.1,
+          8.1
+        ],
+        [
+          2.3,
+          8.1
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          3.1999999999999997,
+          7.05,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "lavanderia",
+      "contorno": [
+        [
+          0,
+          6
+        ],
+        [
+          2.3,
+          6
+        ],
+        [
+          2.3,
+          8.1
+        ],
+        [
+          0,
+          8.1
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          1.15,
+          7.05,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "despensa",
+      "contorno": [
+        [
+          0,
+          8.1
+        ],
+        [
+          2.3,
+          8.1
+        ],
+        [
+          2.3,
+          9.2
+        ],
+        [
+          0,
+          9.2
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          1.15,
+          8.65,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "vestibulo",
+      "contorno": [
+        [
+          2.3,
+          8.1
+        ],
+        [
+          4,
+          8.1
+        ],
+        [
+          4,
+          11.1
+        ],
+        [
+          2.3,
+          11.1
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          3.15,
+          9.6,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "circulacion",
+      "contorno": [
+        [
+          4,
+          8.1
+        ],
+        [
+          7.6,
+          8.1
+        ],
+        [
+          7.6,
+          9.2
+        ],
+        [
+          4,
+          9.2
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          5.8,
+          8.65,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "pasillo",
+      "contorno": [
+        [
+          7.6,
+          8.5
+        ],
+        [
+          12,
+          8.5
+        ],
+        [
+          12,
+          9.2
+        ],
+        [
+          7.6,
+          9.2
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": true,
+      "muestras_solares": [
+        [
+          9.8,
+          8.85,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "terraza_frente",
+      "contorno": [
+        [
+          0,
+          0
+        ],
+        [
+          12,
+          0
+        ],
+        [
+          12,
+          2.4
+        ],
+        [
+          0,
+          2.4
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": false,
+      "muestras_solares": [
+        [
+          6,
+          1.2,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "terraza_gourmet",
+      "contorno": [
+        [
+          12,
+          0
+        ],
+        [
+          18,
+          0
+        ],
+        [
+          18,
+          4.8
+        ],
+        [
+          12,
+          4.8
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": false,
+      "muestras_solares": [
+        [
+          15,
+          2.4,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "terraza_lateral",
+      "contorno": [
+        [
+          15.6,
+          4.8
+        ],
+        [
+          18,
+          4.8
+        ],
+        [
+          18,
+          13
+        ],
+        [
+          15.6,
+          13
+        ]
+      ],
+      "altura": 2.7,
+      "cubierto": false,
+      "muestras_solares": [
+        [
+          16.8,
+          8.899999999999999,
+          0.8
+        ]
+      ]
+    }
+  ],
+  "paredes": [
+    {
+      "id": "fachada_sur",
+      "a": [
+        0,
+        0
+      ],
+      "b": [
+        18,
+        0
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "ventanal_sur",
+          "tipo": "ventana",
+          "distancia": 0.4,
+          "ancho": 16.8,
+          "alto": 2.35,
+          "antepecho": 0.15
+        }
+      ]
+    },
+    {
+      "id": "fachada_este",
+      "a": [
+        18,
+        0
+      ],
+      "b": [
+        18,
+        13
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "ventanal_este",
+          "tipo": "ventana",
+          "distancia": 0.4,
+          "ancho": 11.8,
+          "alto": 2.35,
+          "antepecho": 0.15
+        }
+      ]
+    },
+    {
+      "id": "fachada_norte",
+      "a": [
+        4,
+        13
+      ],
+      "b": [
+        18,
+        13
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "ventana_suite_2",
+          "tipo": "ventana",
+          "distancia": 0.3,
+          "ancho": 3.3,
+          "alto": 1.2,
+          "antepecho": 0.9
+        },
+        {
+          "id": "ventana_suite_3",
+          "tipo": "ventana",
+          "distancia": 5.8,
+          "ancho": 3.2,
+          "alto": 1.2,
+          "antepecho": 0.9
+        },
+        {
+          "id": "ventana_bano_3",
+          "tipo": "ventana",
+          "distancia": 10.5,
+          "ancho": 1.1,
+          "alto": 1,
+          "antepecho": 0.95
+        }
+      ]
+    },
+    {
+      "id": "fachada_oeste_servicio",
+      "a": [
+        0,
+        2.4
+      ],
+      "b": [
+        0,
+        9.2
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "entrada_servicio",
+          "tipo": "puerta",
+          "distancia": 3.8,
+          "ancho": 0.9,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "fachada_acceso",
+      "a": [
+        2.3,
+        9.2
+      ],
+      "b": [
+        2.3,
+        11.1
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "entrada_principal",
+          "tipo": "puerta",
+          "distancia": 0.35,
+          "ancho": 1,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "cierre_acceso",
+      "a": [
+        2.3,
+        11.1
+      ],
+      "b": [
+        4,
+        11.1
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "suite_2_oeste",
+      "a": [
+        4,
+        9.2
+      ],
+      "b": [
+        4,
+        13
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "division_social",
+      "a": [
+        4.5,
+        2.4
+      ],
+      "b": [
+        4.5,
+        6
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "paso_cocina",
+          "tipo": "puerta",
+          "distancia": 2.4,
+          "ancho": 1,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "division_servicio",
+      "a": [
+        0,
+        6
+      ],
+      "b": [
+        4.1,
+        6
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_lavanderia",
+          "tipo": "puerta",
+          "distancia": 0.8,
+          "ancho": 0.85,
+          "alto": 2.2,
+          "antepecho": 0
+        },
+        {
+          "id": "puerta_social",
+          "tipo": "puerta",
+          "distancia": 2.7,
+          "ancho": 0.8,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "division_lavanderia",
+      "a": [
+        2.3,
+        6
+      ],
+      "b": [
+        2.3,
+        9.2
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_despensa",
+          "tipo": "puerta",
+          "distancia": 2.2,
+          "ancho": 0.7,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "division_despensa",
+      "a": [
+        0,
+        9.2
+      ],
+      "b": [
+        2.3,
+        9.2
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "oficina_oeste",
+      "a": [
+        4.1,
+        6
+      ],
+      "b": [
+        4.1,
+        8.1
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "oficina_norte",
+      "a": [
+        4.1,
+        8.1
+      ],
+      "b": [
+        7.6,
+        8.1
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_oficina",
+          "tipo": "puerta",
+          "distancia": 0.3,
+          "ancho": 0.9,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "tv_oeste",
+      "a": [
+        7.6,
+        6
+      ],
+      "b": [
+        7.6,
+        8.5
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "tv_sur",
+      "a": [
+        7.6,
+        6
+      ],
+      "b": [
+        12,
+        6
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_tv",
+          "tipo": "puerta",
+          "distancia": 0.3,
+          "ancho": 1,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "tv_norte",
+      "a": [
+        7.6,
+        8.5
+      ],
+      "b": [
+        12,
+        8.5
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "paso_tv",
+          "tipo": "puerta",
+          "distancia": 2.8,
+          "ancho": 0.9,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "principal_oeste",
+      "a": [
+        12,
+        4.8
+      ],
+      "b": [
+        12,
+        11
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_principal",
+          "tipo": "puerta",
+          "distancia": 3.1,
+          "ancho": 0.85,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "principal_norte",
+      "a": [
+        12,
+        8.6
+      ],
+      "b": [
+        15.6,
+        8.6
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_vestidor",
+          "tipo": "puerta",
+          "distancia": 0.3,
+          "ancho": 0.8,
+          "alto": 2.2,
+          "antepecho": 0
+        },
+        {
+          "id": "puerta_bano_principal",
+          "tipo": "puerta",
+          "distancia": 2.1,
+          "ancho": 0.8,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "vestidor_bano",
+      "a": [
+        13.8,
+        8.6
+      ],
+      "b": [
+        13.8,
+        11
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "vestidor_norte",
+      "a": [
+        12,
+        11
+      ],
+      "b": [
+        15.6,
+        11
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "suites_sur",
+      "a": [
+        4,
+        9.2
+      ],
+      "b": [
+        12,
+        9.2
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_suite_2",
+          "tipo": "puerta",
+          "distancia": 2.5,
+          "ancho": 0.85,
+          "alto": 2.2,
+          "antepecho": 0
+        },
+        {
+          "id": "puerta_suite_3",
+          "tipo": "puerta",
+          "distancia": 6,
+          "ancho": 0.85,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "suite_2_bano",
+      "a": [
+        7.8,
+        9.2
+      ],
+      "b": [
+        7.8,
+        13
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_bano_2",
+          "tipo": "puerta",
+          "distancia": 0.3,
+          "ancho": 0.8,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "suite_3_oeste",
+      "a": [
+        9.5,
+        9.2
+      ],
+      "b": [
+        9.5,
+        13
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": []
+    },
+    {
+      "id": "suite_3_bano",
+      "a": [
+        12,
+        11
+      ],
+      "b": [
+        12,
+        13
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "puerta_bano_3",
+          "tipo": "puerta",
+          "distancia": 0.2,
+          "ancho": 0.8,
+          "alto": 2.2,
+          "antepecho": 0
+        }
+      ]
+    },
+    {
+      "id": "vidrio_terraza_social",
+      "a": [
+        0,
+        2.4
+      ],
+      "b": [
+        12,
+        2.4
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "corredera_social",
+          "tipo": "ventana",
+          "distancia": 4.8,
+          "ancho": 6.5,
+          "alto": 2.4,
+          "antepecho": 0.1
+        }
+      ]
+    },
+    {
+      "id": "vidrio_terraza_suite",
+      "a": [
+        12,
+        4.8
+      ],
+      "b": [
+        15.6,
+        4.8
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "corredera_suite",
+          "tipo": "ventana",
+          "distancia": 0.2,
+          "ancho": 3.2,
+          "alto": 2.4,
+          "antepecho": 0.1
+        }
+      ]
+    },
+    {
+      "id": "limite_lateral",
+      "a": [
+        15.6,
+        4.8
+      ],
+      "b": [
+        15.6,
+        13
+      ],
+      "espesor": 0.17,
+      "altura": 2.7,
+      "aberturas": [
+        {
+          "id": "salida_lateral",
+          "tipo": "ventana",
+          "distancia": 2.2,
+          "ancho": 2.4,
+          "alto": 2.4,
+          "antepecho": 0.1
+        }
+      ]
+    }
+  ],
+  "pilares": [],
+  "instalaciones": []
+}
