@@ -102,7 +102,7 @@ def main(argv=None):
             from .catalog import export_catalog, serve
             destination=(args.salida or Path('publicaciones/catalogo_xixova')).resolve()
             if args.accion=='servir-catalogo':
-                serve(destination,port=args.port); return 0
+                serve(destination,port=args.port,open_browser=not args.no_browser); return 0
             result=export_catalog(destination,args.catalogo_config,args.perfil or 'premium')
             print(json.dumps(result,ensure_ascii=False,indent=2)); return 0
         if args.accion=='biblioteca':
@@ -170,7 +170,7 @@ def main(argv=None):
             if errors: print(json.dumps({'ok':False,'diagnosticos':errors},ensure_ascii=False)); return 1
             destination=(args.salida or (Path(b['archivo']).parent/'publicacion_maqueta')).resolve()
             if args.accion=='servir-maqueta':
-                serve_maquette(destination,port=args.port); return 0
+                serve_maquette(destination,port=args.port,open_browser=not args.no_browser); return 0
             if args.accion=='hornear-maqueta':
                 print(json.dumps(bake_maquette(b,destination,args.perfil),ensure_ascii=False,indent=2)); return 0
             payload=build_payload(b); report=audit_maquette(b,payload,args.calidad_visual)

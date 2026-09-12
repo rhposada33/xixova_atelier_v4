@@ -1295,9 +1295,9 @@ function Ready(p: any) {
     >
       <header>
         <div className="brand">
-          <b>XV</b>
+          <b>ES</b>
           <span>
-            <strong>XIXOVÁ</strong>
+            <strong>ESCOBAR</strong>
             <small>MAQUETE INTERATIVA</small>
           </span>
         </div>
@@ -1592,7 +1592,7 @@ function Ready(p: any) {
             >
               ×
             </button>
-            <small>XIXOVÁ · SEU PRÓXIMO LAR</small>
+            <small>ESCOBAR · SEU PRÓXIMO LAR</small>
             <h2>
               {d.nombre} · Unidade {p.unit}
             </h2>

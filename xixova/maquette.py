@@ -295,8 +295,31 @@ def export(bundle, destination, profile=None):
     return {**report, "salida": str(destination), "url": "index.html", "bytes": size, "limite_bytes": limit}
 
 
-def serve(directory, host="127.0.0.1", port=8877):
+def serve(directory, host="127.0.0.1", port=8877, open_browser=True):
+    import threading
+    import webbrowser
+
     directory = Path(directory).resolve()
     if not (directory / "index.html").is_file(): raise ValueError("La salida no contiene index.html.")
-    handler = lambda *args, **kwargs: SimpleHTTPRequestHandler(*args, directory=str(directory), **kwargs)
-    ThreadingHTTPServer((host, port), handler).serve_forever()
+    url = f"http://{host}:{port}/"
+    print(f"Servidor disponible en {url}", flush=True)
+    if open_browser:
+        threading.Timer(.6, lambda: webbrowser.open(url)).start()
+    class DevelopmentHandler(SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=str(directory), **kwargs)
+
+        def end_headers(self):
+            self.send_header("Cache-Control", "no-store, max-age=0")
+            self.send_header("Pragma", "no-cache")
+            self.send_header("Expires", "0")
+            super().end_headers()
+
+    handler = DevelopmentHandler
+    server = ThreadingHTTPServer((host, port), handler)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServidor detenido.", flush=True)
+    finally:
+        server.server_close()

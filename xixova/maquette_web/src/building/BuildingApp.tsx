@@ -44,7 +44,7 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
   const close=()=>{setModal('');setActiveNav('Edifício');};
   const similar=inventory.filter(u=>u.code!==selected.code&&u.status==='available'&&u.bedrooms===selected.bedrooms).sort((a,b)=>Math.abs(a.priceBRL-selected.priceBRL)-Math.abs(b.priceBRL-selected.priceBRL)).slice(0,6);
   return <main className="building-app">
-    <header className="building-header"><a href="?" className="building-brand" aria-label="Xixová, edifício"><b>XV</b><span>XIXOVÁ<small>VIVER É UMA ARTE</small></span></a>
+    <header className="building-header"><a href="?" className="building-brand" aria-label="Escobar, edifício"><b>ES</b><span>ESCOBAR<small>VIVER É UMA ARTE</small></span></a>
       <nav aria-label="Navegação do edifício">{['Edifício','Andares','Unidades','Comparar','Arredores'].map((name,i)=><button key={name} className={activeNav===name?'active':''} onClick={()=>i===0?close():open(['','floors','matrix','compare','environment'][i])}>{name}{name==='Comparar'&&compare.length>0?` (${compare.length})`:''}</button>)}</nav>
       <div className="building-header-actions"><button onClick={()=>open('favorites')}><Icon name="heart"/> <span>Favoritos{saved.length?` (${saved.length})`:''}</span></button><button onClick={async()=>{try{await navigator.clipboard.writeText(location.href);setNotice('Link desta unidade copiado.');}catch{setModal('share');}}}><Icon name="pin"/><span>Compartilhar</span></button><button className="b-gold" disabled={!canPropose(selected)} onClick={()=>open('proposal')}>Solicitar proposta</button></div>
     </header>
@@ -71,7 +71,7 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
         <div className="b-light-controls"><button className={mode==='neutral_day'?'active':''} aria-pressed={mode==='neutral_day'} onClick={()=>setMode('neutral_day')}><Icon name="sun" size={26}/>Dia</button><button className={mode==='warm_dusk'?'active':''} aria-pressed={mode==='warm_dusk'} onClick={()=>setMode('warm_dusk')}><Icon name="moon" size={24}/>Entardecer</button></div>
         <button className="b-reset-view" onClick={()=>action('reset')}><span><Icon name="reset" size={27}/></span>Restaurar<br/>vista</button>
         <div className="b-camera-tools">{[['rotate','reset','Girar'],['in','zoomin','Aproximar'],['out','zoomout','Afastar'],['reset','home','Vista inicial']].map(([type,icon,title])=><button key={title} onClick={()=>action(type)}><Icon name={icon}/><span>{title}</span></button>)}</div>
-        <div className="b-model-note">XIXOVÁ RESIDENCES <span>·</span> MAQUETE INTERATIVA</div>
+        <div className="b-model-note">ESCOBAR RESIDENCES <span>·</span> MAQUETE INTERATIVA</div>
       </section>
       <aside className={`building-details ${mobilePanel==='detail'?'mobile-open':''}`} aria-label="Ficha da unidade">
         <button className="b-mobile-close" onClick={()=>setMobilePanel('')} aria-label="Fechar ficha"><Icon name="close"/></button>
