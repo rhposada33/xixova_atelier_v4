@@ -19,6 +19,28 @@ DEFAULT_CATALOG = {
     ],
 }
 
+BUILDING_RESERVED = {"401", "704", "902", "1201", "1504", "1702"}
+BUILDING_SOLD = {"101", "104", "202", "203", "301", "304", "502", "603", "801", "1004", "1302", "1603"}
+BUILDING_TYPES = (
+    {"bedrooms": 3, "suites": 2, "parkingSpaces": 2, "privateAreaM2": 118, "orientation": "northeast", "viewType": "garden", "base": 1040000, "interiorProjectId": "garden_house_18"},
+    {"bedrooms": 2, "suites": 1, "parkingSpaces": 1, "privateAreaM2": 82, "orientation": "northwest", "viewType": "city", "base": 740000, "interiorProjectId": "terraza_luz"},
+    {"bedrooms": 3, "suites": 2, "parkingSpaces": 2, "privateAreaM2": 96, "orientation": "southeast", "viewType": "sea", "base": 920000, "interiorProjectId": "terraza_luz"},
+    {"bedrooms": 4, "suites": 3, "parkingSpaces": 3, "privateAreaM2": 146, "orientation": "southwest", "viewType": "garden", "base": 1220000, "interiorProjectId": "garden_house_18"},
+)
+
+
+def build_building_inventory() -> list[dict]:
+    """Inventario de demostración determinista, compartible fuera de React."""
+    units = []
+    for floor in range(1, 19):
+        for final, typology in enumerate(BUILDING_TYPES, 1):
+            code = str(floor * 100 + final)
+            area = typology["privateAreaM2"] + (8 if floor > 16 else 0)
+            status = "reserved" if code in BUILDING_RESERVED else "sold" if code in BUILDING_SOLD else "available"
+            price = typology["base"] + floor * 35000 + (120000 if typology["viewType"] == "sea" else 0) + (150000 if floor > 16 else 0)
+            units.append({"id": f"unit-{code}", "code": code, "projectId": "garden_house_18", "buildingId": "garden-house-tower", "towerId": "A", "floor": floor, "status": status, **{key: value for key, value in typology.items() if key != "base"}, "totalAreaM2": round(area * 1.22), "privateAreaM2": area, "priceBRL": price, "modelObjectId": f"UNIT_{code}_PROXY", "published": True, "updatedAt": "2026-09-12T00:00:00Z"})
+    return units
+
 
 def load_catalog_config(filename: Path | None, root: Path) -> dict:
     value = yaml.safe_load(filename.read_text(encoding="utf-8")) if filename else DEFAULT_CATALOG
@@ -57,6 +79,7 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
         result = export_maquette(bundle, project_destination, profile)
         # Cada proyecto sólo necesita datos; el cliente se comparte en la raíz.
         shutil.rmtree(project_destination / "assets", ignore_errors=True)
+        shutil.rmtree(project_destination / "building", ignore_errors=True)
         (project_destination / "index.html").unlink(missing_ok=True)
         public_projects.append({
             "id": declared["id"], "name": declared["name"], "variant": declared["variant"],
@@ -66,7 +89,11 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
             "thumbnail": f"projects/{declared['id']}/data/miniatura.svg",
             "bytes": result["bytes"],
         })
-    manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "projects": public_projects}
+    building_dir = staging / "building"
+    building_dir.mkdir(exist_ok=True)
+    inventory = build_building_inventory()
+    (building_dir / "inventory.json").write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "defaultView": "building", "building": {"model": "building/xixova-building.glb", "inventory": "building/inventory.json", "visualModes": ["neutral_day", "warm_dusk"], "statistics": "building/asset-statistics.json", "residentialFloors": 18, "units": 72, "provisional": True}, "projects": public_projects}
     (staging / "catalog.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     # `vercel --cwd <destino>` guarda aquí el vínculo del proyecto. Es estado
     # local, no un artefacto de la publicación, y debe sobrevivir al reemplazo
@@ -80,4 +107,4 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
     return {"ok": True, "salida": str(destination), "proyectos": len(public_projects), "catalogo": str(destination / "catalog.json")}
 
 
-__all__ = ["export_catalog", "load_catalog_config", "serve"]
+__all__ = ["build_building_inventory", "export_catalog", "load_catalog_config", "serve"]

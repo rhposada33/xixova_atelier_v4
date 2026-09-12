@@ -1,0 +1,17 @@
+/* Final visual balance for the building overview; mobile retains its compact panels. */
+.b-range input {appearance:none;background:transparent;height:18px}
+.b-range input::-webkit-slider-runnable-track {height:5px;background:#6f8972;border-radius:4px}
+.b-range input::-webkit-slider-thumb {appearance:none;width:17px;height:17px;margin-top:-6px;background:#b48029;border:1.5px solid #fffdf6;border-radius:50%}
+.b-range input::-moz-range-track {height:5px;background:#6f8972;border-radius:4px}
+.b-range input::-moz-range-thumb {width:15px;height:15px;background:#b48029;border:1.5px solid #fffdf6;border-radius:50%}
+@media (min-width:1251px) and (min-height:851px) {
+  .building-layout {grid-template-columns:286px minmax(0,1fr) 365px}
+  .building-filters h1 {font-size:31px;line-height:1.12;letter-spacing:-1.3px}
+  .building-filters fieldset {padding-top:11px;padding-bottom:11px;margin-bottom:10px}
+  .b-preferences {margin:9px 0}
+  .b-preferences button {padding:4px 7px}
+  .b-result-count {margin-top:18px;padding-top:15px}
+  .b-legend {gap:12px}
+  .b-card-heading h2 {font-size:31px}
+  .b-camera-tools {bottom:18px;padding:12px 17px}
+}

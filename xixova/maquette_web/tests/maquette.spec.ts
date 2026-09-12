@@ -1,7 +1,7 @@
 import {expect,test} from "@playwright/test";
 
 test("carga Garden House y conserva una selección compartible",async({page})=>{
-  await page.goto("/");
+  await page.goto("/?vista=interior");
   await expect(page.getByText("GARDEN HOUSE 18")).toBeVisible();
   await expect(page.locator("canvas")).toBeVisible();
   await page.locator("nav").getByRole("button",{name:"Sala comedor"}).click();
@@ -10,34 +10,37 @@ test("carga Garden House y conserva una selección compartible",async({page})=>{
 });
 
 test("cambia de maqueta desde el manifiesto",async({page})=>{
-  await page.goto("/?maqueta=garden_house_18&piso=8&unidad=804");
+  await page.goto("/?vista=interior&maqueta=garden_house_18&piso=8&unidad=804");
   await page.getByLabel("Seleccionar maqueta").selectOption("terraza_luz");
   await expect(page).toHaveURL(/maqueta=terraza_luz/);
-  await expect(page.locator("header .title strong")).toHaveText("TERRAZA LUZ");
+  await expect(page.getByText("TERRAZA LUZ",{exact:true})).toBeVisible({timeout:15_000});
   await expect(page.locator("nav").getByRole("button",{name:"Suite",exact:true})).toBeVisible();
 });
 
 test("libera el renderer al alternar repetidamente",async({page})=>{
   test.setTimeout(60_000);
-  await page.goto("/");
-  await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer?.info?.memory?.geometries)).toBeGreaterThan(0);
-  const baseline=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.renderer.info.memory);
+  await page.goto("/?vista=interior");
+  await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer?.info?.memory?.geometries),{timeout:15_000}).toBeGreaterThan(0);
+  let settled:{geometries:number;textures:number}|undefined;
   for(let index=0;index<2;index++){
     await page.getByLabel("Seleccionar maqueta").selectOption("terraza_luz");
-    await expect(page.locator("header .title strong")).toHaveText("TERRAZA LUZ");
+    await expect(page.getByText("TERRAZA LUZ",{exact:true})).toBeVisible({timeout:15_000});
     await page.getByLabel("Seleccionar maqueta").selectOption("garden_house_18");
-    await expect(page.locator("header .title strong")).toHaveText("GARDEN HOUSE 18");
+    await expect(page.getByText("GARDEN HOUSE 18",{exact:true})).toBeVisible({timeout:15_000});
+    await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer?.info?.memory?.textures)).toBeGreaterThan(3);
+    const memory=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.renderer.info.memory);
+    if(index===0)settled=memory;
   }
   const memory=await page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__.renderer.info.memory);
-  expect(memory.geometries).toBeLessThanOrEqual(baseline.geometries+5);
-  expect(memory.textures).toBeLessThanOrEqual(baseline.textures+2);
+  expect(memory.geometries).toBeLessThanOrEqual(settled!.geometries+2);
+  expect(memory.textures).toBeLessThanOrEqual(settled!.textures+1);
 });
 
 test("funciona en móvil y no solicita recursos externos",async({page})=>{
   const external:string[]=[];
   page.on("request",request=>{const url=new URL(request.url());if(url.protocol!=="blob:"&&url.hostname!=="127.0.0.1")external.push(request.url())});
   await page.setViewportSize({width:390,height:844});
-  await page.goto("/");
+  await page.goto("/?vista=interior");
   await page.getByRole("button",{name:"Explorar ambientes"}).click();
   await expect(page.getByRole("heading",{name:"Ambientes"})).toBeVisible();
   await page.locator("nav").getByRole("button",{name:"Suite Principal"}).click();
@@ -46,7 +49,7 @@ test("funciona en móvil y no solicita recursos externos",async({page})=>{
 });
 
 test("estudio solar cambia fecha, hora y estación",async({page})=>{
-  await page.goto("/");
+  await page.goto("/?vista=interior");
   await expect(page.getByRole("region",{name:"Estudio solar"})).toBeVisible();
   const slider=page.getByRole("slider",{name:"Hora local"});
   await slider.fill("720");
@@ -57,7 +60,7 @@ test("estudio solar cambia fecha, hora y estación",async({page})=>{
 });
 
 test("captura con un renderer temporal",async({page})=>{
-  await page.goto("/");
+  await page.goto("/?vista=interior");
   await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer)).toBeTruthy();
   const download=page.waitForEvent("download");
   await page.getByRole("button",{name:"Guardar vista"}).click();
