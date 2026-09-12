@@ -1059,7 +1059,9 @@ function App() {
     [labels, setLabels] = useState(false),
     [tour, setTour] = useState(false),
     [menu, setMenu] = useState(false),
-    [solarOpen, setSolarOpen] = useState(true),
+    [solarOpen, setSolarOpen] = useState(() =>
+      window.matchMedia("(min-width: 761px)").matches,
+    ),
     [exposure, setExposure] = useState<RoomSunlightResult[]>([]),
     [error, setError] = useState("");
   useEffect(() => {
@@ -1422,6 +1424,7 @@ function Ready(p: any) {
               calibration={d.solar.calibrationStatus}
               rooms={p.exposure}
               names={new Map(d.espacios.map((x: any) => [x.id, x.nombre]))}
+              onClose={() => p.setSolarOpen(false)}
             />
           ) : (
             <div className="explore-panel">

@@ -68,6 +68,12 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
         })
     manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "projects": public_projects}
     (staging / "catalog.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    # `vercel --cwd <destino>` guarda aquí el vínculo del proyecto. Es estado
+    # local, no un artefacto de la publicación, y debe sobrevivir al reemplazo
+    # atómico para que los siguientes despliegues manuales no pidan relink.
+    vercel_link = destination / ".vercel"
+    if vercel_link.is_dir():
+        shutil.copytree(vercel_link, staging / ".vercel")
     if destination.exists():
         shutil.rmtree(destination)
     staging.replace(destination)
