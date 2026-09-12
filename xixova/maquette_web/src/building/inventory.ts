@@ -30,8 +30,8 @@ export const inventory:BuildingUnit[]=Array.from({length:buildingConfig.floors},
       orientation:type.orientation,viewType:type.view,priceBRL:type.base+floor*35000+(type.view==='sea'?120000:0)+(floor>16?150000:0),
       modelObjectId:`UNIT_${code}_PROXY`,interiorProjectId:i===0||i===3?'garden_house_18':'terraza_luz',published:true,updatedAt:buildingConfig.updatedAt};
   })).flat();
-export const statusLabel:Record<UnitAvailability,string>={available:'Disponible',reserved:'Reservada',sold:'Vendida'};
-export const orientationLabel:Record<Orientation,string>={north:'Norte',northeast:'Nordeste',east:'Este',southeast:'Sudeste',south:'Sur',southwest:'Sudoeste',west:'Oeste',northwest:'Noroeste'};
+export const statusLabel:Record<UnitAvailability,string>={available:'Disponível',reserved:'Reservada',sold:'Vendida'};
+export const orientationLabel:Record<Orientation,string>={north:'Norte',northeast:'Nordeste',east:'Leste',southeast:'Sudeste',south:'Sul',southwest:'Sudoeste',west:'Oeste',northwest:'Noroeste'};
 export const formatBRL=(value:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(value);
 export const isMorning=(u:BuildingUnit)=>['east','northeast','southeast'].includes(u.orientation);
 export interface UnitFilters {minPrice:number;maxPrice:number;floor:string;minArea:number;maxArea:number;orientation:string;bedrooms:number;sun:string;sea:boolean;}

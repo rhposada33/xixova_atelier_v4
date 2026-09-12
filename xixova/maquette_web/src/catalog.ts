@@ -3,14 +3,14 @@ import type { CatalogManifest, CatalogProject, SceneData } from "./contracts";
 const absolute=(path:string)=>new URL(path,document.baseURI).toString();
 export async function loadCatalog():Promise<CatalogManifest>{
   const response=await fetch(absolute("catalog.json"));
-  if(!response.ok)throw new Error("No se pudo abrir el catálogo");
+  if(!response.ok)throw new Error("Não foi possível abrir o catálogo");
   const value=await response.json() as CatalogManifest;
-  if(value.schema!==1||!value.projects?.length)throw new Error("Catálogo incompatible");
+  if(value.schema!==1||!value.projects?.length)throw new Error("Catálogo incompatível");
   return value;
 }
 export async function loadScene(project:CatalogProject):Promise<SceneData>{
   const response=await fetch(absolute(project.scene));
-  if(!response.ok)throw new Error(`No se pudo abrir ${project.name}`);
+  if(!response.ok)throw new Error(`Não foi possível abrir ${project.name}`);
   const scene=await response.json() as SceneData;
   const projectRoot=new URL("../",absolute(project.scene));
   if(scene.web_assets)Object.values(scene.web_assets.niveles).forEach(level=>level.url=new URL(level.url,projectRoot).toString());

@@ -12,7 +12,7 @@ export function validateSolarConfig(value:unknown):string[]{
  if(!c.location||c.location.latitude < -90||c.location.latitude > 90)errors.push('Latitud fuera de -90° a 90°.');
  if(!c.location||c.location.longitude < -180||c.location.longitude > 180)errors.push('Longitud fuera de -180° a 180°.');
  try{new Intl.DateTimeFormat('es',{timeZone:c.location?.timezone}).format()}catch{errors.push('Zona horaria IANA desconocida.');}
- if(!c.building||!Number.isFinite(c.building.northOffsetDegrees)||c.building.northOffsetDegrees < -360||c.building.northOffsetDegrees > 360)errors.push('Orientación fuera de -360° a 360°.');
+ if(!c.building||!Number.isFinite(c.building.northOffsetDegrees)||c.building.northOffsetDegrees < -360||c.building.northOffsetDegrees > 360)errors.push('Orientação fora de -360° a 360°.');
  if((c.unit?.elevationMeters??0)<0)errors.push('La elevación de la unidad no puede ser negativa.');
  if((c.exposureThreshold??.2)<=0||(c.exposureThreshold??.2)>1)errors.push('El umbral de exposición debe estar entre 0 y 1.');
  return errors;

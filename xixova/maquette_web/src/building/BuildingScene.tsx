@@ -15,9 +15,9 @@ export function BuildingScene(props:Props){
   useEffect(()=>{
     const el=host.current!;
     let renderer:THREE.WebGLRenderer;
-    try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});}catch{setError('Tu navegador no pudo iniciar 3D. Puedes seleccionar todas las unidades desde la matriz.');setLoading(false);return;}
+    try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});}catch{setError('Seu navegador não conseguiu iniciar o 3D. Você pode selecionar todas as unidades pela matriz.');setLoading(false);return;}
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
-    renderer.domElement.setAttribute('aria-label','Maqueta 3D del edificio. Arrastra para rotar y usa la rueda para acercar. También puedes seleccionar unidades desde la matriz.');renderer.domElement.tabIndex=0;
+    renderer.domElement.setAttribute('aria-label','Maquete 3D do edifício. Arraste para girar e use a roda para aproximar. Você também pode selecionar unidades pela matriz.');renderer.domElement.tabIndex=0;
     el.appendChild(renderer.domElement);
     const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.1,500);
     const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=30;controls.maxDistance=180;controls.maxPolarAngle=Math.PI*.53;controls.minPolarAngle=.45;controls.enablePan=true;
@@ -46,7 +46,7 @@ export function BuildingScene(props:Props){
           for(const m of Array.isArray(o.material)?o.material:[o.material])if(m instanceof THREE.MeshStandardMaterial){m.envMapIntensity=.8;if(o.name.includes('leaf'))m.side=THREE.DoubleSide;if(o.name.endsWith('_glass')){m.transparent=true;m.opacity=.48;m.depthWrite=false;m.color.set('#a0b6bc');}if(o.name.endsWith('_light'))m.emissiveIntensity=3.8;}
         }
       });scene.add(model);setLoading(false);
-    },undefined,()=>{setError('No se pudo cargar la maqueta. Recarga la página o explora la matriz de unidades.');setLoading(false);});
+    },undefined,()=>{setError('Não foi possível carregar a maquete. Recarregue a página ou explore a matriz de unidades.');setLoading(false);});
     const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down={x:0,y:0};
     const hit=(event:PointerEvent)=>{const rect=el.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObjects(proxies,false)[0]?.object.userData.unit as BuildingUnit|undefined;};
     const onMove=(event:PointerEvent)=>{if(event.buttons)return;const unit=hit(event),rect=el.getBoundingClientRect();el.style.cursor=unit?'pointer':'grab';setHover(unit?{unit,x:Math.min(event.clientX-rect.left+14,rect.width-205),y:Math.max(10,event.clientY-rect.top-95)}:null);};
@@ -71,9 +71,9 @@ export function BuildingScene(props:Props){
   useEffect(()=>{engine.current?.command(props.command.type);},[props.command]);
   useEffect(()=>{engine.current?.select(props.selected.code);},[props.selected.code]);
   return <div className={`building-stage ${props.mode}`} ref={host}>
-    {loading&&<div className="building-loading"><span className="building-spinner"/>Preparando tu próximo hogar…</div>}
+    {loading&&<div className="building-loading"><span className="building-spinner"/>Preparando seu novo lar…</div>}
     {error&&<div className="building-error" role="alert">{error}</div>}
     {!loading&&!error&&<div ref={label} className="building-unit-label">{props.selected.code}<span/></div>}
-    {hover&&<div className="building-tooltip" style={{left:hover.x,top:hover.y}}><strong>Unidad {hover.unit.code}</strong><span>{hover.unit.privateAreaM2} m² · {hover.unit.bedrooms} dormitorios</span><small>{statusLabel[hover.unit.status]}</small></div>}
+    {hover&&<div className="building-tooltip" style={{left:hover.x,top:hover.y}}><strong>Unidade {hover.unit.code}</strong><span>{hover.unit.privateAreaM2} m² · {hover.unit.bedrooms} dormitórios</span><small>{statusLabel[hover.unit.status]}</small></div>}
   </div>;
 }

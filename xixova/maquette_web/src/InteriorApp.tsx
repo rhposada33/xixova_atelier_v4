@@ -18,6 +18,16 @@ import { gardenDetails } from "./garden";
 import type { CatalogManifest, CatalogProject, SceneData, SceneElement, WallMode } from "./contracts";
 import { loadCatalog, loadScene, selectionFromURL, updateSelection } from "./catalog";
 import "./atelier.css";
+const roomNamePT=(name:string)=>({
+  "Terraza Jardin":"Terraço Jardim","Terraza Jardín":"Terraço Jardim","Entrada":"Entrada","Lavanderia":"Lavanderia",
+  "Baño social":"Banheiro social","Baño Social":"Banheiro social","Baño 2":"Banheiro 2","Baño 3":"Banheiro 3","Cocina":"Cozinha","Cocina gourmet":"Cozinha gourmet",
+  "Dormitorio Secundario":"Dormitório secundário","Dormitorio secundario":"Dormitório secundário","Circulación":"Circulação",
+  "Baño Suite":"Banheiro da suíte","Baño suite 2":"Banheiro da suíte 2","Baño suite 3":"Banheiro da suíte 3",
+  "Baño principal":"Banheiro principal","Baño Principal":"Banheiro principal","Suite":"Suíte","Suite 2":"Suíte 2","Suite 3":"Suíte 3","Suite principal":"Suíte principal","Suite Principal":"Suíte principal","Sala comedor":"Sala de jantar",
+  "Sala Comedor":"Sala de jantar","Sala de TV":"Sala de TV","Sala Tv":"Sala de TV","Oficina":"Escritório","Vestidor":"Closet","Vestidor principal":"Closet principal","Despensa":"Despensa",
+  "Vestibulo":"Vestíbulo","Pasillo":"Corredor","Terraza Frente":"Terraço frontal","Terraza Gourmet":"Terraço gourmet","Terraza Lateral":"Terraço lateral","Terraza · estar exterior":"Terraço · estar externo","Terraza gourmet":"Terraço gourmet",
+  "Terraza · jardín lateral":"Terraço · jardim lateral",
+}[name]??name);
 const runtime: { current: any } = { current: null };
 const color = (c: string) =>
   c.includes("cama")
@@ -301,7 +311,7 @@ function Viewer({
       objects.set(room.id, floor);
       const label = document.createElement("button");
       label.className = "label";
-      label.textContent = room.nombre;
+      label.textContent = roomNamePT(room.nombre);
       label.dataset.id = room.id;
       label.onclick = () => onSelect(room.id);
       labelRoot.append(label);
@@ -410,7 +420,7 @@ function Viewer({
         ),
         progress = document.createElement("div");
       progress.className = "detail-progress";
-      progress.textContent = "Preparando detalles";
+      progress.textContent = "Preparando detalhes";
       el.append(progress);
       const load = (index: number) => {
         if (disposed) return;
@@ -517,17 +527,17 @@ function Viewer({
               el.dataset.quality = level;
               progress.textContent =
                 index === order.length - 1
-                  ? "Detalles completos"
-                  : "Vista lista · afinando materiales";
+                  ? "Detalhes completos"
+                  : "Visualização pronta · ajustando materiais";
               if (index === 0 && order.length > 1) {
-                progress.textContent = "Vista lista";
+                progress.textContent = "Visualização pronta";
                 loadTimers.push(
                   window.setTimeout(() => progress.remove(), 1200),
                 );
                 if (runtime.current)
                   runtime.current.upgrade = () => {
                     el.append(progress);
-                    progress.textContent = "Preparando materiales HD";
+                    progress.textContent = "Preparando materiais HD";
                     load(index + 1);
                     runtime.current.upgrade = null;
                   };
@@ -536,10 +546,10 @@ function Viewer({
             },
             (xhr) => {
               if (xhr.total)
-                progress.textContent = `Preparando detalles · ${Math.round((xhr.loaded / xhr.total) * 100)}%`;
+                progress.textContent = `Preparando detalhes · ${Math.round((xhr.loaded / xhr.total) * 100)}%`;
             },
             () => {
-              progress.textContent = `No se pudo cargar ${level}`;
+              progress.textContent = `Não foi possível carregar ${level}`;
               loadTimers.push(window.setTimeout(() => load(index + 1), 500));
             },
           );
@@ -913,7 +923,7 @@ function Viewer({
     );
     const sl = document.querySelector(".sun-position-label");
     if (sl)
-      sl.textContent = `${String(Math.floor(solar.minutes / 60)).padStart(2, "0")}:${String(Math.round(solar.minutes) % 60).padStart(2, "0")} · ${["Norte", "Este", "Sur", "Oeste"][Math.round(solar.position.azimuthDegrees / 90) % 4]}`;
+      sl.textContent = `${String(Math.floor(solar.minutes / 60)).padStart(2, "0")}:${String(Math.round(solar.minutes) % 60).padStart(2, "0")} · ${["Norte", "Leste", "Sur", "Oeste"][Math.round(solar.position.azimuthDegrees / 90) % 4]}`;
     const run = () => {
         last.current = performance.now();
         const values = r.analyzer.analyze(
@@ -944,7 +954,7 @@ function Viewer({
       {data.solar?.enabled && (
         <div
           className="compass"
-          title="Norte verdadero según la orientación configurada"
+          title="Norte verdadeiro conforme a orientação configurada"
         >
           <i
             style={{
@@ -964,27 +974,27 @@ function Viewer({
           ⌂
         </button>
         <button
-          aria-label="Girar 45 grados"
+          aria-label="Girar 45 graus"
           onClick={() => runtime.current?.rotate45()}
         >
           ↻ 45°
         </button>
         <button
-          aria-label="Cargar materiales de alta definición"
-          title="Materiales HD"
+          aria-label="Carregar materiais em alta definição"
+          title="Materiais HD"
           onClick={() => runtime.current?.upgrade?.()}
         >
           HD
         </button>
         <button
-          aria-label="Guardar imagen"
+          aria-label="Salvar imagem"
           onClick={() => runtime.current?.capture()}
         >
           ▣
         </button>
       </div>
       <div className="simulation-badge">
-        <span>ⓘ</span> Vista simulada
+        <span>ⓘ</span> Visualização simulada
       </div>
       <div className="sun-journey" aria-hidden="true">
         <svg viewBox="0 0 1400 400" preserveAspectRatio="none">
@@ -993,9 +1003,9 @@ function Viewer({
         <span className="dawn">
           ☀
           <small>
-            Este
+            Leste
             <br />
-            Amanecer
+            Nascer do sol
           </small>
         </span>
         <span className="dusk">
@@ -1003,7 +1013,7 @@ function Viewer({
           <small>
             Oeste
             <br />
-            Atardecer
+            Entardecer
           </small>
         </span>
         <span className="sun-now">
@@ -1012,7 +1022,7 @@ function Viewer({
         </span>
       </div>
       <div className="hint">
-        Arrastra para rotar · Rueda para acercar · Selecciona para explorar
+        Arraste para girar · Use a roda para aproximar · Selecione para explorar
       </div>
     </div>
   );
@@ -1104,7 +1114,7 @@ function App() {
     return (
       <main className="loading">
         <b>XV</b>
-        <span>{error || "Preparando tu próximo hogar…"}</span>
+        <span>{error || "Preparando seu novo lar…"}</span>
         {error && <button onClick={() => location.reload()}>Reintentar</button>}
       </main>
     );
@@ -1288,18 +1298,18 @@ function Ready(p: any) {
           <b>XV</b>
           <span>
             <strong>XIXOVÁ</strong>
-            <small>MAQUETA INTERACTIVA</small>
+            <small>MAQUETE INTERATIVA</small>
           </span>
         </div>
         <div className="title">
           <strong>{d.nombre.toUpperCase()}</strong>
-          <small>Lujo contemporáneo</small>
+          <small>Luxo contemporâneo</small>
         </div>
         <div className="project-selectors">
           <label>
-            <span>Maqueta</span>
+            <span>Maquete</span>
             <select
-              aria-label="Seleccionar maqueta"
+              aria-label="Selecionar maquete"
               value={p.project}
               onChange={(e) => p.switchProject(e.target.value)}
             >
@@ -1307,32 +1317,32 @@ function Ready(p: any) {
             </select>
           </label>
           <label>
-            <span>Piso</span>
+            <span>Andar</span>
             <select
-              aria-label="Seleccionar piso"
+              aria-label="Selecionar andar"
               value={p.floor}
               onChange={(e) => p.setFloor(+e.target.value)}
             >
               {activeProject.floors.map((n) => (
                 <option key={n} value={n}>
-                  Piso {n}
+                  Andar {n}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            <span>Unidad</span>
+            <span>Unidade</span>
             <select
-              aria-label="Seleccionar unidad"
+              aria-label="Selecionar unidade"
               value={p.unit}
               onChange={(e) => {
                 p.setUnit(e.target.value);
-                setNotice("Unidad " + e.target.value + " · misma tipología");
+                setNotice("Unidade " + e.target.value + " · mesma tipologia");
               }}
             >
               {activeProject.units.map((n) => (
                 <option key={n} value={p.floor + n}>
-                  Unidad {p.floor + n}
+                  Unidade {p.floor + n}
                 </option>
               ))}
             </select>
@@ -1340,28 +1350,28 @@ function Ready(p: any) {
         </div>
         <div className="header-actions">
           <button
-            aria-label="Guardar favorito"
+            aria-label="Salvar favorito"
             className={favorite ? "is-favorite" : ""}
             onClick={() => setFavorite(!favorite)}
           >
             <Icon name="heart" />
-            <span>{favorite ? "Guardado" : "Favoritos"}</span>
+            <span>{favorite ? "Salvo" : "Favoritos"}</span>
           </button>
           <button
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(location.href);
-                setNotice("Enlace copiado");
+                setNotice("Link copiado");
               } catch {
                 setNotice(location.href);
               }
             }}
           >
             <Icon name="pin" />
-            <span>Compartir</span>
+            <span>Compartilhar</span>
           </button>
           <button className="gold" onClick={() => setProposal(true)}>
-            Solicitar propuesta
+            Solicitar proposta
           </button>
         </div>
         <button
@@ -1376,15 +1386,15 @@ function Ready(p: any) {
         <aside className={p.menu ? "open" : ""}>
           <h2>Ambientes</h2>
           <p>
-            Selecciona un ambiente para
+            Selecione um ambiente para
             <br />
-            explorar en detalle.
+            explorar em detalhes.
           </p>
           <MiniPlan data={d} selected={p.selected} onSelect={p.choose} />
           <nav>
             {d.espacios.map((r: any) => (
               <button
-                aria-label={r.nombre}
+                aria-label={roomNamePT(r.nombre)}
                 className={p.selected === r.id ? "active" : ""}
                 key={r.id}
                 onClick={() => {
@@ -1393,7 +1403,7 @@ function Ready(p: any) {
                 }}
               >
                 <Icon name={roomIcon(r.id)} />
-                <span>{r.nombre}</span>
+                <span>{roomNamePT(r.nombre)}</span>
                 <b>›</b>
               </button>
             ))}
@@ -1406,7 +1416,7 @@ function Ready(p: any) {
             }}
           >
             <Icon name="home" />
-            Ver proyecto completo
+            Ver projeto completo
           </button>
         </aside>
         <Viewer
@@ -1425,35 +1435,35 @@ function Ready(p: any) {
               timezone={d.solar.location.timezone}
               calibration={d.solar.calibrationStatus}
               rooms={p.exposure}
-              names={new Map(d.espacios.map((x: any) => [x.id, x.nombre]))}
+              names={new Map(d.espacios.map((x: any) => [x.id, roomNamePT(x.nombre)]))}
               onClose={() => p.setSolarOpen(false)}
             />
           ) : (
             <div className="explore-panel">
-              <h2>Tu hogar, en detalle</h2>
-              <p>Explora cada ambiente y descubre sus proporciones.</p>
+              <h2>Seu lar em detalhes</h2>
+              <p>Explore cada ambiente e descubra suas proporções.</p>
               <button onClick={() => p.setSolarOpen(true)}>
-                <Icon name="sun" /> Iluminación natural
+                <Icon name="sun" /> Iluminação natural
               </button>
               <label>
-                Visualización de paredes
+                Visualização das paredes
                 <select
-                  aria-label="Modo de paredes"
+                  aria-label="Modo das paredes"
                   value={p.wallMode}
                   onChange={(e) => p.setWallMode(e.target.value)}
                 >
-                  <option value="inteligentes">Corte arquitectónico</option>
-                  <option value="todas">Altura completa</option>
-                  <option value="ocultas">Sin paredes</option>
+                  <option value="inteligentes">Corte arquitetônico</option>
+                  <option value="todas">Altura total</option>
+                  <option value="ocultas">Sem paredes</option>
                 </select>
               </label>
             </div>
           )}
           <article className="unit-card">
             <div>
-              <h2>{item?.nombre || "Unidad " + p.unit}</h2>
+              <h2>{item ? roomNamePT(item.nombre) : "Unidade " + p.unit}</h2>
               <span className="available">
-                {item ? "Ambiente" : "Tipología Garden"}
+                {item ? "Ambiente" : "Tipologia Garden"}
               </span>
             </div>
             <div className="unit-facts">
@@ -1472,11 +1482,11 @@ function Ready(p: any) {
                 <Icon name="bed" />
                 {d.proyecto === "garden_house_18"
                   ? "3 suites"
-                  : "2 habitaciones"}
+                  : "2 dormitórios"}
               </span>
               <span>
                 <Icon name="layers" />
-                Piso {p.floor}
+                Andar {p.floor}
               </span>
             </div>
             <p className="plan-dimensions">
@@ -1485,12 +1495,12 @@ function Ready(p: any) {
                 : "Terraza Luz"}
               <small>
                 {d.proyecto === "garden_house_18"
-                  ? "Terraza envolvente de 2,40 m"
+                  ? "Terraço perimetral de 2,40 m"
                   : "Arquitectura · naturaleza · luz"}
               </small>
             </p>
             <button className="proposal" onClick={() => setProposal(true)}>
-              Solicitar propuesta <span>→</span>
+              Solicitar proposta <span>→</span>
             </button>
           </article>
         </aside>
@@ -1516,7 +1526,7 @@ function Ready(p: any) {
         </button>
         <button className={furnished ? "active" : ""} onClick={furniture}>
           <Icon name="sofa" />
-          <span>Amueblado</span>
+          <span>Mobiliado</span>
         </button>
         <button
           className={measure ? "active" : ""}
@@ -1533,32 +1543,32 @@ function Ready(p: any) {
           onClick={() => p.setSolarOpen(!p.solarOpen)}
         >
           <Icon name="sun" />
-          <span>Iluminación</span>
+          <span>Iluminação</span>
         </button>
         <button
           onClick={() => {
             runtime.current?.capture();
-            setNotice("Vista guardada");
+            setNotice("Visualização salva");
           }}
         >
           <Icon name="eye" />
-          <span>Guardar vista</span>
+          <span>Salvar visualização</span>
         </button>
         <button
           onClick={() => {
             runtime.current?.focus();
-            setNotice("Orientación norte · São Paulo");
+            setNotice("Orientação norte · São Paulo");
           }}
         >
           <Icon name="pin" />
-          <span>Entorno</span>
+          <span>Arredores</span>
         </button>
       </div>
       {measure && (
         <div className="measure-readout">
           {d.proyecto === "garden_house_18"
-            ? "18,00 m × 13,00 m · Terraza 2,40 m"
-            : "Selecciona un ambiente para ver su superficie"}
+            ? "18,00 m × 13,00 m · Terraço 2,40 m"
+            : "Selecione um ambiente para ver sua área"}
         </div>
       )}
       {notice && (
@@ -1572,33 +1582,32 @@ function Ready(p: any) {
             className="proposal-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="Solicitar propuesta"
+            aria-label="Solicitar proposta"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               className="close-modal"
-              aria-label="Cerrar"
+              aria-label="Fechar"
               onClick={() => setProposal(false)}
             >
               ×
             </button>
-            <small>XIXOVÁ · TU PRÓXIMO HOGAR</small>
+            <small>XIXOVÁ · SEU PRÓXIMO LAR</small>
             <h2>
-              {d.nombre} · Unidad {p.unit}
+              {d.nombre} · Unidade {p.unit}
             </h2>
             <p>
-              Guarda la ficha de esta tipología para conversar con tu asesor. La
-              disponibilidad y el precio se confirman con el proyecto.
+              Salve a ficha desta tipologia para conversar com seu consultor. A disponibilidade e o preço devem ser confirmados com o projeto.
             </p>
             <button
               className="proposal"
               onClick={() => {
                 runtime.current?.capture();
-                setNotice("Ficha visual guardada");
+                setNotice("Ficha visual salva");
                 setProposal(false);
               }}
             >
-              Guardar ficha de la unidad →
+              Salvar ficha da unidade →
             </button>
           </section>
         </div>
