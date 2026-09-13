@@ -1256,6 +1256,15 @@ function Ready(p: any) {
     const t = setTimeout(() => setNotice(""), 3200);
     return () => clearTimeout(t);
   }, [notice]);
+  const openWhatsApp = () => {
+    const message = [
+      `Olá! Tenho interesse na Unidade ${p.unit} do Escobar Residences.`,
+      `Tipologia ilustrativa: ${d.nombre}`,
+      `Andar: ${p.floor}`,
+      `Link: ${location.href}`,
+    ].join("\n");
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  };
   const roomIcon = (id: string) =>
     /suite/.test(id)
       ? "bed"
@@ -1371,7 +1380,7 @@ function Ready(p: any) {
             <span>Compartilhar</span>
           </button>
           <button className="gold" onClick={() => setProposal(true)}>
-            Solicitar proposta
+            Falar pelo WhatsApp
           </button>
         </div>
         <button
@@ -1500,7 +1509,7 @@ function Ready(p: any) {
               </small>
             </p>
             <button className="proposal" onClick={() => setProposal(true)}>
-              Solicitar proposta <span>→</span>
+              Falar pelo WhatsApp <span>→</span>
             </button>
           </article>
         </aside>
@@ -1582,7 +1591,7 @@ function Ready(p: any) {
             className="proposal-modal"
             role="dialog"
             aria-modal="true"
-            aria-label="Solicitar proposta"
+            aria-label="Falar pelo WhatsApp"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -1597,17 +1606,16 @@ function Ready(p: any) {
               {d.nombre} · Unidade {p.unit}
             </h2>
             <p>
-              Salve a ficha desta tipologia para conversar com seu consultor. A disponibilidade e o preço devem ser confirmados com o projeto.
+              Enviaremos os dados desta tipologia para o WhatsApp. Você poderá revisar a mensagem antes de enviá-la.
             </p>
             <button
               className="proposal"
               onClick={() => {
-                runtime.current?.capture();
-                setNotice("Ficha visual salva");
+                openWhatsApp();
                 setProposal(false);
               }}
             >
-              Salvar ficha da unidade →
+              Continuar no WhatsApp →
             </button>
           </section>
         </div>

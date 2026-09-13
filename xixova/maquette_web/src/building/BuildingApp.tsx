@@ -36,6 +36,16 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
   const save=()=>setSaved(s=>s.includes(selected.code)?s.filter(c=>c!==selected.code):[...s,selected.code]);
   const addCompare=()=>{setCompare(c=>c.includes(selected.code)?c.filter(id=>id!==selected.code):c.length<3?[...c,selected.code]:c);setNotice('Selecione até 3 unidades e abra Comparar.');};
   const reset=()=>setFilters({...defaultFilters});
+  const openWhatsApp=()=>{
+    const message=[
+      `Olá! Tenho interesse na Unidade ${selected.code} do Escobar Residences.`,
+      `Área: ${selected.privateAreaM2} m²`,
+      `Andar: ${selected.floor}`,
+      `Valor ilustrativo: ${formatBRL(selected.priceBRL)}`,
+      `Link: ${location.href}`,
+    ].join('\n');
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');
+  };
   useEffect(()=>{sessionStorage.setItem('xixova-building-filters',JSON.stringify(filters));},[filters]);
   useEffect(()=>{localStorage.setItem('xixova-saved-units',JSON.stringify(saved));},[saved]);
   useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),4500);return()=>clearTimeout(timer);},[notice]);
@@ -46,7 +56,7 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
   return <main className="building-app">
     <header className="building-header"><a href="?" className="building-brand" aria-label="Escobar, edifício"><b>ES</b><span>ESCOBAR<small>VIVER É UMA ARTE</small></span></a>
       <nav aria-label="Navegação do edifício">{['Edifício','Andares','Unidades','Comparar','Arredores'].map((name,i)=><button key={name} className={activeNav===name?'active':''} onClick={()=>i===0?close():open(['','floors','matrix','compare','environment'][i])}>{name}{name==='Comparar'&&compare.length>0?` (${compare.length})`:''}</button>)}</nav>
-      <div className="building-header-actions"><button onClick={()=>open('favorites')}><Icon name="heart"/> <span>Favoritos{saved.length?` (${saved.length})`:''}</span></button><button onClick={async()=>{try{await navigator.clipboard.writeText(location.href);setNotice('Link desta unidade copiado.');}catch{setModal('share');}}}><Icon name="pin"/><span>Compartilhar</span></button><button className="b-gold" disabled={!canPropose(selected)} onClick={()=>open('proposal')}>Solicitar proposta</button></div>
+      <div className="building-header-actions"><button onClick={()=>open('favorites')}><Icon name="heart"/> <span>Favoritos{saved.length?` (${saved.length})`:''}</span></button><button onClick={async()=>{try{await navigator.clipboard.writeText(location.href);setNotice('Link desta unidade copiado.');}catch{setModal('share');}}}><Icon name="pin"/><span>Compartilhar</span></button><button className="b-gold" disabled={!canPropose(selected)} onClick={openWhatsApp}>Falar pelo WhatsApp</button></div>
     </header>
     <div className="building-mobile-tabs"><button onClick={()=>setMobilePanel(m=>m==='filters'?'': 'filters')}>Filtros {filtered?'●':''}</button><button onClick={()=>open('matrix')}>Unidades</button><button onClick={()=>setMobilePanel(m=>m==='detail'?'':'detail')}>Unidade {selected.code}</button></div>
     <div className="building-layout">
@@ -80,7 +90,7 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
           <div className="b-price"><strong>{formatBRL(selected.priceBRL)}</strong><button aria-label={saved.includes(selected.code)?'Remover dos favoritos':'Salvar unidade'} aria-pressed={saved.includes(selected.code)} onClick={save}><Icon name="heart"/></button><small>{formatBRL(Math.round(selected.priceBRL/selected.privateAreaM2))}/m² · Preço ilustrativo</small></div>
           <div className="b-unit-extras">{selected.suites} suites · {selected.parkingSpaces} vagas<br/>{isMorning(selected)?'Sol da manhã':'Sol da tarde'} · {selected.viewType==='sea'?'Vista parcial para o mar':selected.viewType==='city'?'Vista para a cidade':'Vista para o jardim'}</div>
           <button className="b-primary" disabled={!canExplore(selected)} onClick={()=>onExplore(selected)}>{canExplore(selected)?'Ver interior  →':'Interior ainda não disponível'}</button>
-          {canPropose(selected)?<button className="b-outline" onClick={()=>open('proposal')}>Solicitar proposta</button>:<button className="b-outline" onClick={()=>open('similar')}>{selected.status==='reserved'?'Consultar disponibilidade':'Ver unidades semelhantes'}</button>}
+          {canPropose(selected)?<button className="b-outline" onClick={openWhatsApp}>Falar pelo WhatsApp</button>:<button className="b-outline" onClick={()=>open('similar')}>{selected.status==='reserved'?'Consultar disponibilidade':'Ver unidades semelhantes'}</button>}
           <button className="b-compare-link" aria-pressed={compare.includes(selected.code)} onClick={addCompare}>{compare.includes(selected.code)?'✓ Adicionada à comparação':'+ Comparar esta unidade'}</button>
           <p className="b-interior-note"><Icon name="info" size={19}/><span>O interior mostra uma tipologia ilustrativa. Os acabamentos, medidas e mobiliário podem variar conforme a unidade.</span></p>
         </article>
@@ -93,7 +103,6 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
       {['matrix','floors'].includes(modal)&&<><p>Selecione uma unidade para ver sua ficha. Os filtros também são aplicados a esta matriz.</p><div className="b-unit-matrix">{Array.from({length:18},(_,i)=>18-i).map(floor=><div key={floor}><button className="b-matrix-floor" onClick={()=>{change('floor',String(floor));close();}}>Andar {String(floor).padStart(2,'0')}</button>{inventory.filter(u=>u.floor===floor).map(u=><button key={u.code} className={`${u.status} ${u.code===selected.code?'selected':''} ${matches.some(m=>m.code===u.code)?'':'dimmed'}`} onClick={()=>{select(u);close();}} aria-label={`Unidade ${u.code}, ${statusLabel[u.status]}, ${u.privateAreaM2} metros quadrados`}><strong>{u.code}</strong><small>{statusLabel[u.status]}</small></button>)}</div>)}</div></>}
       {modal==='compare'&&(compare.length?<div className="b-comparison">{compare.map(code=>inventory.find(u=>u.code===code)!).map(u=><article key={u.code}><h3>Unidade {u.code}</h3><Status unit={u}/><p>{u.privateAreaM2} m² · {u.bedrooms} dormitórios</p><p>Andar {u.floor} · {orientationLabel[u.orientation]}</p><strong>{formatBRL(u.priceBRL)}</strong><button className="b-outline" onClick={()=>{select(u);close();}}>Ver unidade</button><button onClick={()=>setCompare(c=>c.filter(code=>code!==u.code))}>Remover</button></article>)}</div>:<p>Adicione até três unidades pela ficha para comparar área, dormitórios, orientação e preço.</p>)}
       {['favorites','similar'].includes(modal)&&<div className="b-list">{(modal==='favorites'?inventory.filter(u=>saved.includes(u.code)):similar).map(u=><button key={u.code} onClick={()=>{select(u);close();}}><strong>Unidade {u.code}</strong><Status unit={u}/><span>{u.privateAreaM2} m² · {formatBRL(u.priceBRL)} →</span></button>)}{modal==='favorites'&&!saved.length&&<p>Salve unidades com o coração da ficha para encontrá-las aqui.</p>}</div>}
-      {modal==='proposal'&&<><Status unit={selected}/><p>Esta é uma experiência de demonstração. Ela não realiza reservas nem envia solicitações comerciais.</p><p>Salve os dados para conversar com seu consultor: {selected.privateAreaM2} m², {selected.bedrooms} dormitórios, andar {selected.floor} · {formatBRL(selected.priceBRL)}.</p><button className="b-primary" onClick={()=>{if(!saved.includes(selected.code))setSaved(s=>[...s,selected.code]);close();setNotice('Unidade salva para consultar com seu consultor.');}}>Salvar ficha da unidade</button></>}
       {modal==='environment'&&<><div className="b-environment-art"><Icon name="sun" size={48}/><span>BRISA · LUZ · NATUREZA</span></div><p>Uma interpretação residencial inspirada no litoral brasileiro, com varandas profundas, acesso ajardinado e vegetação tropical.</p><p>A localização e a orientação são provisórias. As preferências de sol e vista ilustram o funcionamento do inventário real; não representam um estudo solar do terreno.</p></>}
       {modal==='share'&&<label>Link da unidade<input className="b-share-input" readOnly value={location.href} onFocus={e=>e.target.select()}/></label>}
     </section></div>}

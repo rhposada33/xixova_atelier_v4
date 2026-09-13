@@ -27,7 +27,7 @@ test('matriz, selección, estados e interior no disponible',async({page})=>{
   await page.getByRole('button',{name:'Ver matriz de unidades'}).click();
   await page.getByRole('button',{name:'Unidade 1302, Vendida, 82 metros quadrados'}).click();
   await expect(page.getByRole('button',{name:'Ver unidades semelhantes'})).toBeVisible();
-  await expect(page.locator('.building-header-actions').getByRole('button',{name:'Solicitar proposta'})).toBeDisabled();
+  await expect(page.locator('.building-header-actions').getByRole('button',{name:'Falar pelo WhatsApp'})).toBeDisabled();
 });
 test('interior se carga al entrar y el regreso conserva filtros y selección',async({page})=>{
   const interiorRequests:string[]=[];
