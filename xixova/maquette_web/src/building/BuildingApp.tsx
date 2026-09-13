@@ -1,6 +1,8 @@
 import {useEffect,useMemo,useState} from 'react';
 import {BuildingScene} from './BuildingScene';
-import {buildingConfig,inventory,defaultFilters,filterUnits,formatBRL,statusLabel,orientationLabel,isMorning,canExplore,canPropose,type BuildingUnit,type UnitFilters} from './inventory';
+import {buildingConfig,defaultFilters,filterUnits,formatBRL,statusLabel,orientationLabel,isMorning,canExplore,canPropose,type BuildingUnit,type UnitFilters} from './inventory';
+import {useProjectInventory,useSelectedUnit} from '../infrastructure/inventory/useInventory';
+import type {InventorySummary} from '../domain/inventory';
 
 function Icon({name,size=24}:{name:string;size?:number}){
  const paths:Record<string,React.ReactNode>={
@@ -27,7 +29,17 @@ const savedInitial=():string[]=>{try{return JSON.parse(localStorage.getItem('xix
 function Status({unit}:{unit:BuildingUnit}){return <span className={`b-status ${unit.status}`}><span>{unit.status==='reserved'?'◷':unit.status==='sold'?'−':'●'}</span>{statusLabel[unit.status]}</span>;}
 
 export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
-  const [filters,setFilters]=useState<UnitFilters>(loadFilters),[selected,setSelected]=useState(()=>inventory.find(u=>u.code===new URLSearchParams(location.search).get('unidad'))||inventory.find(u=>u.code===sessionStorage.getItem('xixova-building-unit'))||inventory.find(u=>u.code===buildingConfig.defaultUnit)!),[mode,setMode]=useState<'neutral_day'|'warm_dusk'>('neutral_day');
+  const state=useProjectInventory(buildingConfig);
+  const requested=new URLSearchParams(location.search).get('unidad')||sessionStorage.getItem('xixova-building-unit');
+  const selection=useSelectedUnit(state.data,buildingConfig,requested);
+  if(state.loading)return <main className="building-app"><div className="building-loading"><span className="building-spinner"/>Carregando unidades disponíveis…</div></main>;
+  if(state.error)return <main className="building-app"><div className="building-error" role="alert"><p>Não foi possível carregar a disponibilidade.</p><button onClick={state.retry}>Tentar novamente</button></div></main>;
+  if(!selection.unit)return <main className="building-app"><div className="building-error" role="status">Este empreendimento não está disponível.</div></main>;
+  return <BuildingExperience inventory={state.data} summary={state.summary} initialSelected={selection.unit} invalidCode={selection.invalidCode} onExplore={onExplore}/>;
+}
+
+function BuildingExperience({inventory,summary,initialSelected,invalidCode,onExplore}:{inventory:BuildingUnit[];summary:InventorySummary;initialSelected:BuildingUnit;invalidCode:boolean;onExplore:(unit:BuildingUnit)=>void}){
+  const [filters,setFilters]=useState<UnitFilters>(loadFilters),[selected,setSelected]=useState(initialSelected),[mode,setMode]=useState<'neutral_day'|'warm_dusk'>('neutral_day');
   const [command,setCommand]=useState({type:'',nonce:0}),[modal,setModal]=useState(''),[notice,setNotice]=useState(''),[saved,setSaved]=useState<string[]>(savedInitial),[compare,setCompare]=useState<string[]>([]),[mobilePanel,setMobilePanel]=useState(''),[activeNav,setActiveNav]=useState('Edifício');
   const matches=useMemo(()=>filterUnits(inventory,filters),[filters]);const filtered=JSON.stringify(filters)!==JSON.stringify(defaultFilters);
   const change=<K extends keyof UnitFilters>(key:K,value:UnitFilters[K])=>setFilters(f=>({...f,[key]:value}));
@@ -49,11 +61,12 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
   };
   useEffect(()=>{sessionStorage.setItem('xixova-building-filters',JSON.stringify(filters));},[filters]);
   useEffect(()=>{localStorage.setItem('xixova-saved-units',JSON.stringify(saved));},[saved]);
+  useEffect(()=>{if(invalidCode){setNotice(`A unidade informada não foi encontrada. Exibindo a unidade ${initialSelected.code}.`);const url=new URL(location.href);url.searchParams.set('unidad',initialSelected.code);history.replaceState(null,'',url);}},[invalidCode,initialSelected.code]);
   useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(''),4500);return()=>clearTimeout(timer);},[notice]);
   useEffect(()=>{if(!modal)return;const sections=[...document.querySelectorAll<HTMLElement>('.building-header,.building-layout,.building-mobile-tabs')];sections.forEach(s=>s.inert=true);const listener=(e:KeyboardEvent)=>{if(e.key==='Escape'){setModal('');setActiveNav('Edifício');}if(e.key==='Tab'){const elements=[...document.querySelectorAll<HTMLElement>('.b-modal button:not(:disabled),.b-modal input,.b-modal a[href]')];const first=elements[0],last=elements.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};window.addEventListener('keydown',listener);return()=>{window.removeEventListener('keydown',listener);sections.forEach(s=>s.inert=false);};},[modal]);
   const open=(name:string)=>{setModal(name);setActiveNav(name==='matrix'?'Unidades':name==='floors'?'Andares':name==='compare'?'Comparar':name==='environment'?'Arredores':'Edifício');};
   const close=()=>{setModal('');setActiveNav('Edifício');};
-  const similar=inventory.filter(u=>u.code!==selected.code&&u.status==='available'&&u.bedrooms===selected.bedrooms).sort((a,b)=>Math.abs(a.priceBRL-selected.priceBRL)-Math.abs(b.priceBRL-selected.priceBRL)).slice(0,6);
+  const similar=inventory.filter(u=>u.code!==selected.code&&u.status==='available'&&u.bedrooms===selected.bedrooms).sort((a,b)=>Math.abs((a.priceBRL??0)-(selected.priceBRL??0))-Math.abs((b.priceBRL??0)-(selected.priceBRL??0))).slice(0,6);
   return <main className="building-app">
     <header className="building-header"><a href="?" className="building-brand" aria-label="Escobar, edifício"><b>ES</b><span>ESCOBAR<small>VIVER É UMA ARTE</small></span></a>
       <nav aria-label="Navegação do edifício">{['Edifício','Andares','Unidades','Comparar','Arredores'].map((name,i)=><button key={name} className={activeNav===name?'active':''} onClick={()=>i===0?close():open(['','floors','matrix','compare','environment'][i])}>{name}{name==='Comparar'&&compare.length>0?` (${compare.length})`:''}</button>)}</nav>
@@ -63,7 +76,7 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
     <div className="building-layout">
       <aside className={`building-filters ${mobilePanel==='filters'?'mobile-open':''}`} aria-label="Filtros de unidades">
         <button className="b-mobile-close" onClick={()=>setMobilePanel('')} aria-label="Fechar filtros"><Icon name="close"/></button>
-        <h1>Encontre seu<br/> apartamento ideal</h1><p className="b-availability"><strong>{inventory.filter(u=>u.status==='available').length}</strong> de {inventory.length} unidades disponíveis</p>
+        <h1>Encontre seu<br/> apartamento ideal</h1><p className="b-availability"><strong>{summary.available}</strong> de {summary.total} unidades disponíveis</p>
         <fieldset><legend>Faixa de preço (R$)</legend><div className="b-range"><input aria-label="Preço mínimo" type="range" min="600000" max="2500000" step="10000" value={filters.minPrice} onChange={e=>change('minPrice',Math.min(+e.target.value,filters.maxPrice))}/><input aria-label="Preço máximo" type="range" min="600000" max="2500000" step="10000" value={filters.maxPrice} onChange={e=>change('maxPrice',Math.max(+e.target.value,filters.minPrice))}/></div><div className="b-range-values"><label><input aria-label="Preço mínimo exato" type="number" min="0" value={filters.minPrice} onChange={e=>change('minPrice',+e.target.value)}/></label><label><input aria-label="Preço máximo exato" type="number" min="0" value={filters.maxPrice} onChange={e=>change('maxPrice',+e.target.value)}/></label></div></fieldset>
         <fieldset><legend>Andar</legend><select aria-label="Andar" value={filters.floor} onChange={e=>change('floor',e.target.value)}><option value="">Todos os andares</option>{Array.from({length:buildingConfig.floors},(_,i)=><option key={i+1} value={i+1}>Andar {i+1}</option>)}</select></fieldset>
         <fieldset><legend>Área (m²)</legend><div className="b-range"><input aria-label="Área mínima" type="range" min="50" max="200" value={filters.minArea} onChange={e=>change('minArea',Math.min(+e.target.value,filters.maxArea))}/><input aria-label="Área máxima" type="range" min="50" max="200" value={filters.maxArea} onChange={e=>change('maxArea',Math.max(+e.target.value,filters.minArea))}/></div><div className="b-range-values"><label><input aria-label="Área mínima exata" type="number" min="0" value={filters.minArea} onChange={e=>change('minArea',+e.target.value)}/><span>m²</span></label><label><input aria-label="Área máxima exata" type="number" min="0" value={filters.maxArea} onChange={e=>change('maxArea',+e.target.value)}/><span>m²</span></label></div></fieldset>
@@ -73,12 +86,12 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
         <button className="b-clear" onClick={reset}><Icon name="clear" size={17}/>Limpar filtros</button>
         <p className="b-result-count" aria-live="polite">{filtered?`${matches.length} unidades correspondem aos seus filtros`:`${inventory.length} unidades no edifício`}</p>
         {matches.length===0&&<p className="b-empty-inline">Não há unidades com esta combinação. Tente ampliar a faixa ou limpar os filtros.</p>}
-        <div className="b-legend">{(['available','reserved','sold'] as const).map(status=><div key={status}><i className={status}/><span>{statusLabel[status]}</span><b>{inventory.filter(u=>u.status===status).length}</b></div>)}</div>
+        <div className="b-legend">{(['available','reserved','sold'] as const).map(status=><div key={status}><i className={status}/><span>{statusLabel[status]}</span><b>{summary[status]}</b></div>)}</div>
         <button className="b-matrix-link" onClick={()=>open('matrix')}><Icon name="matrix" size={16}/>Ver matriz de unidades →</button>
         <small className="b-demo">Inventário de demonstração · Reconstrução aproximada</small>
       </aside>
       <section className="building-view" aria-label="Vista geral do edifício">
-        <BuildingScene selected={selected} matches={matches.map(u=>u.code)} filtered={filtered} mode={mode} onSelect={select} command={command}/>
+        <BuildingScene units={inventory} selected={selected} matches={matches.map(u=>u.code)} filtered={filtered} mode={mode} onSelect={select} command={command}/>
         <div className="b-light-controls"><button className={mode==='neutral_day'?'active':''} aria-pressed={mode==='neutral_day'} onClick={()=>setMode('neutral_day')}><Icon name="sun" size={26}/>Dia</button><button className={mode==='warm_dusk'?'active':''} aria-pressed={mode==='warm_dusk'} onClick={()=>setMode('warm_dusk')}><Icon name="moon" size={24}/>Entardecer</button></div>
         <button className="b-reset-view" onClick={()=>action('reset')}><span><Icon name="reset" size={27}/></span>Restaurar<br/>vista</button>
         <div className="b-camera-tools">{[['rotate','reset','Girar'],['in','zoomin','Aproximar'],['out','zoomout','Afastar'],['reset','home','Vista inicial']].map(([type,icon,title])=><button key={title} onClick={()=>action(type)}><Icon name={icon}/><span>{title}</span></button>)}</div>
@@ -88,7 +101,7 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
         <button className="b-mobile-close" onClick={()=>setMobilePanel('')} aria-label="Fechar ficha"><Icon name="close"/></button>
         <article className="b-unit-card"><div className="b-card-heading"><h2>Unidade {selected.code}</h2><Status unit={selected}/></div><p className="b-floor-subtitle">Andar {selected.floor} · Final {selected.code.slice(-2)}</p>
           <div className="b-unit-facts"><div><i><Icon name="area"/></i><span><strong>{selected.privateAreaM2} m²</strong><small>Área privativa</small></span></div><div><i><Icon name="bed"/></i><span><strong>{selected.bedrooms}</strong><small>Dormitórios</small></span></div><div><i><Icon name="compass"/></i><span><strong>{orientationLabel[selected.orientation]}</strong><small>Orientação</small></span></div><div><i><Icon name="layers"/></i><span><strong>Andar {selected.floor}</strong><small>Do edifício</small></span></div></div>
-          <div className="b-price"><strong>{formatBRL(selected.priceBRL)}</strong><button aria-label={saved.includes(selected.code)?'Remover dos favoritos':'Salvar unidade'} aria-pressed={saved.includes(selected.code)} onClick={save}><Icon name="heart"/></button><small>{formatBRL(Math.round(selected.priceBRL/selected.privateAreaM2))}/m² · Preço ilustrativo</small></div>
+          <div className="b-price"><strong>{formatBRL(selected.priceBRL)}</strong><button aria-label={saved.includes(selected.code)?'Remover dos favoritos':'Salvar unidade'} aria-pressed={saved.includes(selected.code)} onClick={save}><Icon name="heart"/></button><small>{selected.priceBRL===undefined?'Valor sob consulta':`${formatBRL(Math.round(selected.priceBRL/selected.privateAreaM2))}/m² · Preço ilustrativo`}</small></div>
           <div className="b-unit-extras">{selected.suites} suites · {selected.parkingSpaces} vagas<br/>{isMorning(selected)?'Sol da manhã':'Sol da tarde'} · {selected.viewType==='sea'?'Vista parcial para o mar':selected.viewType==='city'?'Vista para a cidade':'Vista para o jardim'}</div>
           <button className="b-primary" disabled={!canExplore(selected)} onClick={()=>onExplore(selected)}>{canExplore(selected)?'Ver interior  →':'Interior ainda não disponível'}</button>
           {canPropose(selected)?<button className="b-outline" onClick={openWhatsApp}>Falar pelo WhatsApp</button>:<button className="b-outline" onClick={()=>open('similar')}>{selected.status==='reserved'?'Consultar disponibilidade':'Ver unidades semelhantes'}</button>}

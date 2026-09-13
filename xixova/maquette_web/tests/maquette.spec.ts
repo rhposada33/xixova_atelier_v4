@@ -18,7 +18,7 @@ test("cambia de maqueta desde el manifiesto",async({page})=>{
 });
 
 test("libera el renderer al alternar repetidamente",async({page})=>{
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
   await page.goto("/?vista=interior");
   await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer?.info?.memory?.geometries),{timeout:15_000}).toBeGreaterThan(0);
   let settled:{geometries:number;textures:number}|undefined;

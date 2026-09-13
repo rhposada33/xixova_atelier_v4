@@ -21,26 +21,12 @@ DEFAULT_CATALOG = {
     ],
 }
 
-BUILDING_RESERVED = {"401", "704", "902", "1201", "1504", "1702"}
-BUILDING_SOLD = {"101", "104", "202", "203", "301", "304", "502", "603", "801", "1004", "1302", "1603"}
-BUILDING_TYPES = (
-    {"bedrooms": 3, "suites": 2, "parkingSpaces": 2, "privateAreaM2": 118, "orientation": "northeast", "viewType": "garden", "base": 1040000, "interiorProjectId": "garden_house_18"},
-    {"bedrooms": 2, "suites": 1, "parkingSpaces": 1, "privateAreaM2": 82, "orientation": "northwest", "viewType": "city", "base": 740000, "interiorProjectId": "terraza_luz"},
-    {"bedrooms": 3, "suites": 2, "parkingSpaces": 2, "privateAreaM2": 96, "orientation": "southeast", "viewType": "sea", "base": 920000, "interiorProjectId": "terraza_luz"},
-    {"bedrooms": 4, "suites": 3, "parkingSpaces": 3, "privateAreaM2": 146, "orientation": "southwest", "viewType": "garden", "base": 1220000, "interiorProjectId": "garden_house_18"},
-)
-
-
 def build_building_inventory() -> list[dict]:
-    """Inventario de demostración determinista, compartible fuera de React."""
-    units = []
-    for floor in range(1, 19):
-        for final, typology in enumerate(BUILDING_TYPES, 1):
-            code = str(floor * 100 + final)
-            area = typology["privateAreaM2"] + (8 if floor > 16 else 0)
-            status = "reserved" if code in BUILDING_RESERVED else "sold" if code in BUILDING_SOLD else "available"
-            price = typology["base"] + floor * 35000 + (120000 if typology["viewType"] == "sea" else 0) + (150000 if floor > 16 else 0)
-            units.append({"id": f"unit-{code}", "code": code, "projectId": "garden_house_18", "buildingId": "garden-house-tower", "towerId": "A", "floor": floor, "status": status, **{key: value for key, value in typology.items() if key != "base"}, "totalAreaM2": round(area * 1.22), "privateAreaM2": area, "priceBRL": price, "modelObjectId": f"UNIT_{code}_PROXY", "published": True, "updatedAt": "2026-09-12T00:00:00Z"})
+    """Carga el fixture temporal compartido por web, catálogo y seed SQL."""
+    fixture = Path(__file__).resolve().parent / "data" / "escobar_inventory.json"
+    units = json.loads(fixture.read_text(encoding="utf-8"))
+    if not isinstance(units, list) or len(units) != 72:
+        raise ValueError("El fixture de Escobar debe contener exactamente 72 unidades.")
     return units
 
 
@@ -120,7 +106,7 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
         unit_dir = staging / "unidades" / unit["code"]
         unit_dir.mkdir(parents=True, exist_ok=True)
         (unit_dir / "index.html").write_text(page, encoding="utf-8")
-    manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "defaultView": "building", "building": {"model": "building/xixova-building.glb", "inventory": "building/inventory.json", "visualModes": ["neutral_day", "warm_dusk"], "statistics": "building/asset-statistics.json", "residentialFloors": 18, "units": 72, "provisional": True}, "projects": public_projects}
+    manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "defaultView": "building", "building": {"organizationSlug": "escobar", "projectSlug": "escobar-residences", "defaultUnitCode": "1203", "model": "building/xixova-building.glb", "inventory": "building/inventory.json", "visualModes": ["neutral_day", "warm_dusk"], "statistics": "building/asset-statistics.json", "residentialFloors": 18, "units": 72, "provisional": True}, "projects": public_projects}
     (staging / "catalog.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     # `vercel --cwd <destino>` guarda aquí el vínculo del proyecto. Es estado
     # local, no un artefacto de la publicación, y debe sobrevivir al reemplazo

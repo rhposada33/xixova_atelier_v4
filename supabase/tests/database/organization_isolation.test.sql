@@ -1,0 +1,14 @@
+begin;
+select plan(4);
+insert into auth.users(id,aud,role,email,created_at,updated_at) values ('10000000-0000-4000-8000-000000000001','authenticated','authenticated','member@example.test',now(),now());
+insert into public.organizations(id,name,slug,status) values ('10000000-0000-4000-8000-000000000002','Outra organização','outra','active');
+insert into public.projects(id,organization_id,name,slug,status,timezone,published_at) values ('10000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000002','Projeto privado','privado','published','America/Sao_Paulo',now());
+insert into public.organization_members(organization_id,user_id,role) values ('00000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','viewer');
+select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);
+set local role authenticated;
+select is((select count(*)::integer from public.organizations),1,'member sees only own organization');
+select is((select count(*)::integer from public.projects),1,'member cannot cross organizations');
+select is((select count(*)::integer from public.organization_members),1,'member sees only own membership');
+select throws_ok($$update public.projects set name='x'$$,'42501','permission denied for table projects','authenticated has no general writes');
+select * from finish();
+rollback;

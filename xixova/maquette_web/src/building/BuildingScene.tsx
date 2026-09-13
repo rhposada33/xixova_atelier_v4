@@ -3,10 +3,11 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
-import {buildingConfig,inventory,statusLabel,type BuildingUnit} from './inventory';
+import {buildingConfig,statusLabel,type BuildingUnit} from './inventory';
+import {bindUnitsToScene} from './bindUnitsToScene';
 import './refinement.css';
 
-type Props={selected:BuildingUnit;matches:string[];filtered:boolean;mode:'neutral_day'|'warm_dusk';onSelect:(u:BuildingUnit)=>void;command:{type:string;nonce:number};};
+type Props={units:BuildingUnit[];selected:BuildingUnit;matches:string[];filtered:boolean;mode:'neutral_day'|'warm_dusk';onSelect:(u:BuildingUnit)=>void;command:{type:string;nonce:number};};
 export function BuildingScene(props:Props){
   const host=useRef<HTMLDivElement>(null),live=useRef(props),engine=useRef<{command:(type:string)=>void;select:(code:string)=>void}|null>(null);
   const [loading,setLoading]=useState(true),[error,setError]=useState(''),[hover,setHover]=useState<{unit:BuildingUnit;x:number;y:number}|null>(null);
@@ -33,11 +34,11 @@ export function BuildingScene(props:Props){
     const resize=()=>{renderer.setSize(el.clientWidth,el.clientHeight);camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();};const observer=new ResizeObserver(resize);observer.observe(el);resize();
     const loader=new GLTFLoader();loader.load(new URL(buildingConfig.modelUrl,document.baseURI).href,gltf=>{
       if(disposed){gltf.scene.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});return;}
-      const model=gltf.scene;model.updateMatrixWorld(true);
+      const model=gltf.scene;model.updateMatrixWorld(true);const bindings=bindUnitsToScene(live.current.units,model);
       model.traverse(o=>{
         if(!(o instanceof THREE.Mesh))return;
         if(o.name.startsWith('UNIT_')){
-          const unit=inventory.find(u=>u.modelObjectId===o.name);if(!unit)return;
+          const unit=bindings.bound.get(o.uuid);if(!unit)return;
           o.visible=true;o.userData.unit=unit;o.material=new THREE.MeshBasicMaterial({color:'#85ad93',transparent:true,opacity:.035,depthWrite:false,side:THREE.DoubleSide});o.renderOrder=3;proxies.push(o);
           const box=new THREE.Box3().setFromObject(o),center=box.getCenter(new THREE.Vector3());center.z=Number(unit.code.slice(-2))>=3?box.max.z:box.min.z;centers.set(unit.code,center);
           const edge=new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry),new THREE.LineBasicMaterial({color:'#7b9f86',transparent:true,opacity:.4}));edge.renderOrder=4;o.add(edge);outlines.set(unit.code,edge);

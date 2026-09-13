@@ -1,0 +1,13 @@
+create index projects_status_idx on public.projects(status);
+create index projects_organization_id_idx on public.projects(organization_id);
+create index buildings_project_id_idx on public.buildings(project_id);
+create index floors_building_id_idx on public.floors(building_id);
+create index unit_types_project_id_idx on public.unit_types(project_id);
+create index units_project_id_idx on public.units(project_id);
+create index units_building_id_idx on public.units(building_id);
+create index units_floor_id_idx on public.units(floor_id);
+create index units_status_idx on public.units(status);
+create index units_published_idx on public.units(published);
+create index units_price_brl_idx on public.units(price_brl);
+create index units_orientation_idx on public.units(orientation);
+create index unit_status_history_unit_id_idx on public.unit_status_history(unit_id);

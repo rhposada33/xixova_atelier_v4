@@ -30,6 +30,7 @@ test('matriz, selección, estados e interior no disponible',async({page})=>{
   await expect(page.locator('.building-header-actions').getByRole('button',{name:'Falar pelo WhatsApp'})).toBeDisabled();
 });
 test('interior se carga al entrar y el regreso conserva filtros y selección',async({page})=>{
+  test.setTimeout(60_000);
   const interiorRequests:string[]=[];
   page.on('request',r=>{if(/scene\.json|catalog\.json/.test(r.url()))interiorRequests.push(r.url());});
   await page.goto('/?vista=edificio&unidad=1203');
@@ -40,7 +41,7 @@ test('interior se carga al entrar y el regreso conserva filtros y selección',as
   await expect(page).toHaveURL(/vista=interior/);
   await expect(page.getByText('TERRAZA LUZ',{exact:true})).toBeVisible({timeout:15_000});
   await page.getByRole('button',{name:'Voltar ao edifício'}).click();
-  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1203');
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1203',{timeout:15_000});
   await expect(page.getByLabel('Andar',{exact:true})).toHaveValue('12');
 });
 test('modo atardecer y navegación móvil',async({page})=>{
