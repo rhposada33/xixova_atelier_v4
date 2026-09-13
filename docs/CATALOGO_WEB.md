@@ -4,20 +4,21 @@
 
 ## Construcción reproducible
 
-Desde la raíz del repositorio:
+Desde la raíz del repositorio, con las variables públicas de producción cargadas
+en el entorno:
 
 ```bash
-cd xixova/maquette_web
-npm ci
-npm run build
-cd ../..
-uv run xixova_cli.py exportar-catalogo \
-  --catalogo-config catalogo.yaml \
-  --salida publicaciones/catalogo_xixova \
-  --perfil premium
+VITE_INVENTORY_PROVIDER=supabase \
+VITE_SUPABASE_URL="$VITE_SUPABASE_URL" \
+VITE_SUPABASE_PUBLISHABLE_KEY="$VITE_SUPABASE_PUBLISHABLE_KEY" \
+bash scripts/build_catalogo_xixova.sh
 ```
 
 La exportación se realiza en un directorio temporal y reemplaza la publicación anterior al terminar. Así desaparecen automáticamente los bundles con hash de compilaciones previas.
+El script valida la ruta de salida, conserva el vínculo local `.vercel`, copia el
+fallback SPA y falla si no se generó el chunk diferido del portal. Las variables
+`VITE_*` se incorporan al JavaScript durante la compilación, no durante la
+ejecución del navegador ni al subir un artefacto ya construido.
 
 ## Servir localmente
 

@@ -9,10 +9,12 @@ node_modules/
 .env
 .env.*
 !.env.example
-xixova/maquette_web/tsconfig.tsbuildinfo
+/xixova/maquette_web/*.tsbuildinfo
 /xixova/maquette_web/dist/
 /xixova/maquette_web/test-results/
 /xixova/maquette_web/playwright-report/
+/xixova/maquette_web/vite.config.js
+/xixova/maquette_web/vite.config.d.ts
 /publicaciones/
 xixova/director_web/tsconfig.tsbuildinfo
 xixova/director_web/test-results/
