@@ -22,11 +22,3 @@ export interface InventoryReader {
   getPublishedUnit(organizationSlug:string,projectSlug:string,code:string,signal?:AbortSignal):Promise<PropertyUnit|null>;
   getInventorySummary(organizationSlug:string,projectSlug:string,signal?:AbortSignal):Promise<InventorySummary>;
 }
-
-export interface UpdateUnitInput {status?:UnitStatus;priceBRL?:number;published?:boolean;}
-export interface ChangeUnitStatusCommand {status:UnitStatus;reason?:string;}
-export interface InventoryAdminRepository {
-  listAllUnits(projectId:string):Promise<PropertyUnit[]>;
-  updateUnit(unitId:string,changes:UpdateUnitInput):Promise<PropertyUnit>;
-  changeUnitStatus(unitId:string,command:ChangeUnitStatusCommand):Promise<PropertyUnit>;
-}

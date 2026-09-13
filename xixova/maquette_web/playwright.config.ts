@@ -11,8 +11,8 @@ export default defineConfig({
     launchOptions:{executablePath:"/usr/bin/google-chrome",args:["--use-angle=swiftshader","--enable-webgl"]},
   },
   webServer:{
-    command:"cd ../.. && python3 -m http.server 8892 --bind 127.0.0.1 --directory publicaciones/catalogo_xixova",
-    url:"http://127.0.0.1:8892/catalog.json",
+    command:"VITE_SUPABASE_URL=http://supabase.test VITE_SUPABASE_PUBLISHABLE_KEY=test-public-key npm exec vite -- --host 127.0.0.1 --port 8892",
+    url:"http://127.0.0.1:8892/",
     reuseExistingServer:false,
     timeout:30_000,
   },

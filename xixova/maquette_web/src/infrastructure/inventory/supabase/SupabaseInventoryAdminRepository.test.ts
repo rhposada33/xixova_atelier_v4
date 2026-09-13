@@ -1,0 +1,14 @@
+import {describe,expect,it,vi} from 'vitest';
+import {InventoryError} from '../../../domain/inventory';
+import {adminError,mapAdminUnit,SupabaseInventoryAdminRepository} from './SupabaseInventoryAdminRepository';
+
+const row={id:'u1',organization_id:'o1',project_id:'p1',building_id:'b1',floor_id:'f1',unit_type_id:'t1',code:'1203',floor:12,unit_type_name:'Final 03',status:'available',bedrooms:3,suites:2,parking_spaces:2,private_area_m2:'118',total_area_m2:'144',orientation:'southeast',view_type:'sea',sun_exposure:'morning',price_brl:'1460000',model_object_id:'UNIT_1203_PROXY',interior_project_id:'terraza_luz',published:true,reserved_by:null,reserved_at:null,reserved_until:null,version:'3',updated_at:'2026-09-13T00:00:00Z',total_count:'72'};
+
+describe('SupabaseInventoryAdminRepository',()=>{
+  it('mapeia a linha administrativa sem contaminar o modelo público',()=>{expect(mapAdminUnit(row)).toMatchObject({id:'u1',organizationId:'o1',floor:12,priceBRL:1460000,version:3,unitTypeName:'Final 03'});});
+  it('mapeia códigos estruturados de PostgreSQL',()=>{const error=adminError({details:'{"code":"version_conflict"}',message:'inventory_admin_error'},'fallback');expect(error).toBeInstanceOf(InventoryError);expect(error.code).toBe('version_conflict');expect(error.message).toContain('alterada');});
+  it('trata falhas de transporte como resultado de rede',()=>{expect(adminError(new TypeError('Failed to fetch'),'fallback').code).toBe('network');});
+  it('valida a paginação antes de consultar Supabase',async()=>{const client={rpc:vi.fn()} as any;const repo=new SupabaseInventoryAdminRepository(client);await expect(repo.listUnits({page:0,pageSize:25})).rejects.toMatchObject({code:'invalid_input'});expect(client.rpc).not.toHaveBeenCalled();});
+  it('envia filtros e converte uma página remota',async()=>{const client={rpc:vi.fn().mockResolvedValue({data:[row],error:null})} as any;const repo=new SupabaseInventoryAdminRepository(client);const result=await repo.listUnits({projectId:'p1',page:2,pageSize:12,status:'available',sortBy:'price',sortDirection:'desc'});expect(client.rpc).toHaveBeenCalledWith('admin_list_units',expect.objectContaining({p_project_id:'p1',p_page:2,p_page_size:12,p_status:'available',p_sort_by:'price',p_sort_direction:'desc'}));expect(result).toMatchObject({total:72,page:2,pageSize:12,items:[{code:'1203'}]});});
+  it('usa somente a RPC específica para alterar status',async()=>{const client={rpc:vi.fn().mockResolvedValue({data:row,error:null})} as any;const repo=new SupabaseInventoryAdminRepository(client);await repo.changeUnitStatus({unitId:'u1',expectedVersion:3,expectedStatus:'available',newStatus:'reserved',reason:'Contato'});expect(client.rpc).toHaveBeenCalledWith('admin_change_unit_status',{p_unit_id:'u1',p_expected_version:3,p_expected_status:'available',p_new_status:'reserved',p_reason:'Contato'});});
+});

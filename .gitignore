@@ -6,6 +6,9 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 node_modules/
+.env
+.env.*
+!.env.example
 xixova/maquette_web/tsconfig.tsbuildinfo
 /xixova/maquette_web/dist/
 /xixova/maquette_web/test-results/
