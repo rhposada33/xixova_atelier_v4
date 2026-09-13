@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
+from html import escape
 from pathlib import Path
 
 import yaml
@@ -93,6 +95,31 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
     building_dir.mkdir(exist_ok=True)
     inventory = build_building_inventory()
     (building_dir / "inventory.json").write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    public_url = os.environ.get("ESCOBAR_PUBLIC_URL", "https://escobarpro.vercel.app").rstrip("/")
+    social_image = f"{public_url}/social/escobar-residences.png"
+    for unit in inventory:
+        unit_url = f"{public_url}/unidades/{unit['code']}/"
+        app_url = f"/?vista=edificio&unidad={unit['code']}"
+        title = f"Unidade {unit['code']} · Escobar Residences"
+        description = (
+            f"{unit['privateAreaM2']} m², {unit['bedrooms']} dormitórios, andar {unit['floor']}. "
+            "Conheça esta unidade e explore sua tipologia ilustrativa em 3D."
+        )
+        page = f'''<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/><title>{escape(title)}</title>
+<meta name="description" content="{escape(description)}"/><link rel="canonical" href="{escape(unit_url)}"/>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg"/><meta property="og:type" content="website"/>
+<meta property="og:locale" content="pt_BR"/><meta property="og:site_name" content="Escobar Residences"/>
+<meta property="og:title" content="{escape(title)}"/><meta property="og:description" content="{escape(description)}"/>
+<meta property="og:url" content="{escape(unit_url)}"/><meta property="og:image" content="{escape(social_image)}"/>
+<meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="Vista 3D do Escobar Residences"/><meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="{escape(title)}"/><meta name="twitter:description" content="{escape(description)}"/>
+<meta name="twitter:image" content="{escape(social_image)}"/><meta http-equiv="refresh" content="0;url={escape(app_url)}"/>
+<script>location.replace({json.dumps(app_url)})</script></head><body><p>Abrindo a <a href="{escape(app_url)}">Unidade {unit['code']}</a>…</p></body></html>'''
+        unit_dir = staging / "unidades" / unit["code"]
+        unit_dir.mkdir(parents=True, exist_ok=True)
+        (unit_dir / "index.html").write_text(page, encoding="utf-8")
     manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "defaultView": "building", "building": {"model": "building/xixova-building.glb", "inventory": "building/inventory.json", "visualModes": ["neutral_day", "warm_dusk"], "statistics": "building/asset-statistics.json", "residentialFloors": 18, "units": 72, "provisional": True}, "projects": public_projects}
     (staging / "catalog.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     # `vercel --cwd <destino>` guarda aquí el vínculo del proyecto. Es estado

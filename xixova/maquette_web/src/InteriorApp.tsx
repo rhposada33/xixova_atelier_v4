@@ -1257,11 +1257,12 @@ function Ready(p: any) {
     return () => clearTimeout(t);
   }, [notice]);
   const openWhatsApp = () => {
+    const shareUrl = `${location.origin}/unidades/${p.unit}/`;
     const message = [
       `Olá! Tenho interesse na Unidade ${p.unit} do Escobar Residences.`,
       `Tipologia ilustrativa: ${d.nombre}`,
       `Andar: ${p.floor}`,
-      `Link: ${location.href}`,
+      `Link: ${shareUrl}`,
     ].join("\n");
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   };

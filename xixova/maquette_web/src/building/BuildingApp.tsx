@@ -37,12 +37,13 @@ export function BuildingApp({onExplore}:{onExplore:(unit:BuildingUnit)=>void}){
   const addCompare=()=>{setCompare(c=>c.includes(selected.code)?c.filter(id=>id!==selected.code):c.length<3?[...c,selected.code]:c);setNotice('Selecione até 3 unidades e abra Comparar.');};
   const reset=()=>setFilters({...defaultFilters});
   const openWhatsApp=()=>{
+    const shareUrl=`${location.origin}/unidades/${selected.code}/`;
     const message=[
       `Olá! Tenho interesse na Unidade ${selected.code} do Escobar Residences.`,
       `Área: ${selected.privateAreaM2} m²`,
       `Andar: ${selected.floor}`,
       `Valor ilustrativo: ${formatBRL(selected.priceBRL)}`,
-      `Link: ${location.href}`,
+      `Link: ${shareUrl}`,
     ].join('\n');
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`,'_blank','noopener,noreferrer');
   };
