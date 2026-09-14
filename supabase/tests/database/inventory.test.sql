@@ -19,7 +19,7 @@ reset role;
 update public.projects set status='draft',published_at=null where slug='escobar-residences';
 select is((select count(*)::integer from public.get_public_inventory('escobar','escobar-residences',null)),0,'draft project is excluded');
 update public.projects set status='published',published_at='2026-09-12T00:00:00Z' where slug='escobar-residences';
-update public.organizations set status='inactive' where slug='escobar';
+update public.organizations set status='suspended' where slug='escobar';
 select is((select count(*)::integer from public.get_public_inventory('escobar','escobar-residences',null)),0,'inactive organization is excluded');
 update public.organizations set status='active' where slug='escobar';
 update public.units set published=false where code='1203';

@@ -8,9 +8,10 @@ const authMessage=(message:string)=>/invalid login credentials/i.test(message)?'
 
 export function LoginPage(){
   const {session,loading}=useAuth();const navigate=useNavigate();const location=useLocation();
+  const requested=new URLSearchParams(location.search).get('returnTo');const returnTo=requested?.startsWith('/')&&!requested.startsWith('//')?requested:(location.state as any)?.from||'/portal';
   const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);
-  if(!loading&&session)return <Navigate to="/portal" replace/>;
-  const submit=async(event:FormEvent)=>{event.preventDefault();setBusy(true);setError('');const {error:authError}=await getSupabaseClient().auth.signInWithPassword({email,password});setBusy(false);if(authError)setError(authMessage(authError.message));else navigate((location.state as any)?.from||'/portal',{replace:true});};
+  if(!loading&&session)return <Navigate to={returnTo} replace/>;
+  const submit=async(event:FormEvent)=>{event.preventDefault();setBusy(true);setError('');const {error:authError}=await getSupabaseClient().auth.signInWithPassword({email,password});setBusy(false);if(authError)setError(authMessage(authError.message));else navigate(returnTo,{replace:true});};
   return <AuthFrame title="Acesse o Portal Escobar" subtitle="Gestão segura do inventário imobiliário.">
     <form onSubmit={submit} className="auth-form" aria-busy={busy}>
       <label>E-mail<input type="email" autoComplete="email" required value={email} onChange={event=>setEmail(event.target.value)}/></label>

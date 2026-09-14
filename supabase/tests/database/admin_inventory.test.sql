@@ -27,7 +27,7 @@ insert into auth.users(id,aud,role,email,created_at,updated_at) values
 insert into public.platform_admins(user_id) values ('20000000-0000-4000-8000-000000000001');
 insert into public.organizations(id,name,slug,status) values
   ('20000000-0000-4000-8000-000000000100','Organização B','organizacao-b','active'),
-  ('20000000-0000-4000-8000-000000000101','Organização inativa','organizacao-inativa','inactive');
+  ('20000000-0000-4000-8000-000000000101','Organização suspensa','organizacao-inativa','suspended');
 insert into public.projects(id,organization_id,name,slug,status,timezone,published_at) values
   ('20000000-0000-4000-8000-000000000110','20000000-0000-4000-8000-000000000100','Projeto B','projeto-b','published','America/Sao_Paulo',now());
 insert into public.buildings(id,project_id,name,code,model_path,floor_count) values
@@ -60,7 +60,7 @@ select ok((select is_nullable='YES' from information_schema.columns where table_
 
 select set_config('request.jwt.claim.sub','20000000-0000-4000-8000-000000000001',true);
 set local role authenticated;
-select is((select count(*)::integer from public.organizations),2,'platform admin sees every active organization');
+select is((select count(*)::integer from public.organizations),3,'platform admin sees active and suspended onboarding organizations');
 select is((select count(*)::integer from public.units),73,'platform admin reads units without membership');
 select is((select public.admin_update_unit_price('20000000-0000-4000-8000-000000000150',1,510000)).version,2::bigint,'platform admin mutates any active organization without membership');
 select is((select count(*)::integer from public.admin_get_unit_history(null,'20000000-0000-4000-8000-000000000110',null,null,null)),1,'platform admin reads complete audit without membership');

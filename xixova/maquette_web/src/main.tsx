@@ -6,6 +6,7 @@ import {InventoryProvider} from './infrastructure/inventory/InventoryContext';
 import type {PropertyUnit} from './domain/inventory';
 import {AuthProvider} from './auth/AuthContext';
 import {ForgotPasswordPage,LoginPage,ResetPasswordPage} from './auth/AuthPages';
+import {AcceptInvitationPage} from './auth/AcceptInvitationPage';
 import './building/building.css';
 const InteriorApp=lazy(()=>import('./InteriorApp'));
 const PortalApp=lazy(()=>import('./portal/PortalApp'));
@@ -17,5 +18,5 @@ function PublicViewer(){
 }
 function AuthRoute({children}:{children:React.ReactNode}){return <AuthProvider>{children}</AuthProvider>}
 function NotFound(){return <main style={{padding:'3rem',fontFamily:'system-ui'}}><h1>Página não encontrada</h1><p>O endereço informado não existe.</p><a href="/">Voltar ao visualizador</a></main>}
-function App(){return <BrowserRouter><Routes><Route path="/" element={<InventoryProvider><PublicViewer/></InventoryProvider>}/><Route path="/login" element={<AuthRoute><LoginPage/></AuthRoute>}/><Route path="/forgot-password" element={<AuthRoute><ForgotPasswordPage/></AuthRoute>}/><Route path="/reset-password" element={<AuthRoute><ResetPasswordPage/></AuthRoute>}/><Route path="/portal/*" element={<AuthRoute><Suspense fallback={<main className="portal-state">Carregando o portal…</main>}><PortalApp/></Suspense></AuthRoute>}/><Route path="*" element={<NotFound/>}/></Routes></BrowserRouter>}
+function App(){return <BrowserRouter><Routes><Route path="/" element={<InventoryProvider><PublicViewer/></InventoryProvider>}/><Route path="/login" element={<AuthRoute><LoginPage/></AuthRoute>}/><Route path="/forgot-password" element={<AuthRoute><ForgotPasswordPage/></AuthRoute>}/><Route path="/reset-password" element={<AuthRoute><ResetPasswordPage/></AuthRoute>}/><Route path="/accept-invitation" element={<AuthRoute><AcceptInvitationPage/></AuthRoute>}/><Route path="/portal/*" element={<AuthRoute><Suspense fallback={<main className="portal-state">Carregando o portal…</main>}><PortalApp/></Suspense></AuthRoute>}/><Route path="*" element={<NotFound/>}/></Routes></BrowserRouter>}
 createRoot(document.getElementById('root')!).render(<App/>);

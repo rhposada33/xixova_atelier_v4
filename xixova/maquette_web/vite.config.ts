@@ -1,1 +1,1 @@
-import{defineConfig}from'vite';import react from'@vitejs/plugin-react';export default defineConfig({plugins:[react()],base:'/',build:{assetsDir:'assets'}});
+import{defineConfig}from'vite';import react from'@vitejs/plugin-react';export default defineConfig({plugins:[react()],base:'/',publicDir:process.env.VITE_E2E_PUBLIC_DIR||false,build:{assetsDir:'assets'}});
