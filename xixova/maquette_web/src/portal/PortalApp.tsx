@@ -1,81 +1,1300 @@
-import {createContext,useContext,useEffect,useMemo,useState,type FormEvent,type ReactNode} from 'react';
-import {Link,NavLink,Navigate,Route,Routes,useLocation,useNavigate,useParams} from 'react-router-dom';
-import {InventoryError,type AdminPropertyUnit,type AdminUnitQuery,type InventoryAdminRepository,type OrganizationSummary,type ProjectSummary,type UnitAuditEntry,type UnitStatus} from '../domain/inventory';
-import {SupabaseInventoryAdminRepository} from '../infrastructure/inventory/supabase/SupabaseInventoryAdminRepository';
-import {getSupabaseClient} from '../infrastructure/supabase/client';
-import {useAuth} from '../auth/AuthContext';
-import {MembersPage,OrganizationsPage} from './OrganizationPages';
-import './portal.css';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import {
+  Link,
+  NavLink,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import {
+  InventoryError,
+  type AdminPropertyUnit,
+  type AdminUnitQuery,
+  type InventoryAdminRepository,
+  type OrganizationSummary,
+  type ProjectSummary,
+  type UnitAuditEntry,
+  type UnitStatus,
+} from "../domain/inventory";
+import { SupabaseInventoryAdminRepository } from "../infrastructure/inventory/supabase/SupabaseInventoryAdminRepository";
+import { getSupabaseClient } from "../infrastructure/supabase/client";
+import { useAuth } from "../auth/AuthContext";
+import { MembersPage, OrganizationsPage } from "./OrganizationPages";
+import {
+  BuildingPage,
+  NewProjectPage,
+  NewUnitPage,
+  ProjectDetailPage,
+  ProjectsPage,
+  ProjectStructurePage,
+  StructuralUnitPage,
+  UnitTypesPage,
+} from "./StructurePages";
+import "./portal.css";
 
-interface PortalValue {repo:InventoryAdminRepository;organizations:OrganizationSummary[];organization?:OrganizationSummary;setOrganizationId:(id:string)=>void;projects:ProjectSummary[];project?:ProjectSummary;setProjectId:(id:string)=>void;userId:string;}
-const PortalContext=createContext<PortalValue|null>(null);
-const usePortal=()=>{const value=useContext(PortalContext);if(!value)throw new Error('Portal não configurado.');return value;};
-const statusLabels:Record<UnitStatus,string>={available:'Disponível',reserved:'Reservada',sold:'Vendida',blocked:'Bloqueada',coming_soon:'Em breve',hidden:'Oculta'};
-const orientationLabels:Record<string,string>={north:'Norte',northeast:'Nordeste',east:'Leste',southeast:'Sudeste',south:'Sul',southwest:'Sudoeste',west:'Oeste',northwest:'Noroeste'};
-const actionLabels:Record<string,string>={'unit.price_updated':'Preço alterado','unit.status_changed':'Status alterado','unit.published':'Unidade publicada','unit.unpublished':'Unidade ocultada','unit.sold_reverted':'Venda revertida'};
-const money=(value?:number)=>value==null?'—':new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(value);
-const dateTime=(value:string)=>new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date(value));
+export interface PortalValue {
+  repo: InventoryAdminRepository;
+  organizations: OrganizationSummary[];
+  organization?: OrganizationSummary;
+  setOrganizationId: (id: string) => void;
+  projects: ProjectSummary[];
+  project?: ProjectSummary;
+  setProjectId: (id: string) => void;
+  userId: string;
+}
+const PortalContext = createContext<PortalValue | null>(null);
+export const usePortal = () => {
+  const value = useContext(PortalContext);
+  if (!value) throw new Error("Portal não configurado.");
+  return value;
+};
+const statusLabels: Record<UnitStatus, string> = {
+  available: "Disponível",
+  reserved: "Reservada",
+  sold: "Vendida",
+  blocked: "Bloqueada",
+  coming_soon: "Em breve",
+  hidden: "Oculta",
+};
+const orientationLabels: Record<string, string> = {
+  north: "Norte",
+  northeast: "Nordeste",
+  east: "Leste",
+  southeast: "Sudeste",
+  south: "Sul",
+  southwest: "Sudoeste",
+  west: "Oeste",
+  northwest: "Noroeste",
+};
+const actionLabels: Record<string, string> = {
+  "unit.price_updated": "Preço alterado",
+  "unit.status_changed": "Status alterado",
+  "unit.published": "Unidade publicada",
+  "unit.unpublished": "Unidade ocultada",
+  "unit.sold_reverted": "Venda revertida",
+};
+const money = (value?: number) =>
+  value == null
+    ? "—"
+    : new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        maximumFractionDigits: 0,
+      }).format(value);
+const dateTime = (value: string) =>
+  new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
 
-export default function PortalApp(){
-  const auth=useAuth();const location=useLocation();const repo=useMemo(()=>new SupabaseInventoryAdminRepository(getSupabaseClient()),[]);
-  const [organizations,setOrganizations]=useState<OrganizationSummary[]>([]);const [organizationId,setOrganizationId]=useState('');
-  const [projects,setProjects]=useState<ProjectSummary[]>([]);const [projectId,setProjectId]=useState('');
-  const [loading,setLoading]=useState(true);const [error,setError]=useState('');
-  useEffect(()=>{if(auth.loading||!auth.session)return;let current=true;setLoading(true);repo.listOrganizations().then(items=>{if(!current)return;setOrganizations(items);setOrganizationId(id=>id&&items.some(item=>item.id===id)?id:items[0]?.id??'');setError('');}).catch(reason=>{if(current)setError(reason instanceof InventoryError?reason.message:'Não foi possível validar seu acesso.');}).finally(()=>{if(current)setLoading(false);});return()=>{current=false;};},[auth.loading,auth.session,repo]);
-  useEffect(()=>{if(!organizationId){setProjects([]);setProjectId('');return;}let current=true;repo.listProjects(organizationId).then(items=>{if(!current)return;setProjects(items);setProjectId(id=>id&&items.some(item=>item.id===id)?id:items[0]?.id??'');}).catch(reason=>{if(current)setError(reason instanceof Error?reason.message:'Não foi possível carregar os projetos.');});return()=>{current=false;};},[organizationId,repo]);
-  if(auth.loading)return <PortalState title="Preparando seu portal…" detail="Estamos restaurando sua sessão e validando o acesso."/>;
-  if(!auth.session)return <Navigate to="/login" state={{from:location.pathname+location.search}} replace/>;
-  if(loading)return <PortalState title="Preparando seu portal…" detail="Estamos restaurando sua sessão e validando o acesso."/>;
-  if(error)return <PortalState title="Acesso indisponível" detail={error} action={<button onClick={()=>auth.signOut()}>Voltar ao login</button>}/>;
-  if(!organizations.length)return <PortalState title="Nenhuma organização disponível" detail="Seu usuário não possui vínculo ativo com uma organização. Fale com o administrador da plataforma." action={<button onClick={()=>auth.signOut()}>Sair</button>}/>;
-  const organization=organizations.find(item=>item.id===organizationId);const project=projects.find(item=>item.id===projectId);
-  const context={repo,organizations,organization,setOrganizationId,projects,project,setProjectId,userId:auth.session.user.id};
-  return <PortalContext.Provider value={context}><div className="portal-shell"><PortalSidebar role={organization!.role} onSignOut={()=>auth.signOut()}/><main className="portal-main"><PortalTopbar/><Routes><Route index element={<Dashboard/>}/><Route path="clients" element={(organization!.role==='platform_admin'||organization!.role==='organization_admin')?<OrganizationsPage/>:<Navigate to="/portal" replace/>}/><Route path="users" element={(organization!.role==='platform_admin'||organization!.role==='organization_admin')?<MembersPage organizationId={organization!.id}/>:<Navigate to="/portal" replace/>}/><Route path="inventory" element={<InventoryPage/>}/><Route path="inventory/:unitId" element={<InventoryPage/>}/><Route path="history" element={organization!.role==='viewer'?<Navigate to="/portal" replace/>:<HistoryPage/>}/><Route path="*" element={<PortalNotFound/>}/></Routes></main></div></PortalContext.Provider>;
+export default function PortalApp() {
+  const auth = useAuth();
+  const location = useLocation();
+  const repo = useMemo(
+    () => new SupabaseInventoryAdminRepository(getSupabaseClient()),
+    [],
+  );
+  const [organizations, setOrganizations] = useState<OrganizationSummary[]>([]);
+  const [organizationId, setOrganizationId] = useState("");
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [projectId, setProjectId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (auth.loading || !auth.session) return;
+    let current = true;
+    setLoading(true);
+    repo
+      .listOrganizations()
+      .then((items) => {
+        if (!current) return;
+        setOrganizations(items);
+        setOrganizationId((id) =>
+          id && items.some((item) => item.id === id)
+            ? id
+            : (items[0]?.id ?? ""),
+        );
+        setError("");
+      })
+      .catch((reason) => {
+        if (current)
+          setError(
+            reason instanceof InventoryError
+              ? reason.message
+              : "Não foi possível validar seu acesso.",
+          );
+      })
+      .finally(() => {
+        if (current) setLoading(false);
+      });
+    return () => {
+      current = false;
+    };
+  }, [auth.loading, auth.session, repo]);
+  useEffect(() => {
+    if (!organizationId) {
+      setProjects([]);
+      setProjectId("");
+      return;
+    }
+    let current = true;
+    repo
+      .listProjects(organizationId)
+      .then((items) => {
+        if (!current) return;
+        setProjects(items);
+        setProjectId((id) =>
+          id && items.some((item) => item.id === id)
+            ? id
+            : (items[0]?.id ?? ""),
+        );
+      })
+      .catch((reason) => {
+        if (current)
+          setError(
+            reason instanceof Error
+              ? reason.message
+              : "Não foi possível carregar os projetos.",
+          );
+      });
+    return () => {
+      current = false;
+    };
+  }, [organizationId, repo]);
+  if (auth.loading)
+    return (
+      <PortalState
+        title="Preparando seu portal…"
+        detail="Estamos restaurando sua sessão e validando o acesso."
+      />
+    );
+  if (!auth.session)
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: location.pathname + location.search }}
+        replace
+      />
+    );
+  if (loading)
+    return (
+      <PortalState
+        title="Preparando seu portal…"
+        detail="Estamos restaurando sua sessão e validando o acesso."
+      />
+    );
+  if (error)
+    return (
+      <PortalState
+        title="Acesso indisponível"
+        detail={error}
+        action={<button onClick={() => auth.signOut()}>Voltar ao login</button>}
+      />
+    );
+  if (!organizations.length)
+    return (
+      <PortalState
+        title="Nenhuma organização disponível"
+        detail="Seu usuário não possui vínculo ativo com uma organização. Fale com o administrador da plataforma."
+        action={<button onClick={() => auth.signOut()}>Sair</button>}
+      />
+    );
+  const organization = organizations.find((item) => item.id === organizationId);
+  const project = projects.find((item) => item.id === projectId);
+  const context = {
+    repo,
+    organizations,
+    organization,
+    setOrganizationId,
+    projects,
+    project,
+    setProjectId,
+    userId: auth.session.user.id,
+  };
+  return (
+    <PortalContext.Provider value={context}>
+      <div className="portal-shell">
+        <PortalSidebar
+          role={organization!.role}
+          onSignOut={() => auth.signOut()}
+        />
+        <main className="portal-main">
+          <PortalTopbar />
+          <Routes>
+            <Route index element={<Dashboard />} />
+            <Route
+              path="clients"
+              element={
+                organization!.role === "platform_admin" ||
+                organization!.role === "organization_admin" ? (
+                  <OrganizationsPage />
+                ) : (
+                  <Navigate to="/portal" replace />
+                )
+              }
+            />
+            <Route
+              path="users"
+              element={
+                organization!.role === "platform_admin" ||
+                organization!.role === "organization_admin" ? (
+                  <MembersPage organizationId={organization!.id} />
+                ) : (
+                  <Navigate to="/portal" replace />
+                )
+              }
+            />
+            <Route path="projects" element={<ProjectsPage />} />
+            <Route path="projects/new" element={<NewProjectPage />} />
+            <Route path="projects/:projectId" element={<ProjectDetailPage />} />
+            <Route
+              path="projects/:projectId/structure"
+              element={<ProjectStructurePage />}
+            />
+            <Route
+              path="projects/:projectId/buildings/:buildingId"
+              element={<BuildingPage />}
+            />
+            <Route
+              path="projects/:projectId/unit-types"
+              element={<UnitTypesPage />}
+            />
+            <Route
+              path="projects/:projectId/units/new"
+              element={<NewUnitPage />}
+            />
+            <Route
+              path="projects/:projectId/units/:unitId/structure"
+              element={<StructuralUnitPage />}
+            />
+            <Route path="inventory" element={<InventoryPage />} />
+            <Route path="inventory/:unitId" element={<InventoryPage />} />
+            <Route
+              path="history"
+              element={
+                organization!.role === "viewer" ? (
+                  <Navigate to="/portal" replace />
+                ) : (
+                  <HistoryPage />
+                )
+              }
+            />
+            <Route path="*" element={<PortalNotFound />} />
+          </Routes>
+        </main>
+      </div>
+    </PortalContext.Provider>
+  );
 }
 
-function PortalSidebar({role,onSignOut}:{role:string;onSignOut:()=>Promise<void>}){const manager=role==='platform_admin'||role==='organization_admin';return <aside className="portal-sidebar"><Link to="/" className="portal-logo">ESCOBAR<span>Portal administrativo</span></Link><nav aria-label="Navegação principal"><NavLink end to="/portal">Visão geral</NavLink>{manager&&<NavLink to="/portal/clients">Clientes</NavLink>}{manager&&<NavLink to="/portal/users">Usuários</NavLink>}<NavLink to="/portal/inventory">Inventário</NavLink>{role!=='viewer'&&<NavLink to="/portal/history">Histórico</NavLink>}</nav><button className="sidebar-logout" onClick={onSignOut}>Sair</button></aside>}
-function PortalTopbar(){const {organizations,organization,setOrganizationId,projects,project,setProjectId}=usePortal();return <header className="portal-topbar"><div><p className="eyebrow">Portal Escobar</p><strong>{organization?.name}</strong></div><div className="portal-selectors">{organizations.length>1&&<label>Organização<select value={organization?.id} onChange={event=>setOrganizationId(event.target.value)}>{organizations.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></label>}<label>Projeto<select value={project?.id??''} onChange={event=>setProjectId(event.target.value)} disabled={!projects.length}>{projects.map(item=><option key={item.id} value={item.id}>{item.name}</option>)}</select></label></div></header>}
-
-function Dashboard(){const {repo,project}=usePortal();const [summary,setSummary]=useState<any>();const [error,setError]=useState('');useEffect(()=>{if(!project)return;setSummary(undefined);repo.getProjectSummary(project.id).then(setSummary).catch(reason=>setError(reason.message));},[repo,project]);return <Page title="Visão geral" subtitle={project?`Acompanhe o desempenho de ${project.name}.`:'Selecione um projeto para continuar.'}>{error?<InlineError message={error}/>:!summary?<LoadingRows/>:<><section className="metric-grid"><Metric label="Unidades totais" value={summary.total}/><Metric label="Disponíveis" value={summary.available}/><Metric label="Reservadas" value={summary.reserved}/><Metric label="Vendidas" value={summary.sold}/><Metric label="Ocultas" value={summary.hidden}/><Metric label="Atualizadas em 7 dias" value={summary.recentlyUpdated}/></section><section className="portal-panel dashboard-callout"><div><p className="eyebrow">Projeto selecionado</p><h2>{project?.name}</h2><p>Consulte, filtre e atualize as unidades com controle de versão e histórico completo.</p></div><Link className="primary-button link-button" to="/portal/inventory">Abrir inventário</Link></section></>}</Page>}
-function Metric({label,value}:{label:string;value:number}){return <article className="metric-card"><span>{label}</span><strong>{value}</strong></article>}
-
-function InventoryPage(){
-  const {repo,organization,project,userId}=usePortal();const params=useParams();const navigate=useNavigate();
-  const [query,setQuery]=useState<AdminUnitQuery>({page:1,pageSize:12,sortBy:'floor',sortDirection:'asc'});const [result,setResult]=useState<{items:AdminPropertyUnit[];total:number}>({items:[],total:0});
-  const [loading,setLoading]=useState(true);const [error,setError]=useState('');const [notice,setNotice]=useState('');const [selected,setSelected]=useState<AdminPropertyUnit|null>(null);const [reload,setReload]=useState(0);
-  const effectiveQuery={...query,organizationId:organization?.id,projectId:project?.id};
-  useEffect(()=>{if(!project)return;let current=true;setLoading(true);setError('');repo.listUnits(effectiveQuery).then(data=>{if(current)setResult(data);}).catch(reason=>{if(current)setError(reason.message);}).finally(()=>{if(current)setLoading(false);});return()=>{current=false;};},[repo,organization?.id,project?.id,query.page,query.pageSize,query.search,query.floor,query.status,query.bedrooms,query.orientation,query.published,query.sortBy,query.sortDirection,reload]);
-  useEffect(()=>{if(!params.unitId){setSelected(null);return;}repo.getUnit(params.unitId).then(unit=>{if(unit)setSelected(unit);else navigate('/portal/inventory',{replace:true});}).catch(reason=>setError(reason.message));},[params.unitId,repo,navigate]);
-  const patchQuery=(patch:Partial<AdminUnitQuery>)=>setQuery(current=>({...current,...patch,page:patch.page??1}));const pages=Math.max(1,Math.ceil(result.total/query.pageSize));
-  return <Page title="Inventário" subtitle={`${result.total} unidades encontradas no projeto selecionado.`} action={<a className="secondary-button link-button" href={publicLink()} target="_blank" rel="noreferrer">Abrir visualizador público</a>}>
-    <div className="portal-panel filters" aria-label="Filtros do inventário"><label className="search-field">Buscar unidade<input value={query.search??''} onChange={event=>patchQuery({search:event.target.value})} placeholder="Ex.: 1203"/></label><label>Status<select value={query.status??''} onChange={event=>patchQuery({status:(event.target.value||undefined) as UnitStatus|undefined})}><option value="">Todos</option>{Object.entries(statusLabels).map(([value,label])=><option value={value} key={value}>{label}</option>)}</select></label><label>Andar<input type="number" min="1" value={query.floor??''} onChange={event=>patchQuery({floor:event.target.value?Number(event.target.value):undefined})}/></label><label>Publicação<select value={query.published===undefined?'':String(query.published)} onChange={event=>patchQuery({published:event.target.value===''?undefined:event.target.value==='true'})}><option value="">Todas</option><option value="true">Publicadas</option><option value="false">Ocultas</option></select></label><label>Ordenar<select value={`${query.sortBy}:${query.sortDirection}`} onChange={event=>{const [sortBy,sortDirection]=event.target.value.split(':');patchQuery({sortBy:sortBy as any,sortDirection:sortDirection as any});}}><option value="floor:asc">Andar crescente</option><option value="floor:desc">Andar decrescente</option><option value="price:asc">Menor preço</option><option value="price:desc">Maior preço</option><option value="updated_at:desc">Atualização recente</option></select></label></div>
-    <div aria-live="polite" className="portal-live">{notice}</div>{error?<InlineError message={error} retry={()=>setReload(value=>value+1)}/>:loading?<LoadingRows/>:!result.items.length?<EmptyState title="Nenhuma unidade encontrada" detail="Ajuste os filtros ou tente novamente."/>:<><UnitTable units={result.items} onOpen={unit=>navigate(`/portal/inventory/${unit.id}`)}/><div className="pagination"><button disabled={query.page<=1} onClick={()=>patchQuery({page:query.page-1})}>Anterior</button><span>Página {query.page} de {pages}</span><button disabled={query.page>=pages} onClick={()=>patchQuery({page:query.page+1})}>Próxima</button></div></>}
-    {selected&&<UnitEditor unit={selected} role={organization!.role} userId={userId} repo={repo} onClose={()=>navigate('/portal/inventory')} onSaved={unit=>{setSelected(unit);setNotice(`Unidade ${unit.code} atualizada com sucesso.`);setReload(value=>value+1);navigate('/portal/inventory');}}/>}
-  </Page>;
+function PortalSidebar({
+  role,
+  onSignOut,
+}: {
+  role: string;
+  onSignOut: () => Promise<void>;
+}) {
+  const manager = role === "platform_admin" || role === "organization_admin";
+  return (
+    <aside className="portal-sidebar">
+      <Link to="/" className="portal-logo">
+        ESCOBAR<span>Portal administrativo</span>
+      </Link>
+      <nav aria-label="Navegação principal">
+        <NavLink end to="/portal">
+          Visão geral
+        </NavLink>
+        {manager && <NavLink to="/portal/clients">Clientes</NavLink>}
+        {manager && <NavLink to="/portal/users">Usuários</NavLink>}
+        <NavLink to="/portal/projects">Projetos</NavLink>
+        <NavLink to="/portal/inventory">Inventário</NavLink>
+        {role !== "viewer" && <NavLink to="/portal/history">Histórico</NavLink>}
+      </nav>
+      <button className="sidebar-logout" onClick={onSignOut}>
+        Sair
+      </button>
+    </aside>
+  );
+}
+function PortalTopbar() {
+  const {
+    organizations,
+    organization,
+    setOrganizationId,
+    projects,
+    project,
+    setProjectId,
+  } = usePortal();
+  return (
+    <header className="portal-topbar">
+      <div>
+        <p className="eyebrow">Portal Escobar</p>
+        <strong>{organization?.name}</strong>
+      </div>
+      <div className="portal-selectors">
+        {organizations.length > 1 && (
+          <label>
+            Organização
+            <select
+              value={organization?.id}
+              onChange={(event) => setOrganizationId(event.target.value)}
+            >
+              {organizations.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        <label>
+          Projeto
+          <select
+            value={project?.id ?? ""}
+            onChange={(event) => setProjectId(event.target.value)}
+            disabled={!projects.length}
+          >
+            {projects.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    </header>
+  );
 }
 
-function UnitTable({units,onOpen}:{units:AdminPropertyUnit[];onOpen:(unit:AdminPropertyUnit)=>void}){return <section className="portal-panel table-wrap"><table><thead><tr><th>Unidade</th><th>Andar</th><th>Área</th><th>Preço</th><th>Status</th><th>Publicada</th><th>Atualizada</th><th><span className="sr-only">Ações</span></th></tr></thead><tbody>{units.map(unit=><tr key={unit.id}><td data-label="Unidade"><strong>{unit.code}</strong></td><td data-label="Andar">{unit.floor}</td><td data-label="Área">{unit.privateAreaM2} m²</td><td data-label="Preço">{money(unit.priceBRL)}</td><td data-label="Status"><span className={`status status-${unit.status}`}>{statusLabels[unit.status]}</span></td><td data-label="Publicada">{unit.published?'Sim':'Não'}</td><td data-label="Atualizada">{dateTime(unit.updatedAt)}</td><td><button className="text-button" onClick={()=>onOpen(unit)}>Editar</button></td></tr>)}</tbody></table></section>}
-
-function UnitEditor({unit,role,userId,repo,onClose,onSaved}:{unit:AdminPropertyUnit;role:string;userId:string;repo:InventoryAdminRepository;onClose:()=>void;onSaved:(unit:AdminPropertyUnit)=>void}){
-  const admin=role==='platform_admin'||role==='organization_admin';const seller=role==='seller';
-  const allowed:UnitStatus[]=admin?(unit.status==='available'?['available','reserved','sold']:unit.status==='reserved'?['reserved','available','sold']:unit.status==='sold'?['sold','available']:[unit.status]):seller?(unit.status==='available'?['available','reserved']:unit.status==='reserved'&&unit.reservedBy===userId?['reserved','available']:[unit.status]):[unit.status];
-  const [price,setPrice]=useState(unit.priceBRL?.toString()??'');const [status,setStatus]=useState<UnitStatus>(unit.status);const [published,setPublished]=useState(unit.published);const [reason,setReason]=useState('');const [confirmSold,setConfirmSold]=useState(false);const [busy,setBusy]=useState(false);const [message,setMessage]=useState('');const [latest,setLatest]=useState(unit);const [conflict,setConflict]=useState(false);
-  useEffect(()=>{const previous=document.body.style.overflow;document.body.style.overflow='hidden';const close=(event:KeyboardEvent)=>{if(event.key==='Escape')onClose();};window.addEventListener('keydown',close);return()=>{document.body.style.overflow=previous;window.removeEventListener('keydown',close);};},[onClose]);
-  const stateChanged=status!==latest.status;const sensitive=latest.status==='sold'&&status==='available';const canSave=(admin||seller)&&(!stateChanged||reason.trim().length>0)&&(!sensitive||confirmSold);
-  const verify=async(current:AdminPropertyUnit,predicate:(fresh:AdminPropertyUnit)=>boolean)=>{setMessage('A conexão foi interrompida. Estamos verificando se a alteração foi concluída…');try{const fresh=await repo.getUnit(current.id);if(fresh&&predicate(fresh)&&fresh.version>current.version){setMessage('A alteração foi confirmada após verificar os dados.');return fresh;}if(fresh){setLatest(fresh);throw new InventoryError('network','A alteração não foi aplicada. Você pode tentar novamente.');}throw new InventoryError('network','Não foi possível verificar o resultado da alteração. Não reenvie sem atualizar os dados.');}catch(error){if(error instanceof InventoryError)throw error;throw new InventoryError('network','Não foi possível verificar o resultado da alteração. Não reenvie sem atualizar os dados.');}};
-  const execute=async(current:AdminPropertyUnit,call:()=>Promise<AdminPropertyUnit>,predicate:(fresh:AdminPropertyUnit)=>boolean)=>{try{return await call();}catch(error){if(error instanceof InventoryError&&error.code==='version_conflict'){const fresh=await repo.getUnit(current.id);if(fresh){setLatest(fresh);setConflict(true);}throw new InventoryError('version_conflict','Esta unidade foi alterada por outro usuário. Os dados foram atualizados para você revisar novamente.');}if(error instanceof InventoryError&&error.code==='network')return verify(current,predicate);throw error;}};
-  const submit=async(event:FormEvent)=>{event.preventDefault();if(busy||!canSave)return;setBusy(true);setMessage('');setConflict(false);let current=latest;try{const nextPrice=price===''?undefined:Number(price);if(admin&&nextPrice!==current.priceBRL){if(nextPrice===undefined||nextPrice<0)throw new InventoryError('invalid_input','Informe um preço válido.');const intended=nextPrice;current=await execute(current,()=>repo.updateUnitPrice({unitId:current.id,expectedVersion:current.version,newPrice:intended}),fresh=>fresh.priceBRL===intended);}if(status!==current.status){const intended=status;const previous=current.status;current=await execute(current,()=>repo.changeUnitStatus({unitId:current.id,expectedVersion:current.version,expectedStatus:previous,newStatus:intended,reason:reason.trim()}),fresh=>fresh.status===intended);}if(admin&&published!==current.published){const intended=published;current=await execute(current,()=>repo.setUnitPublished({unitId:current.id,expectedVersion:current.version,published:intended}),fresh=>fresh.published===intended);}onSaved(current);}catch(error){setMessage(error instanceof Error?error.message:'Não foi possível salvar as alterações.');}finally{setBusy(false);}};
-  return <div className="drawer-backdrop" role="presentation" onMouseDown={event=>{if(event.target===event.currentTarget)onClose();}}><aside className="unit-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title"><header><div><p className="eyebrow">Editar unidade</p><h2 id="drawer-title">Unidade {unit.code}</h2></div><button aria-label="Fechar edição" onClick={onClose}>×</button></header><form onSubmit={submit} aria-busy={busy}><div className="readonly-grid"><ReadOnly label="Andar" value={String(latest.floor)}/><ReadOnly label="Área" value={`${latest.privateAreaM2} m²`}/><ReadOnly label="Dormitórios" value={String(latest.bedrooms)}/><ReadOnly label="Tipologia" value={latest.unitTypeName}/><ReadOnly label="Orientação" value={orientationLabels[latest.orientation]??latest.orientation}/><ReadOnly label="Versão" value={String(latest.version)}/></div><label>Preço<input type="number" min="0" step="1" value={price} disabled={!admin} onChange={event=>setPrice(event.target.value)}/></label><label>Status<select value={status} disabled={!admin&&!seller} onChange={event=>{setStatus(event.target.value as UnitStatus);setConfirmSold(false);}}>{allowed.map(value=><option key={value} value={value}>{statusLabels[value]}</option>)}</select></label>{stateChanged&&<label>Motivo da alteração<textarea required value={reason} onChange={event=>setReason(event.target.value)} placeholder="Descreva o motivo"/></label>}<label className="check-row"><input type="checkbox" checked={published} disabled={!admin} onChange={event=>setPublished(event.target.checked)}/> Unidade publicada</label>{sensitive&&<label className="sensitive-confirm"><input type="checkbox" checked={confirmSold} onChange={event=>setConfirmSold(event.target.checked)}/><span>Confirmo que desejo reverter a venda e tornar esta unidade disponível novamente.</span></label>}{conflict&&<div className="conflict-box" role="alert"><strong>Alteração concorrente detectada</strong><p>Compare os dados atualizados antes de confirmar um novo envio. O valor que você digitou foi preservado.</p></div>}<div className="drawer-history"><Link to={`/portal/history?unit=${unit.id}`}>Ver histórico</Link><a href={publicLink(unit.code)} target="_blank" rel="noreferrer">Abrir no visualizador</a></div><div aria-live="polite" className={message?'drawer-message':''}>{message}</div><footer><button type="button" className="secondary-button" onClick={onClose}>Cancelar</button><button className="primary-button" disabled={busy||!canSave}>{busy?'Salvando…':'Salvar alterações'}</button></footer></form></aside></div>;
+function Dashboard() {
+  const { repo, project } = usePortal();
+  const [summary, setSummary] = useState<any>();
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (!project) return;
+    setSummary(undefined);
+    repo
+      .getProjectSummary(project.id)
+      .then(setSummary)
+      .catch((reason) => setError(reason.message));
+  }, [repo, project]);
+  return (
+    <Page
+      title="Visão geral"
+      subtitle={
+        project
+          ? `Acompanhe o desempenho de ${project.name}.`
+          : "Selecione um projeto para continuar."
+      }
+    >
+      {error ? (
+        <InlineError message={error} />
+      ) : !summary ? (
+        <LoadingRows />
+      ) : (
+        <>
+          <section className="metric-grid">
+            <Metric label="Unidades totais" value={summary.total} />
+            <Metric label="Disponíveis" value={summary.available} />
+            <Metric label="Reservadas" value={summary.reserved} />
+            <Metric label="Vendidas" value={summary.sold} />
+            <Metric label="Ocultas" value={summary.hidden} />
+            <Metric
+              label="Atualizadas em 7 dias"
+              value={summary.recentlyUpdated}
+            />
+          </section>
+          <section className="portal-panel dashboard-callout">
+            <div>
+              <p className="eyebrow">Projeto selecionado</p>
+              <h2>{project?.name}</h2>
+              <p>
+                Consulte, filtre e atualize as unidades com controle de versão e
+                histórico completo.
+              </p>
+            </div>
+            <Link className="primary-button link-button" to="/portal/inventory">
+              Abrir inventário
+            </Link>
+          </section>
+        </>
+      )}
+    </Page>
+  );
 }
-function ReadOnly({label,value}:{label:string;value:string}){return <div><span>{label}</span><strong>{value}</strong></div>}
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <article className="metric-card">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </article>
+  );
+}
 
-function HistoryPage(){const {repo,project}=usePortal();const location=useLocation();const unitFromUrl=new URLSearchParams(location.search).get('unit')??'';const [unit,setUnit]=useState(unitFromUrl);const [action,setAction]=useState('');const [from,setFrom]=useState('');const [to,setTo]=useState('');const [entries,setEntries]=useState<UnitAuditEntry[]>([]);const [loading,setLoading]=useState(true);const [error,setError]=useState('');const load=()=>{if(!project)return;setLoading(true);setError('');repo.getUnitHistory({projectId:project.id,unitId:unit||undefined,action:action||undefined,createdFrom:from?new Date(`${from}T00:00:00`).toISOString():undefined,createdTo:to?new Date(`${to}T23:59:59`).toISOString():undefined}).then(setEntries).catch(reason=>setError(reason.message)).finally(()=>setLoading(false));};useEffect(load,[repo,project?.id,unit,action,from,to]);return <Page title="Histórico" subtitle="Registro imutável das alterações de inventário."><div className="portal-panel filters history-filters"><label>Unidade (UUID)<input value={unit} onChange={event=>setUnit(event.target.value)} placeholder="Todas as unidades"/></label><label>Ação<select value={action} onChange={event=>setAction(event.target.value)}><option value="">Todas</option>{Object.entries(actionLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><label>De<input type="date" value={from} onChange={event=>setFrom(event.target.value)}/></label><label>Até<input type="date" value={to} onChange={event=>setTo(event.target.value)}/></label></div>{error?<InlineError message={error} retry={load}/>:loading?<LoadingRows/>:!entries.length?<EmptyState title="Nenhuma atividade encontrada" detail="Não há registros para os filtros selecionados."/>:<section className="history-list">{entries.map(entry=><article className="portal-panel history-card" key={entry.id}><div><span className="status">{actionLabels[entry.action]??entry.action}</span><h2>Unidade {entry.unitCode}</h2><p>{dateTime(entry.createdAt)} · Usuário {entry.performedBy.slice(0,8)}…</p></div><div className="history-values"><code>{formatValues(entry.oldValues)}</code><span aria-hidden="true">→</span><code>{formatValues(entry.newValues)}</code></div>{entry.reason&&<p><strong>Motivo:</strong> {entry.reason}</p>}</article>)}</section>}</Page>}
-const auditFieldLabels:Record<string,string>={status:'Status',version:'Versão',price_brl:'Preço',published:'Publicada'};
-const formatValues=(values:Record<string,unknown>)=>Object.entries(values).filter(([key])=>key!=='reserved_by'&&key!=='reserved_at'&&key!=='reserved_until').map(([key,value])=>{const shown=key==='status'&&typeof value==='string'?statusLabels[value as UnitStatus]??value:key==='price_brl'&&typeof value==='number'?money(value):typeof value==='boolean'?(value?'Sim':'Não'):String(value??'—');return `${auditFieldLabels[key]??key}: ${shown}`;}).join(' · ');
-function publicLink(code?:string){const url=new URL('/',location.origin);url.searchParams.set('vista','edificio');if(code)url.searchParams.set('unidad',code);return url.toString();}
-function Page({title,subtitle,action,children}:{title:string;subtitle:string;action?:ReactNode;children:ReactNode}){useEffect(()=>{document.title=`${title} · Portal Escobar`;},[title]);return <div className="portal-page"><header className="page-heading"><div><h1>{title}</h1><p>{subtitle}</p></div>{action}</header>{children}</div>}
-function LoadingRows(){return <div className="portal-panel loading-rows" role="status" aria-label="Carregando"><i/><i/><i/></div>}
-function EmptyState({title,detail}:{title:string;detail:string}){return <section className="portal-panel empty-state"><h2>{title}</h2><p>{detail}</p></section>}
-function InlineError({message,retry}:{message:string;retry?:()=>void}){return <section className="portal-panel inline-error" role="alert"><div><strong>Não foi possível carregar</strong><p>{message}</p></div>{retry&&<button onClick={retry}>Tentar novamente</button>}</section>}
-function PortalState({title,detail,action}:{title:string;detail:string;action?:ReactNode}){return <main className="portal-state"><p className="eyebrow">Portal Escobar</p><h1>{title}</h1><p>{detail}</p>{action}</main>}
-function PortalNotFound(){return <Page title="Página não encontrada" subtitle="O endereço informado não existe no portal."><Link to="/portal">Voltar à visão geral</Link></Page>}
+function InventoryPage() {
+  const { repo, organization, project, userId } = usePortal();
+  const params = useParams();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState<AdminUnitQuery>({
+    page: 1,
+    pageSize: 12,
+    sortBy: "floor",
+    sortDirection: "asc",
+  });
+  const [result, setResult] = useState<{
+    items: AdminPropertyUnit[];
+    total: number;
+  }>({ items: [], total: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [selected, setSelected] = useState<AdminPropertyUnit | null>(null);
+  const [reload, setReload] = useState(0);
+  const effectiveQuery = {
+    ...query,
+    organizationId: organization?.id,
+    projectId: project?.id,
+  };
+  useEffect(() => {
+    if (!project) return;
+    let current = true;
+    setLoading(true);
+    setError("");
+    repo
+      .listUnits(effectiveQuery)
+      .then((data) => {
+        if (current) setResult(data);
+      })
+      .catch((reason) => {
+        if (current) setError(reason.message);
+      })
+      .finally(() => {
+        if (current) setLoading(false);
+      });
+    return () => {
+      current = false;
+    };
+  }, [
+    repo,
+    organization?.id,
+    project?.id,
+    query.page,
+    query.pageSize,
+    query.search,
+    query.floor,
+    query.status,
+    query.bedrooms,
+    query.orientation,
+    query.published,
+    query.sortBy,
+    query.sortDirection,
+    reload,
+  ]);
+  useEffect(() => {
+    if (!params.unitId) {
+      setSelected(null);
+      return;
+    }
+    repo
+      .getUnit(params.unitId)
+      .then((unit) => {
+        if (unit) setSelected(unit);
+        else navigate("/portal/inventory", { replace: true });
+      })
+      .catch((reason) => setError(reason.message));
+  }, [params.unitId, repo, navigate]);
+  const patchQuery = (patch: Partial<AdminUnitQuery>) =>
+    setQuery((current) => ({ ...current, ...patch, page: patch.page ?? 1 }));
+  const pages = Math.max(1, Math.ceil(result.total / query.pageSize));
+  return (
+    <Page
+      title="Inventário"
+      subtitle={`${result.total} unidades encontradas no projeto selecionado.`}
+      action={
+        <a
+          className="secondary-button link-button"
+          href={publicLink()}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Abrir visualizador público
+        </a>
+      }
+    >
+      <div className="portal-panel filters" aria-label="Filtros do inventário">
+        <label className="search-field">
+          Buscar unidade
+          <input
+            value={query.search ?? ""}
+            onChange={(event) => patchQuery({ search: event.target.value })}
+            placeholder="Ex.: 1203"
+          />
+        </label>
+        <label>
+          Status
+          <select
+            value={query.status ?? ""}
+            onChange={(event) =>
+              patchQuery({
+                status: (event.target.value || undefined) as
+                  UnitStatus | undefined,
+              })
+            }
+          >
+            <option value="">Todos</option>
+            {Object.entries(statusLabels).map(([value, label]) => (
+              <option value={value} key={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Andar
+          <input
+            type="number"
+            min="1"
+            value={query.floor ?? ""}
+            onChange={(event) =>
+              patchQuery({
+                floor: event.target.value
+                  ? Number(event.target.value)
+                  : undefined,
+              })
+            }
+          />
+        </label>
+        <label>
+          Publicação
+          <select
+            value={query.published === undefined ? "" : String(query.published)}
+            onChange={(event) =>
+              patchQuery({
+                published:
+                  event.target.value === ""
+                    ? undefined
+                    : event.target.value === "true",
+              })
+            }
+          >
+            <option value="">Todas</option>
+            <option value="true">Publicadas</option>
+            <option value="false">Ocultas</option>
+          </select>
+        </label>
+        <label>
+          Ordenar
+          <select
+            value={`${query.sortBy}:${query.sortDirection}`}
+            onChange={(event) => {
+              const [sortBy, sortDirection] = event.target.value.split(":");
+              patchQuery({
+                sortBy: sortBy as any,
+                sortDirection: sortDirection as any,
+              });
+            }}
+          >
+            <option value="floor:asc">Andar crescente</option>
+            <option value="floor:desc">Andar decrescente</option>
+            <option value="price:asc">Menor preço</option>
+            <option value="price:desc">Maior preço</option>
+            <option value="updated_at:desc">Atualização recente</option>
+          </select>
+        </label>
+      </div>
+      <div aria-live="polite" className="portal-live">
+        {notice}
+      </div>
+      {error ? (
+        <InlineError
+          message={error}
+          retry={() => setReload((value) => value + 1)}
+        />
+      ) : loading ? (
+        <LoadingRows />
+      ) : !result.items.length ? (
+        <EmptyState
+          title="Nenhuma unidade encontrada"
+          detail="Ajuste os filtros ou tente novamente."
+        />
+      ) : (
+        <>
+          <UnitTable
+            units={result.items}
+            onOpen={(unit) => navigate(`/portal/inventory/${unit.id}`)}
+          />
+          <div className="pagination">
+            <button
+              disabled={query.page <= 1}
+              onClick={() => patchQuery({ page: query.page - 1 })}
+            >
+              Anterior
+            </button>
+            <span>
+              Página {query.page} de {pages}
+            </span>
+            <button
+              disabled={query.page >= pages}
+              onClick={() => patchQuery({ page: query.page + 1 })}
+            >
+              Próxima
+            </button>
+          </div>
+        </>
+      )}
+      {selected && (
+        <UnitEditor
+          unit={selected}
+          role={organization!.role}
+          userId={userId}
+          repo={repo}
+          onClose={() => navigate("/portal/inventory")}
+          onSaved={(unit) => {
+            setSelected(unit);
+            setNotice(`Unidade ${unit.code} atualizada com sucesso.`);
+            setReload((value) => value + 1);
+            navigate("/portal/inventory");
+          }}
+        />
+      )}
+    </Page>
+  );
+}
+
+function UnitTable({
+  units,
+  onOpen,
+}: {
+  units: AdminPropertyUnit[];
+  onOpen: (unit: AdminPropertyUnit) => void;
+}) {
+  return (
+    <section className="portal-panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Unidade</th>
+            <th>Andar</th>
+            <th>Área</th>
+            <th>Preço</th>
+            <th>Status</th>
+            <th>Publicada</th>
+            <th>Atualizada</th>
+            <th>
+              <span className="sr-only">Ações</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {units.map((unit) => (
+            <tr key={unit.id}>
+              <td data-label="Unidade">
+                <strong>{unit.code}</strong>
+              </td>
+              <td data-label="Andar">{unit.floor}</td>
+              <td data-label="Área">{unit.privateAreaM2} m²</td>
+              <td data-label="Preço">{money(unit.priceBRL)}</td>
+              <td data-label="Status">
+                <span className={`status status-${unit.status}`}>
+                  {statusLabels[unit.status]}
+                </span>
+              </td>
+              <td data-label="Publicada">{unit.published ? "Sim" : "Não"}</td>
+              <td data-label="Atualizada">{dateTime(unit.updatedAt)}</td>
+              <td>
+                <button className="text-button" onClick={() => onOpen(unit)}>
+                  Editar
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+function UnitEditor({
+  unit,
+  role,
+  userId,
+  repo,
+  onClose,
+  onSaved,
+}: {
+  unit: AdminPropertyUnit;
+  role: string;
+  userId: string;
+  repo: InventoryAdminRepository;
+  onClose: () => void;
+  onSaved: (unit: AdminPropertyUnit) => void;
+}) {
+  const admin = role === "platform_admin" || role === "organization_admin";
+  const seller = role === "seller";
+  const allowed: UnitStatus[] = admin
+    ? unit.status === "available"
+      ? ["available", "reserved", "sold"]
+      : unit.status === "reserved"
+        ? ["reserved", "available", "sold"]
+        : unit.status === "sold"
+          ? ["sold", "available"]
+          : [unit.status]
+    : seller
+      ? unit.status === "available"
+        ? ["available", "reserved"]
+        : unit.status === "reserved" && unit.reservedBy === userId
+          ? ["reserved", "available"]
+          : [unit.status]
+      : [unit.status];
+  const [price, setPrice] = useState(unit.priceBRL?.toString() ?? "");
+  const [status, setStatus] = useState<UnitStatus>(unit.status);
+  const [published, setPublished] = useState(unit.published);
+  const [reason, setReason] = useState("");
+  const [confirmSold, setConfirmSold] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [latest, setLatest] = useState(unit);
+  const [conflict, setConflict] = useState(false);
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", close);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", close);
+    };
+  }, [onClose]);
+  const stateChanged = status !== latest.status;
+  const sensitive = latest.status === "sold" && status === "available";
+  const canSave =
+    (admin || seller) &&
+    (!stateChanged || reason.trim().length > 0) &&
+    (!sensitive || confirmSold);
+  const verify = async (
+    current: AdminPropertyUnit,
+    predicate: (fresh: AdminPropertyUnit) => boolean,
+  ) => {
+    setMessage(
+      "A conexão foi interrompida. Estamos verificando se a alteração foi concluída…",
+    );
+    try {
+      const fresh = await repo.getUnit(current.id);
+      if (fresh && predicate(fresh) && fresh.version > current.version) {
+        setMessage("A alteração foi confirmada após verificar os dados.");
+        return fresh;
+      }
+      if (fresh) {
+        setLatest(fresh);
+        throw new InventoryError(
+          "network",
+          "A alteração não foi aplicada. Você pode tentar novamente.",
+        );
+      }
+      throw new InventoryError(
+        "network",
+        "Não foi possível verificar o resultado da alteração. Não reenvie sem atualizar os dados.",
+      );
+    } catch (error) {
+      if (error instanceof InventoryError) throw error;
+      throw new InventoryError(
+        "network",
+        "Não foi possível verificar o resultado da alteração. Não reenvie sem atualizar os dados.",
+      );
+    }
+  };
+  const execute = async (
+    current: AdminPropertyUnit,
+    call: () => Promise<AdminPropertyUnit>,
+    predicate: (fresh: AdminPropertyUnit) => boolean,
+  ) => {
+    try {
+      return await call();
+    } catch (error) {
+      if (
+        error instanceof InventoryError &&
+        error.code === "version_conflict"
+      ) {
+        const fresh = await repo.getUnit(current.id);
+        if (fresh) {
+          setLatest(fresh);
+          setConflict(true);
+        }
+        throw new InventoryError(
+          "version_conflict",
+          "Esta unidade foi alterada por outro usuário. Os dados foram atualizados para você revisar novamente.",
+        );
+      }
+      if (error instanceof InventoryError && error.code === "network")
+        return verify(current, predicate);
+      throw error;
+    }
+  };
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (busy || !canSave) return;
+    setBusy(true);
+    setMessage("");
+    setConflict(false);
+    let current = latest;
+    try {
+      const nextPrice = price === "" ? undefined : Number(price);
+      if (admin && nextPrice !== current.priceBRL) {
+        if (nextPrice === undefined || nextPrice < 0)
+          throw new InventoryError("invalid_input", "Informe um preço válido.");
+        const intended = nextPrice;
+        current = await execute(
+          current,
+          () =>
+            repo.updateUnitPrice({
+              unitId: current.id,
+              expectedVersion: current.version,
+              newPrice: intended,
+            }),
+          (fresh) => fresh.priceBRL === intended,
+        );
+      }
+      if (status !== current.status) {
+        const intended = status;
+        const previous = current.status;
+        current = await execute(
+          current,
+          () =>
+            repo.changeUnitStatus({
+              unitId: current.id,
+              expectedVersion: current.version,
+              expectedStatus: previous,
+              newStatus: intended,
+              reason: reason.trim(),
+            }),
+          (fresh) => fresh.status === intended,
+        );
+      }
+      if (admin && published !== current.published) {
+        const intended = published;
+        current = await execute(
+          current,
+          () =>
+            repo.setUnitPublished({
+              unitId: current.id,
+              expectedVersion: current.version,
+              published: intended,
+            }),
+          (fresh) => fresh.published === intended,
+        );
+      }
+      onSaved(current);
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível salvar as alterações.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div
+      className="drawer-backdrop"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <aside
+        className="unit-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="drawer-title"
+      >
+        <header>
+          <div>
+            <p className="eyebrow">Editar unidade</p>
+            <h2 id="drawer-title">Unidade {unit.code}</h2>
+          </div>
+          <button aria-label="Fechar edição" onClick={onClose}>
+            ×
+          </button>
+        </header>
+        <form onSubmit={submit} aria-busy={busy}>
+          <div className="readonly-grid">
+            <ReadOnly label="Andar" value={String(latest.floor)} />
+            <ReadOnly label="Área" value={`${latest.privateAreaM2} m²`} />
+            <ReadOnly label="Dormitórios" value={String(latest.bedrooms)} />
+            <ReadOnly label="Tipologia" value={latest.unitTypeName} />
+            <ReadOnly
+              label="Orientação"
+              value={
+                orientationLabels[latest.orientation] ?? latest.orientation
+              }
+            />
+            <ReadOnly label="Versão" value={String(latest.version)} />
+          </div>
+          <label>
+            Preço
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={price}
+              disabled={!admin}
+              onChange={(event) => setPrice(event.target.value)}
+            />
+          </label>
+          <label>
+            Status
+            <select
+              value={status}
+              disabled={!admin && !seller}
+              onChange={(event) => {
+                setStatus(event.target.value as UnitStatus);
+                setConfirmSold(false);
+              }}
+            >
+              {allowed.map((value) => (
+                <option key={value} value={value}>
+                  {statusLabels[value]}
+                </option>
+              ))}
+            </select>
+          </label>
+          {stateChanged && (
+            <label>
+              Motivo da alteração
+              <textarea
+                required
+                value={reason}
+                onChange={(event) => setReason(event.target.value)}
+                placeholder="Descreva o motivo"
+              />
+            </label>
+          )}
+          <label className="check-row">
+            <input
+              type="checkbox"
+              checked={published}
+              disabled={!admin}
+              onChange={(event) => setPublished(event.target.checked)}
+            />{" "}
+            Unidade publicada
+          </label>
+          {sensitive && (
+            <label className="sensitive-confirm">
+              <input
+                type="checkbox"
+                checked={confirmSold}
+                onChange={(event) => setConfirmSold(event.target.checked)}
+              />
+              <span>
+                Confirmo que desejo reverter a venda e tornar esta unidade
+                disponível novamente.
+              </span>
+            </label>
+          )}
+          {conflict && (
+            <div className="conflict-box" role="alert">
+              <strong>Alteração concorrente detectada</strong>
+              <p>
+                Compare os dados atualizados antes de confirmar um novo envio. O
+                valor que você digitou foi preservado.
+              </p>
+            </div>
+          )}
+          <div className="drawer-history">
+            <Link to={`/portal/history?unit=${unit.id}`}>Ver histórico</Link>
+            {admin && (
+              <Link
+                to={`/portal/projects/${unit.projectId}/units/${unit.id}/structure`}
+              >
+                Editar estrutura
+              </Link>
+            )}
+            <a href={publicLink(unit.code)} target="_blank" rel="noreferrer">
+              Abrir no visualizador
+            </a>
+          </div>
+          <div aria-live="polite" className={message ? "drawer-message" : ""}>
+            {message}
+          </div>
+          <footer>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onClose}
+            >
+              Cancelar
+            </button>
+            <button className="primary-button" disabled={busy || !canSave}>
+              {busy ? "Salvando…" : "Salvar alterações"}
+            </button>
+          </footer>
+        </form>
+      </aside>
+    </div>
+  );
+}
+function ReadOnly({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function HistoryPage() {
+  const { repo, project } = usePortal();
+  const location = useLocation();
+  const unitFromUrl = new URLSearchParams(location.search).get("unit") ?? "";
+  const [unit, setUnit] = useState(unitFromUrl);
+  const [action, setAction] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [entries, setEntries] = useState<UnitAuditEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const load = () => {
+    if (!project) return;
+    setLoading(true);
+    setError("");
+    repo
+      .getUnitHistory({
+        projectId: project.id,
+        unitId: unit || undefined,
+        action: action || undefined,
+        createdFrom: from
+          ? new Date(`${from}T00:00:00`).toISOString()
+          : undefined,
+        createdTo: to ? new Date(`${to}T23:59:59`).toISOString() : undefined,
+      })
+      .then(setEntries)
+      .catch((reason) => setError(reason.message))
+      .finally(() => setLoading(false));
+  };
+  useEffect(load, [repo, project?.id, unit, action, from, to]);
+  return (
+    <Page
+      title="Histórico"
+      subtitle="Registro imutável das alterações de inventário."
+    >
+      <div className="portal-panel filters history-filters">
+        <label>
+          Unidade (UUID)
+          <input
+            value={unit}
+            onChange={(event) => setUnit(event.target.value)}
+            placeholder="Todas as unidades"
+          />
+        </label>
+        <label>
+          Ação
+          <select
+            value={action}
+            onChange={(event) => setAction(event.target.value)}
+          >
+            <option value="">Todas</option>
+            {Object.entries(actionLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          De
+          <input
+            type="date"
+            value={from}
+            onChange={(event) => setFrom(event.target.value)}
+          />
+        </label>
+        <label>
+          Até
+          <input
+            type="date"
+            value={to}
+            onChange={(event) => setTo(event.target.value)}
+          />
+        </label>
+      </div>
+      {error ? (
+        <InlineError message={error} retry={load} />
+      ) : loading ? (
+        <LoadingRows />
+      ) : !entries.length ? (
+        <EmptyState
+          title="Nenhuma atividade encontrada"
+          detail="Não há registros para os filtros selecionados."
+        />
+      ) : (
+        <section className="history-list">
+          {entries.map((entry) => (
+            <article className="portal-panel history-card" key={entry.id}>
+              <div>
+                <span className="status">
+                  {actionLabels[entry.action] ?? entry.action}
+                </span>
+                <h2>Unidade {entry.unitCode}</h2>
+                <p>
+                  {dateTime(entry.createdAt)} · Usuário{" "}
+                  {entry.performedBy.slice(0, 8)}…
+                </p>
+              </div>
+              <div className="history-values">
+                <code>{formatValues(entry.oldValues)}</code>
+                <span aria-hidden="true">→</span>
+                <code>{formatValues(entry.newValues)}</code>
+              </div>
+              {entry.reason && (
+                <p>
+                  <strong>Motivo:</strong> {entry.reason}
+                </p>
+              )}
+            </article>
+          ))}
+        </section>
+      )}
+    </Page>
+  );
+}
+const auditFieldLabels: Record<string, string> = {
+  status: "Status",
+  version: "Versão",
+  price_brl: "Preço",
+  published: "Publicada",
+};
+const formatValues = (values: Record<string, unknown>) =>
+  Object.entries(values)
+    .filter(
+      ([key]) =>
+        key !== "reserved_by" &&
+        key !== "reserved_at" &&
+        key !== "reserved_until",
+    )
+    .map(([key, value]) => {
+      const shown =
+        key === "status" && typeof value === "string"
+          ? (statusLabels[value as UnitStatus] ?? value)
+          : key === "price_brl" && typeof value === "number"
+            ? money(value)
+            : typeof value === "boolean"
+              ? value
+                ? "Sim"
+                : "Não"
+              : String(value ?? "—");
+      return `${auditFieldLabels[key] ?? key}: ${shown}`;
+    })
+    .join(" · ");
+function publicLink(code?: string) {
+  const url = new URL("/", location.origin);
+  url.searchParams.set("vista", "edificio");
+  if (code) url.searchParams.set("unidad", code);
+  return url.toString();
+}
+function Page({
+  title,
+  subtitle,
+  action,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
+  useEffect(() => {
+    document.title = `${title} · Portal Escobar`;
+  }, [title]);
+  return (
+    <div className="portal-page">
+      <header className="page-heading">
+        <div>
+          <h1>{title}</h1>
+          <p>{subtitle}</p>
+        </div>
+        {action}
+      </header>
+      {children}
+    </div>
+  );
+}
+function LoadingRows() {
+  return (
+    <div
+      className="portal-panel loading-rows"
+      role="status"
+      aria-label="Carregando"
+    >
+      <i />
+      <i />
+      <i />
+    </div>
+  );
+}
+function EmptyState({ title, detail }: { title: string; detail: string }) {
+  return (
+    <section className="portal-panel empty-state">
+      <h2>{title}</h2>
+      <p>{detail}</p>
+    </section>
+  );
+}
+function InlineError({
+  message,
+  retry,
+}: {
+  message: string;
+  retry?: () => void;
+}) {
+  return (
+    <section className="portal-panel inline-error" role="alert">
+      <div>
+        <strong>Não foi possível carregar</strong>
+        <p>{message}</p>
+      </div>
+      {retry && <button onClick={retry}>Tentar novamente</button>}
+    </section>
+  );
+}
+function PortalState({
+  title,
+  detail,
+  action,
+}: {
+  title: string;
+  detail: string;
+  action?: ReactNode;
+}) {
+  return (
+    <main className="portal-state">
+      <p className="eyebrow">Portal Escobar</p>
+      <h1>{title}</h1>
+      <p>{detail}</p>
+      {action}
+    </main>
+  );
+}
+function PortalNotFound() {
+  return (
+    <Page
+      title="Página não encontrada"
+      subtitle="O endereço informado não existe no portal."
+    >
+      <Link to="/portal">Voltar à visão geral</Link>
+    </Page>
+  );
+}
