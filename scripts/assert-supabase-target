@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+expected_environment="${1:-}"
+explicit_ref="${2:-}"
+staging_ref="kihyogedhwvzmewceqjg"
+production_ref="fdquwfmrpvemxqutyupn"
+production_ref_confirmed="fdguwfmrpvemxqutyupn"
+
+if [[ -z "$expected_environment" ]]; then
+  echo "ERROR: expected environment is required" >&2
+  exit 2
+fi
+
+effective_ref="${explicit_ref:-${SUPABASE_PROJECT_REF:-}}"
+if [[ -z "$effective_ref" && "${ASSERT_SUPABASE_NO_LINKED_REF:-0}" != "1" && -f "supabase/.temp/project-ref" ]]; then
+  effective_ref="$(tr -d '[:space:]' < supabase/.temp/project-ref)"
+fi
+if [[ -z "$effective_ref" ]]; then
+  echo "ERROR: Supabase project ref is empty or unverifiable" >&2
+  exit 3
+fi
+
+case "$effective_ref" in
+  "$production_ref"|"$production_ref_confirmed")
+    echo "BLOCKED: production Supabase target" >&2
+    exit 4
+    ;;
+esac
+
+if [[ "$expected_environment" != "staging" ]]; then
+  echo "ERROR: only the staging environment is allowlisted" >&2
+  exit 5
+fi
+if [[ "$effective_ref" != "$staging_ref" ]]; then
+  echo "ERROR: target does not match the staging allowlist" >&2
+  exit 6
+fi
+
+echo "OK: verified staging target $staging_ref"
