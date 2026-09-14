@@ -84,6 +84,8 @@ async function mockBackend(
   } = {},
 ) {
   let unit = { ...baseUnit, status: options.status ?? baseUnit.status };
+  const importExpiry=new Date(Date.now()+30*60*1000).toISOString();
+  const imports:any[]=[];
   await page.route("http://supabase.test/**", async (route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
@@ -329,6 +331,21 @@ async function mockBackend(
           },
         ]),
       });
+    if (path.includes("/rest/v1/rpc/admin_preview_inventory_import")) {
+      const item={ id:"import-1",project_id:projectId,mode:"create_and_update",status:"validated",operation_id:"operation-1",payload_hash:"hash",created_at:new Date().toISOString(),expires_at:importExpiry,row_count:1,new_count:1,update_count:0,unchanged_count:0,warning_count:0,error_count:0 };
+      imports.splice(0,imports.length,item);
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(item) });
+    }
+    if (path.includes("/rest/v1/rpc/admin_confirm_inventory_import")) {
+      const item={...imports[0],status:"completed",completed_at:new Date().toISOString()};imports.splice(0,imports.length,item);
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(item) });
+    }
+    if (path.includes("/rest/v1/rpc/admin_list_inventory_imports"))
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(imports) });
+    if (path.includes("/rest/v1/rpc/admin_get_inventory_import"))
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id:"import-1",status:"completed",row_count:1,new_count:1,update_count:0,unchanged_count:0,warning_count:0,error_count:0,completed_at:"2026-09-14T10:00:00Z" }) });
+    if (path.includes("/rest/v1/inventory_import_errors"))
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(imports.length?[{row_number:2,column_name:null,code:"new",message:"Nova unidade",severity:"warning",classification:"new"}]:[]) });
     if (path.includes("/rest/v1/rpc/admin_validate_project_readiness"))
       return route.fulfill({
         status: 200,
@@ -552,6 +569,42 @@ test("inventário, edição e histórico", async ({ page }) => {
     path: "test-results/visuals/history-desktop.png",
     fullPage: true,
   });
+});
+
+test("importação CSV exige dry-run e confirmação explícita", async ({ page }) => {
+  await mockBackend(page);
+  await login(page);
+  await page.getByRole("link", { name: "Importações" }).click();
+  await expect(page.getByRole("heading", { name: "Importar inventário" })).toBeVisible();
+  const csv = "unit_code;building_code;floor_code;unit_type_code;external_reference;orientation;view_type;solar_exposure;parking_spaces;price;currency;status;published;expected_version\n101;A;F1;T1;EXT;north;sea;morning;1;500000;BRL;available;false;";
+  await page.getByLabel("Arquivo CSV").setInputFiles({ name:"units.csv",mimeType:"text/csv",buffer:Buffer.from(csv) });
+  await page.getByRole("button", { name: "Executar dry-run" }).click();
+  await expect(page.getByText("Dry-run concluído. Revise antes de confirmar.")).toBeVisible();
+  await expect(page.getByRole("heading", { name:"Linhas normalizadas" })).toBeVisible();
+  await expect(page.getByText("31/12/2098")).toHaveCount(0);
+  await expect(page.getByText("Validada",{exact:true})).toBeVisible();
+  await page.screenshot({ path:"test-results/visuals/import-preview-desktop.png",fullPage:true });
+  await page.getByRole("button", { name: "Confirmar importação" }).click();
+  const confirmation=page.getByRole("dialog");
+  await expect(confirmation.getByText("Escobar Residences")).toBeVisible();
+  await expect(confirmation.getByText(/operação é atômica/i)).toBeVisible();
+  await page.screenshot({path:"test-results/visuals/import-confirmation-desktop.png",fullPage:true});
+  await confirmation.getByRole("button",{name:"Confirmar aplicação"}).click();
+  await expect(page.getByText("Importação concluída: 1 linhas processadas.")).toBeVisible();
+  await expect(page.getByText("Concluída",{exact:true})).toBeVisible();
+  await page.screenshot({path:"test-results/visuals/import-history-desktop.png",fullPage:true});
+  await page.setViewportSize({ width:768,height:1024 });
+  await page.screenshot({ path:"test-results/visuals/import-tablet.png",fullPage:true });
+  await page.setViewportSize({ width:390,height:844 });
+  await page.screenshot({ path:"test-results/visuals/import-mobile.png",fullPage:true });
+});
+
+test("seller não vê nem acessa importações", async ({ page }) => {
+  await mockBackend(page, { role:"seller" });
+  await login(page);
+  await expect(page.getByRole("link", { name:"Importações" })).toHaveCount(0);
+  await page.goto(`/portal/projects/${projectId}/imports`);
+  await expect(page).toHaveURL(/\/portal$/);
 });
 
 test("conflito preserva a intenção e exige nova revisão", async ({ page }) => {

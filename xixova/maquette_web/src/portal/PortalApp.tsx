@@ -31,6 +31,7 @@ import { SupabaseInventoryAdminRepository } from "../infrastructure/inventory/su
 import { getSupabaseClient } from "../infrastructure/supabase/client";
 import { useAuth } from "../auth/AuthContext";
 import { MembersPage, OrganizationsPage } from "./OrganizationPages";
+import { ImportDetailPage, ImportsPage } from "./ImportPages";
 import {
   BuildingPage,
   NewProjectPage,
@@ -278,6 +279,8 @@ export default function PortalApp() {
               path="projects/:projectId/units/:unitId/structure"
               element={<StructuralUnitPage />}
             />
+            <Route path="projects/:projectId/imports" element={organization!.role === "platform_admin" || organization!.role === "organization_admin" ? <ImportsPage /> : <Navigate to="/portal" replace />} />
+            <Route path="projects/:projectId/imports/:importId" element={organization!.role === "platform_admin" || organization!.role === "organization_admin" ? <ImportDetailPage /> : <Navigate to="/portal" replace />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="inventory/:unitId" element={<InventoryPage />} />
             <Route
@@ -305,6 +308,7 @@ function PortalSidebar({
   role: string;
   onSignOut: () => Promise<void>;
 }) {
+  const { project } = usePortal();
   const manager = role === "platform_admin" || role === "organization_admin";
   return (
     <aside className="portal-sidebar">
@@ -319,6 +323,7 @@ function PortalSidebar({
         {manager && <NavLink to="/portal/users">Usuários</NavLink>}
         <NavLink to="/portal/projects">Projetos</NavLink>
         <NavLink to="/portal/inventory">Inventário</NavLink>
+        {manager && <NavLink to={`/portal/projects/${project?.id ?? "none"}/imports`}>Importações</NavLink>}
         {role !== "viewer" && <NavLink to="/portal/history">Histórico</NavLink>}
       </nav>
       <button className="sidebar-logout" onClick={onSignOut}>

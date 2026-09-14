@@ -499,6 +499,7 @@ export function ProjectDetailPage() {
 
 export function ProjectStructurePage() {
   const { projectId } = useParams(),
+    { organization } = usePortal(),
     repo = useRepo(),
     [items, setItems] = useState<Building[]>([]),
     [message, setMessage] = useState("");
@@ -550,11 +551,7 @@ export function ProjectStructurePage() {
     <Frame
       title="Estrutura"
       subtitle="Edifícios e pavimentos do projeto."
-      action={
-        <button className="primary-button" onClick={create}>
-          Novo edifício
-        </button>
-      }
+      action={<div className="structure-links">{manager(organization?.role) && <Link className="secondary-button link-button" to={`/portal/projects/${projectId}/imports`}>Importar CSV</Link>}<button className="primary-button" onClick={create}>Novo edifício</button></div>}
     >
       <nav className="breadcrumbs">
         <Link to={`/portal/projects/${projectId}`}>Projeto</Link>
