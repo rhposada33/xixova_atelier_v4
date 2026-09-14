@@ -24,7 +24,7 @@ Deno.serve(async request=>{
       ?await caller.rpc('admin_retry_invitation',{p_invitation_id:body.invitationId,p_expected_version:body.expectedVersion,p_token_hash:tokenHash,p_operation_id:body.operationId})
       :await caller.rpc('admin_prepare_invitation',{p_organization_id:body.organizationId,p_email:body.email,p_role:body.role,p_token_hash:tokenHash,p_operation_id:body.operationId});
     const {data:invitation,error:prepareError}=prepared;
-    if(prepareError)return json(400,{code:'request_rejected',details:prepareError.details},origin);
+    if(prepareError)return json(400,{code:'request_rejected'},origin);
     if(invitation.status!=='pending_delivery')return json(200,{status:invitation.status,invitationId:invitation.id},origin);
     const {data:claimed,error:claimError}=await admin.rpc('admin_claim_invitation_delivery',{p_invitation_id:invitation.id,p_actor_id:user.id});
     if(claimError)throw claimError;
