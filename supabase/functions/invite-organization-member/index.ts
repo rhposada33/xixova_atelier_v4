@@ -1,6 +1,6 @@
 import {createClient} from 'npm:@supabase/supabase-js@2';
 
-const cors=(origin:string)=>({'access-control-allow-origin':origin,'access-control-allow-headers':'authorization,content-type,x-idempotency-key','access-control-allow-methods':'POST,OPTIONS','access-control-max-age':'600','vary':'origin'});
+const cors=(origin:string)=>({'access-control-allow-origin':origin,'access-control-allow-headers':'authorization,content-type,apikey,x-client-info','access-control-allow-methods':'POST,OPTIONS','access-control-max-age':'600','vary':'origin'});
 const json=(status:number,body:Record<string,unknown>,origin:string)=>new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json',...cors(origin)}});
 const base64=(bytes:Uint8Array)=>btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
 const digest=async(value:string)=>btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)))));
