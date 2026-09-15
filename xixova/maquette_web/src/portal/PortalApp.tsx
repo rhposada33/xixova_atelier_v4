@@ -30,6 +30,7 @@ import {
 import { SupabaseInventoryAdminRepository } from "../infrastructure/inventory/supabase/SupabaseInventoryAdminRepository";
 import { getSupabaseClient } from "../infrastructure/supabase/client";
 import { useAuth } from "../auth/AuthContext";
+import { isStagingEnvironment } from "../config/appEnvironment";
 import { MembersPage, OrganizationsPage } from "./OrganizationPages";
 import { ImportDetailPage, ImportsPage } from "./ImportPages";
 import {
@@ -315,6 +316,9 @@ function PortalSidebar({
       <Link to="/" className="portal-logo">
         ESCOBAR<span>Portal administrativo</span>
       </Link>
+      {isStagingEnvironment() && (
+        <span className="staging-environment">Ambiente de homologação</span>
+      )}
       <nav aria-label="Navegação principal">
         <NavLink end to="/portal">
           Visão geral

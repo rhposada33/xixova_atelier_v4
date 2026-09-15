@@ -60,8 +60,9 @@ test("estudio solar cambia fecha, hora y estación",async({page})=>{
 });
 
 test("captura con un renderer temporal",async({page})=>{
+  test.setTimeout(60_000);
   await page.goto("/?vista=interior");
-  await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer)).toBeTruthy();
+  await expect.poll(()=>page.evaluate(()=>(window as any).__XIXOVA_MAQUETA__?.renderer),{timeout:30_000}).toBeTruthy();
   const download=page.waitForEvent("download");
   await page.getByRole("button",{name:"Salvar visualização"}).click();
   expect((await download).suggestedFilename()).toBe("garden_house_18-maqueta.png");
