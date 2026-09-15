@@ -7,7 +7,7 @@ test('portada del edificio, filtros combinados y limpieza accesible',async({page
   await page.goto('/?vista=edificio');
   await expect(page.getByRole('heading',{name:'Encontre seu apartamento ideal'})).toBeVisible();
   await expect(page.getByText('54 de 72 unidades disponíveis')).toBeVisible();
-  await expect(page.locator('.building-stage canvas')).toBeVisible();
+  await expect(page.locator('.building-stage canvas')).toBeVisible({timeout:20_000});
   await page.getByLabel('Andar',{exact:true}).selectOption('12');
   await page.locator('.b-bedroom-buttons').getByRole('button',{name:'3',exact:true}).click();
   await expect(page.getByText('2 unidades correspondem aos seus filtros')).toBeVisible();
@@ -34,7 +34,7 @@ test('interior se carga al entrar y el regreso conserva filtros y selección',as
   const interiorRequests:string[]=[];
   page.on('request',r=>{if(/scene\.json|catalog\.json/.test(r.url()))interiorRequests.push(r.url());});
   await page.goto('/?vista=edificio&unidad=1203');
-  await expect(page.locator('.building-stage canvas')).toBeVisible();
+  await expect(page.locator('.building-stage canvas')).toBeVisible({timeout:20_000});
   expect(interiorRequests).toEqual([]);
   await page.getByLabel('Andar',{exact:true}).selectOption('12');
   await page.getByRole('button',{name:'Ver interior'}).click();

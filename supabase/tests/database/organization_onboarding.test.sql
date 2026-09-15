@@ -35,8 +35,8 @@ select is(pg_temp.err($$select public.admin_create_organization('X','','x','BR',
 select is((select count(*)::int from public.admin_list_members((select id from public.organizations where slug='cliente-novo'),1,25)),1,'organization admin lists own members');
 select is(pg_temp.err($$select * from public.admin_list_members('00000000-0000-4000-8000-000000000001',1,25)$$),'not_found','organization admin cannot inspect another organization');
 select ok((select (public.admin_prepare_invitation((select id from public.organizations where slug='cliente-novo'),'new.user@test.local','viewer',repeat('a',43),'51000000-0000-4000-8000-000000000001')).status='pending_delivery'),'manager prepares invitation');
-select is((select count(*)::int from public.admin_audit_logs where action='invitation.created'),1,'invitation creation is audited without email');
-select ok(not exists(select 1 from public.admin_audit_logs where old_values::text like '%new.user%' or new_values::text like '%new.user%'),'audit excludes invitation email');
+select is((select count(*)::int from public.admin_list_audit_logs(p_action=>'invitation.created')),1,'invitation creation is audited without email');
+select ok(not exists(select 1 from public.admin_list_audit_logs() where old_values::text like '%new.user%' or new_values::text like '%new.user%'),'audit reading excludes invitation email');
 select is((select count(*)::int from public.admin_prepare_invitation((select id from public.organizations where slug='cliente-novo'),'new.user@test.local','viewer',repeat('b',43),'51000000-0000-4000-8000-000000000001')),1,'repeated operation id is idempotent');
 select is((select count(*)::int from public.organization_invitations),1,'idempotency creates one invitation');
 select is(pg_temp.err($$select public.admin_prepare_invitation((select id from public.organizations where slug='cliente-novo'),'new.user@test.local','viewer',repeat('c',44),'51000000-0000-4000-8000-000000000099')$$),'invitation_exists','concurrent operation cannot create a second current invitation');
@@ -55,9 +55,9 @@ select throws_ok($$insert into public.admin_audit_logs(organization_id,resource_
 select throws_ok($$delete from public.admin_audit_logs$$,'42501','permission denied for table admin_audit_logs','direct audit delete denied');
 select throws_ok($$update public.organization_members set role='organization_admin'$$,'42501','permission denied for table organization_members','direct membership update denied');
 reset role;select set_config('request.jwt.claim.sub','41000000-0000-4000-8000-000000000001',true);set local role authenticated;
-select is((select count(*)::int from public.admin_audit_logs where resource_type='membership'),1,'membership change audited');
+select is((select count(*)::int from public.admin_list_audit_logs(p_resource_type=>'membership')),1,'membership change audited');
 select is((select count(*)::int from public.admin_list_organizations(1,100,null,'active')),2,'platform listing remains remote and deterministic');
-select is((select count(*)::int from public.admin_audit_logs where resource_type='organization'),4,'organization lifecycle is audited');
+select is((select count(*)::int from public.admin_list_audit_logs(p_resource_type=>'organization')),4,'organization lifecycle is audited');
 reset role;set local role service_role;select set_config('request.jwt.claims','{"role":"service_role"}',true);
 select ok(public.admin_claim_invitation_delivery((select id from public.organization_invitations where email_normalized='new.user@test.local'),'41000000-0000-4000-8000-000000000002'),'server claims the first cross-system delivery attempt');
 select is(public.admin_claim_invitation_delivery((select id from public.organization_invitations where email_normalized='new.user@test.local'),'41000000-0000-4000-8000-000000000002'),false,'repeated request cannot claim or resend an ambiguous delivery');

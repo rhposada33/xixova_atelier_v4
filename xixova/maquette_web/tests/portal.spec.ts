@@ -81,6 +81,8 @@ async function mockBackend(
     status?: "available" | "reserved" | "sold";
     delay?: boolean;
     invalidLogin?: boolean;
+    auditEmpty?: boolean;
+    auditError?: boolean;
   } = {},
 ) {
   let unit = { ...baseUnit, status: options.status ?? baseUnit.status };
@@ -421,6 +423,15 @@ async function mockBackend(
           },
         ]),
       });
+    if (path.includes("/rest/v1/rpc/admin_list_audit_logs")) {
+      if(options.auditError)return route.fulfill({status:500,contentType:'application/json',body:JSON.stringify({code:'XX000',message:'internal'})});
+      const filters=route.request().postDataJSON() as Record<string,unknown>;
+      const actions=['organization.created','invitation.created','invitation.sent','invitation.accepted','membership.bootstrap'];
+      const events=actions.map((action,index)=>({id:`admin-audit-${index}`,organization_id:organizationId,organization_name:'Escobar',project_id:null,project_name:null,action,resource_type:index===0?'organization':index===4?'membership':'invitation',resource_name:index===0?'Escobar':'Registro administrativo',actor_id:userId,actor_name:'Administrador Local',created_at:`2026-09-15T0${index}:00:00Z`,old_values:{},new_values:{role:'organization_admin',status:index===3?'accepted':'sent'},reason:null,total_count:5}));
+      const filtered=options.auditEmpty?[]:events.filter(item=>(!filters.p_action||item.action===filters.p_action)&&(!filters.p_resource_type||item.resource_type===filters.p_resource_type));
+      return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(filtered.map(item=>({...item,total_count:filtered.length})))});
+    }
+    if(path.includes('/rest/v1/rpc/admin_list_audit_actors'))return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify([{actor_id:userId,actor_name:'Administrador Local'}])});
     if (path.includes("/rest/v1/rpc/admin_change_unit_status")) {
       if (options.conflict)
         return route.fulfill({
@@ -505,6 +516,56 @@ async function login(page: Page, expected = /\/portal$/) {
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL(expected);
 }
+
+test('atividade administrativa é separada, filtrável e não expõe dados sensíveis',async({page})=>{
+  await mockBackend(page);
+  await login(page);
+  await page.goto('/portal/history');
+  await expect(page.getByRole('heading',{name:'Histórico'})).toBeVisible();
+  await page.getByRole('link',{name:'Atividade administrativa'}).click();
+  await expect(page.locator('.history-card .status').filter({hasText:'Convite aceito'})).toBeVisible();
+  await expect(page.locator('.history-card .status').filter({hasText:'Organização criada'})).toBeVisible();
+  await page.getByRole('combobox',{name:'Ação',exact:true}).selectOption('invitation.accepted');
+  await expect(page.locator('.history-card .status').filter({hasText:'Convite aceito'})).toBeVisible();
+  await expect(page.locator('.history-card .status').filter({hasText:'Organização criada'})).toHaveCount(0);
+  await page.getByRole('button',{name:'Ver detalhes'}).click();
+  await expect(page.getByRole('dialog',{name:'Detalhes da atividade administrativa'})).toBeVisible();
+  await expect(page.locator('body')).not.toContainText('private@example.com');
+  await expect(page.locator('body')).not.toContainText('token_hash');
+  await page.screenshot({path:'test-results/visuals/admin-audit-desktop.png',fullPage:true});
+  await page.setViewportSize({width:768,height:1024});
+  await page.screenshot({path:'test-results/visuals/admin-audit-tablet.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:'test-results/visuals/admin-audit-mobile.png',fullPage:true});
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog',{name:'Detalhes da atividade administrativa'})).toHaveCount(0);
+  await page.setViewportSize({width:1440,height:900});
+  await page.screenshot({path:'test-results/visuals/admin-audit-page-desktop.png',fullPage:true});
+  await page.setViewportSize({width:768,height:1024});
+  await page.screenshot({path:'test-results/visuals/admin-audit-page-tablet.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:'test-results/visuals/admin-audit-page-mobile.png',fullPage:true});
+  await page.getByRole('link',{name:'Inventário'}).last().click();
+  await expect(page).toHaveURL(/\/portal\/history$/);
+});
+
+test('atividade administrativa trata estado vazio',async({page})=>{
+  await mockBackend(page,{auditEmpty:true});await login(page);await page.goto('/portal/history/admin');
+  await expect(page.getByRole('heading',{name:'Nenhuma atividade encontrada'})).toBeVisible();
+});
+
+test('atividade administrativa trata erro e oferece retry',async({page})=>{
+  await mockBackend(page,{auditError:true});await login(page);await page.goto('/portal/history/admin');
+  await expect(page.getByRole('alert')).toContainText('Não foi possível carregar');
+  await expect(page.getByRole('button',{name:'Tentar novamente'})).toBeVisible();
+  await expect(page.locator('body')).not.toContainText('internal');
+});
+
+test('seller não pode abrir auditoria administrativa',async({page})=>{
+  await mockBackend(page,{role:'seller'});await login(page);await page.goto('/portal/history');
+  await expect(page.getByRole('link',{name:'Atividade administrativa'})).toHaveCount(0);
+  await page.goto('/portal/history/admin');await expect(page).toHaveURL(/\/portal$/);
+});
 
 test("login e dashboard responsivos", async ({ page }) => {
   await mockBackend(page);

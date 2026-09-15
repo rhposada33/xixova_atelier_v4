@@ -32,6 +32,7 @@ import { getSupabaseClient } from "../infrastructure/supabase/client";
 import { useAuth } from "../auth/AuthContext";
 import { isStagingEnvironment } from "../config/appEnvironment";
 import { MembersPage, OrganizationsPage } from "./OrganizationPages";
+import { AdminAuditPage } from "./AdminAuditPage";
 import { ImportDetailPage, ImportsPage } from "./ImportPages";
 import {
   BuildingPage,
@@ -284,6 +285,7 @@ export default function PortalApp() {
             <Route path="projects/:projectId/imports/:importId" element={organization!.role === "platform_admin" || organization!.role === "organization_admin" ? <ImportDetailPage /> : <Navigate to="/portal" replace />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="inventory/:unitId" element={<InventoryPage />} />
+            <Route path="history/admin" element={organization!.role === "platform_admin" || organization!.role === "organization_admin" ? <AdminAuditPage /> : <Navigate to="/portal" replace />} />
             <Route
               path="history"
               element={
@@ -1066,7 +1068,7 @@ function ReadOnly({ label, value }: { label: string; value: string }) {
 }
 
 function HistoryPage() {
-  const { repo, project } = usePortal();
+  const { repo, project, organization } = usePortal();
   const location = useLocation();
   const unitFromUrl = new URLSearchParams(location.search).get("unit") ?? "";
   const [unit, setUnit] = useState(unitFromUrl);
@@ -1100,6 +1102,7 @@ function HistoryPage() {
       title="Histórico"
       subtitle="Registro imutável das alterações de inventário."
     >
+      <nav className="audit-tabs" aria-label="Tipos de histórico"><Link to="/portal/history" aria-current="page">Inventário</Link>{(organization?.role==='platform_admin'||organization?.role==='organization_admin')&&<Link to="/portal/history/admin">Atividade administrativa</Link>}</nav>
       <div className="portal-panel filters history-filters">
         <label>
           Unidade (UUID)
