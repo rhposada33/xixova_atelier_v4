@@ -8,6 +8,7 @@ test('portada del edificio, filtros combinados y limpieza accesible',async({page
   await expect(page.getByRole('heading',{name:'Encontre seu apartamento ideal'})).toBeVisible();
   await expect(page.getByText('54 de 72 unidades disponíveis')).toBeVisible();
   await expect(page.locator('.building-stage canvas')).toBeVisible({timeout:20_000});
+  await page.getByRole('region',{name:'Apresentação do empreendimento'}).getByRole('button',{name:'Filtros'}).click();
   await page.getByLabel('Andar',{exact:true}).selectOption('12');
   await page.locator('.b-bedroom-buttons').getByRole('button',{name:'3',exact:true}).click();
   await expect(page.getByText('2 unidades correspondem aos seus filtros')).toBeVisible();
@@ -18,13 +19,13 @@ test('portada del edificio, filtros combinados y limpieza accesible',async({page
 });
 test('matriz, selección, estados e interior no disponible',async({page})=>{
   await page.goto('/?vista=edificio');
-  await page.getByRole('button',{name:'Ver matriz de unidades'}).click();
+  await page.getByRole('navigation',{name:'Navegação do edifício'}).getByRole('button',{name:'Unidades'}).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button',{name:'Unidade 1201, Reservada, 118 metros quadrados'}).click();
   await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1201');
   await expect(page.getByRole('button',{name:'Consultar disponibilidade'})).toBeVisible();
   await expect(page).toHaveURL(/unidad=1201/);
-  await page.getByRole('button',{name:'Ver matriz de unidades'}).click();
+  await page.getByRole('navigation',{name:'Navegação do edifício'}).getByRole('button',{name:'Unidades'}).click();
   await page.getByRole('button',{name:'Unidade 1302, Vendida, 82 metros quadrados'}).click();
   await expect(page.getByRole('button',{name:'Ver unidades semelhantes'})).toBeVisible();
   await expect(page.locator('.building-header-actions').getByRole('button',{name:'Falar pelo WhatsApp'})).toBeDisabled();
@@ -49,8 +50,8 @@ test('modo atardecer y navegación móvil',async({page})=>{
   await page.goto('/?vista=edificio');
   await page.getByRole('button',{name:'Entardecer',exact:true}).click();
   await expect(page.locator('.building-stage')).toHaveClass(/warm_dusk/);
-  await page.locator('.building-mobile-tabs').getByRole('button',{name:'Filtros'}).click();
-  await expect(page.getByRole('heading',{name:'Encontre seu apartamento ideal'})).toBeVisible();
+  await page.getByRole('region',{name:'Apresentação do empreendimento'}).getByRole('button',{name:'Filtros'}).click();
+  await expect(page.getByRole('heading',{name:'Filtros de busca'})).toBeVisible();
   await page.getByRole('button',{name:'Fechar filtros'}).click();
   await page.locator('.building-mobile-tabs').getByRole('button',{name:'Unidades',exact:true}).click();
   await expect(page.getByRole('dialog')).toBeVisible();

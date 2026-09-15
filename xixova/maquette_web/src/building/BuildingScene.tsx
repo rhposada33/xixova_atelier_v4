@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
-import {buildingConfig,statusLabel,type BuildingUnit} from './inventory';
+import {buildingConfig,formatBRL,statusLabel,type BuildingUnit} from './inventory';
 import {bindUnitsToScene} from './bindUnitsToScene';
 import './refinement.css';
 
@@ -50,9 +50,9 @@ export function BuildingScene(props:Props){
     },undefined,()=>{setError('Não foi possível carregar a maquete. Recarregue a página ou explore a matriz de unidades.');setLoading(false);});
     const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down={x:0,y:0};
     const hit=(event:PointerEvent)=>{const rect=el.getBoundingClientRect();pointer.set((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);raycaster.setFromCamera(pointer,camera);return raycaster.intersectObjects(proxies,false)[0]?.object.userData.unit as BuildingUnit|undefined;};
-    const onMove=(event:PointerEvent)=>{if(event.buttons)return;const unit=hit(event),rect=el.getBoundingClientRect();el.style.cursor=unit?'pointer':'grab';setHover(unit?{unit,x:Math.min(event.clientX-rect.left+14,rect.width-205),y:Math.max(10,event.clientY-rect.top-95)}:null);};
+    const onMove=(event:PointerEvent)=>{if(event.buttons)return;const candidate=hit(event),unit=candidate&&(!live.current.filtered||live.current.matches.includes(candidate.code))?candidate:undefined,rect=el.getBoundingClientRect();el.style.cursor=unit?'pointer':'grab';setHover(unit?{unit,x:Math.min(event.clientX-rect.left+14,rect.width-205),y:Math.max(10,event.clientY-rect.top-95)}:null);};
     const onDown=(event:PointerEvent)=>{down={x:event.clientX,y:event.clientY};};
-    const onUp=(event:PointerEvent)=>{if(Math.hypot(event.clientX-down.x,event.clientY-down.y)>5)return;const unit=hit(event);if(unit)live.current.onSelect(unit);};
+    const onUp=(event:PointerEvent)=>{if(Math.hypot(event.clientX-down.x,event.clientY-down.y)>5)return;const unit=hit(event);if(unit&&(!live.current.filtered||live.current.matches.includes(unit.code)))live.current.onSelect(unit);};
     const leave=()=>setHover(null);
     el.addEventListener('pointermove',onMove);el.addEventListener('pointerdown',onDown);el.addEventListener('pointerup',onUp);el.addEventListener('pointerleave',leave);
     const select=(code:string)=>{const center=centers.get(code);if(!center)return;const dir=new THREE.Vector3(center.x*.85,.02,center.z*1.5).normalize();targetLook=new THREE.Vector3(center.x*.3,Math.min(40,Math.max(22,center.y)),center.z*.3);targetCamera=targetLook.clone().add(dir.multiplyScalar(Math.max(91,camera.position.distanceTo(controls.target)*.94)));};
@@ -75,6 +75,6 @@ export function BuildingScene(props:Props){
     {loading&&<div className="building-loading"><span className="building-spinner"/>Preparando seu novo lar…</div>}
     {error&&<div className="building-error" role="alert">{error}</div>}
     {!loading&&!error&&<div ref={label} className="building-unit-label">{props.selected.code}<span/></div>}
-    {hover&&<div className="building-tooltip" style={{left:hover.x,top:hover.y}}><strong>Unidade {hover.unit.code}</strong><span>{hover.unit.privateAreaM2} m² · {hover.unit.bedrooms} dormitórios</span><small>{statusLabel[hover.unit.status]}</small></div>}
+    {hover&&<div className="building-tooltip" style={{left:hover.x,top:hover.y}}><strong>Unidade {hover.unit.code}</strong><span>{hover.unit.floor}º andar · {hover.unit.privateAreaM2} m²</span>{hover.unit.priceBRL!==undefined&&<span>{formatBRL(hover.unit.priceBRL)}</span>}<small>{statusLabel[hover.unit.status]}</small></div>}
   </div>;
 }
