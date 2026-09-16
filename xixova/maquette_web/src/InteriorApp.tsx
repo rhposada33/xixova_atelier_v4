@@ -3,6 +3,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { installJequitibaEnvironment } from "./jequitibaPremium";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { SSAOPass } from "three/addons/postprocessing/SSAOPass.js";
+import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import "./style.css";
 import {
   validateSolarConfig,
@@ -15,6 +21,7 @@ import { useSolarSimulation } from "./solar/state";
 import { SolarControls } from "./solar/SolarControls";
 import { editorialDetails } from "./editorial";
 import { gardenDetails } from "./garden";
+import { jequitibaInterior } from "./jequitiba";
 import type { CatalogManifest, CatalogProject, SceneData, SceneElement, WallMode } from "./contracts";
 import { loadCatalog, loadScene, selectionFromURL, updateSelection } from "./catalog";
 import "./atelier.css";
@@ -212,7 +219,7 @@ function Viewer({
         antialias: true,
         preserveDrawingBuffer: false,
       });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, data.proyecto === "jequitiba_final_03" ? 1.5 : 1));
     renderer.localClippingEnabled = true;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.autoUpdate = false;
@@ -255,6 +262,40 @@ function Viewer({
     world.add(ambient);
     world.environmentIntensity = 0.35;
     const editorialSun = editorialDetails(world, data);
+    let disposeInteriorEnvironment: (() => void) | undefined;
+    if (data.proyecto === "jequitiba_final_03") {
+      disposeInteriorEnvironment = installJequitibaEnvironment(renderer, world, () => { needsRender = true; });
+      ambient.color.set("#fff9ee");
+      ambient.groundColor.set("#a4aaa2");
+      ambient.intensity = 1.12;
+      editorialSun.color.set("#fff0d8");
+      editorialSun.intensity = 2.25;
+      editorialSun.position.set(-4, 8, 17);
+      editorialSun.target.position.set(6, 5, 0);
+      editorialSun.shadow.radius = 4;
+      renderer.toneMappingExposure = 1.0;
+      camera.position.set(center.x + radius * .70, center.y - radius * .88, radius * 1.7);
+    }
+    // Contact shading grounds upholstery, joinery and table legs in the cutaway.
+    // A bounded render ratio and smaller kernel retain responsive orbit controls.
+    const premiumComposer =
+      data.proyecto === "jequitiba_final_03" &&
+      el.clientWidth >= 640 &&
+      (navigator.hardwareConcurrency || 4) >= 4
+        ? new EffectComposer(renderer)
+        : undefined;
+    let contactPass: SSAOPass | undefined;
+    if (premiumComposer) {
+      premiumComposer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+      premiumComposer.addPass(new RenderPass(world, camera));
+      contactPass = new SSAOPass(world, camera, el.clientWidth, el.clientHeight, 12);
+      contactPass.kernelRadius = 9;
+      contactPass.minDistance = .001;
+      contactPass.maxDistance = .075;
+      premiumComposer.addPass(contactPass);
+      premiumComposer.addPass(new SMAAPass());
+      premiumComposer.addPass(new OutputPass());
+    }
     if (data.proyecto === "garden_house_18") {
       gardenDetails(world, { surfaces: false, furniture: true });
       // The textured scene is already lit by the editorial sun and hemisphere.
@@ -278,7 +319,9 @@ function Viewer({
         ),
         material = new THREE.MeshStandardMaterial({
           color:
-            data.proyecto === "garden_house_18"
+            data.proyecto === "jequitiba_final_03"
+              ? room.id.startsWith("suite") ? "#b39877" : room.id === "terraco" ? "#c8bca7" : "#e5dfd2"
+              : data.proyecto === "garden_house_18"
               ? room.cubierto === false
                 ? "#e9dcca"
                 : i % 2
@@ -383,7 +426,16 @@ function Viewer({
         blockers.push(mesh);
         selectables.push(mesh);
       };
-      [...w.aberturas]
+      const openings = data.proyecto === "jequitiba_final_03"
+        ? w.id === "divisoria_terraco"
+          ? [{ distancia: .25, ancho: 11.5, antepecho: 0, alto: 2.5 }]
+          : w.id === "divisoria_privada"
+            ? [1.2, 4.3, 7.4].map(distancia => ({ distancia, ancho: .90, antepecho: 0, alto: 2.2 }))
+            : w.id === "fachada_norte"
+              ? [{ distancia: .15, ancho: 11.7, antepecho: 0, alto: 2.8 }]
+              : w.aberturas
+        : w.aberturas;
+      [...openings]
         .sort((a: any, b: any) => a.distancia - b.distancia)
         .forEach((o: any) => {
           part(cursor, o.distancia, 0, w.altura);
@@ -400,7 +452,7 @@ function Viewer({
       if (segments[0]) objects.set(w.id, segments[0]);
     });
     data.elementos.forEach((x) => {
-      if (data.proyecto === "garden_house_18") return;
+      if (data.proyecto === "garden_house_18" || data.proyecto === "jequitiba_final_03") return;
       const n = proxy(x);
       if (
         data.proyecto === "terraza_luz" &&
@@ -413,7 +465,14 @@ function Viewer({
       proxyRoots.set(x.id, n);
     });
     const loadedLevels: THREE.Object3D[] = [];
-    if (data.web_assets) {
+    if (data.proyecto === "jequitiba_final_03") {
+      const interior = jequitibaInterior(world, data);
+      selectables.push(interior);
+      interior.traverse(node => { if (node.userData.id) objects.set(node.userData.id, node); });
+      el.dataset.sceneReady = "true";
+      el.dataset.quality = "premium-authored";
+    }
+    if (data.web_assets && data.proyecto !== "jequitiba_final_03") {
       const target = data.web_assets!.objetivo,
         order = ["mobile", target].filter(
           (x, i, a) => a.indexOf(x) === i && data.web_assets!.niveles[x],
@@ -496,6 +555,21 @@ function Viewer({
                   }
                 }
               });
+              if (data.proyecto === "jequitiba_final_03") {
+                // glTF converts Blender's Z-up model to Y-up. The existing
+                // interior viewer uses Z-up, so restore that convention before
+                // aligning the centered Blender plan to its metadata origin.
+                g.scene.rotation.x = Math.PI / 2;
+                g.scene.position.set(6, 5.4, 0);
+                proceduralArchitecture.forEach((node) => {
+                  node.visible = false;
+                  node.userData.retired = true;
+                });
+                proxyRoots.forEach((node) => {
+                  node.visible = false;
+                  node.userData.retired = true;
+                });
+              }
               loadedLevels.forEach((x) => {
                 x.traverse((n: any) => (n.userData.retired = true));
                 world.remove(x);
@@ -555,7 +629,7 @@ function Viewer({
           );
       };
       load(0);
-    } else if (data.activos_glb)
+    } else if (data.activos_glb && data.proyecto !== "jequitiba_final_03")
       Object.assign(new GLTFLoader(), {})
         .setMeshoptDecoder(MeshoptDecoder)
         .load(
@@ -716,6 +790,9 @@ function Viewer({
     const resize = () => {
       needsRender = true;
       renderer.setSize(el.clientWidth, el.clientHeight, false);
+      premiumComposer?.setPixelRatio(Math.min(devicePixelRatio, el.clientWidth >= 640 ? 1.25 : 1));
+      premiumComposer?.setSize(el.clientWidth, el.clientHeight);
+      if (contactPass) contactPass.enabled = el.clientWidth >= 640 && (navigator.hardwareConcurrency || 4) >= 4;
       const a = el.clientWidth / el.clientHeight;
       camera.left = -frustum * a;
       camera.right = frustum * a;
@@ -742,6 +819,10 @@ function Viewer({
           world.traverse((n) => {
             if (n.userData.gardenWallCap)
               n.visible = r.wallMode === "inteligentes";
+            if (n.userData.jequitibaWardrobeCap)
+              n.visible = r.wallMode === "inteligentes";
+            if (n.userData.jequitibaWardrobeUpper)
+              n.visible = r.wallMode !== "inteligentes";
           });
         }
         if (!needsRender || performance.now() - lastDraw < 40) return;
@@ -772,13 +853,14 @@ function Viewer({
           if (
             r.wallMode === "inteligentes" &&
             (data.proyecto === "garden_house_18" ||
+              data.proyecto === "jequitiba_final_03" ||
               facade.includes("fachada_sur") ||
               facade.includes("fachada_este"))
           ) {
             m.clippingPlanes = [
               new THREE.Plane(
                 new THREE.Vector3(0, 0, -1),
-                data.proyecto === "garden_house_18" ? 0.74 : 0.95,
+                data.proyecto === "garden_house_18" ? 0.74 : data.proyecto === "jequitiba_final_03" ? 0.68 : 0.95,
               ),
             ];
             m.clipShadows = true;
@@ -787,8 +869,9 @@ function Viewer({
           m.opacity = opacity;
           w.visible = m.opacity > 0.025;
         });
-        (world.background as THREE.Color).copy(r.targetBackground);
-        renderer.render(world, camera);
+        if (world.background instanceof THREE.Color) world.background.copy(r.targetBackground);
+        if (premiumComposer) premiumComposer.render();
+        else renderer.render(world, camera);
         const sunLabel = el.querySelector(".sun-position-label") as HTMLElement;
         if (sunLabel && r.path?.userData.marker) {
           const sp = r.path.userData.marker
@@ -828,7 +911,10 @@ function Viewer({
           material.dispose();
         });
       });
-      world.environment?.dispose();
+      if (disposeInteriorEnvironment) disposeInteriorEnvironment();
+      else world.environment?.dispose();
+      premiumComposer?.passes.forEach(pass => pass.dispose());
+      premiumComposer?.dispose();
       renderer.dispose();
       renderer.domElement.remove();
       labelRoot.replaceChildren();
@@ -1234,6 +1320,7 @@ function Icon({ name }: { name: string }) {
 function Ready(p: any) {
   const d = p.data,
     activeProject = (p.projects as CatalogProject[]).find(item=>item.id===p.project)!,
+    isJequitiba = d.proyecto === "jequitiba_final_03",
     valid = d.solar?.enabled && !validateSolarConfig(d.solar).length,
     solar = valid ? useSolarSimulation(d.solar) : null;
   const [favorite, setFavorite] = useState(false),
@@ -1305,9 +1392,9 @@ function Ready(p: any) {
     >
       <header>
         <div className="brand">
-          <b>ES</b>
+          <b>{isJequitiba ? "JQ" : "ES"}</b>
           <span>
-            <strong>ESCOBAR</strong>
+            <strong>{isJequitiba ? "JEQUITIBÁ" : "ESCOBAR"}</strong>
             <small>MAQUETE INTERATIVA</small>
           </span>
         </div>
@@ -1473,7 +1560,7 @@ function Ready(p: any) {
             <div>
               <h2>{item ? roomNamePT(item.nombre) : "Unidade " + p.unit}</h2>
               <span className="available">
-                {item ? "Ambiente" : "Tipologia Garden"}
+                {item ? "Ambiente" : isJequitiba ? "Tipologia ilustrativa" : "Tipologia Garden"}
               </span>
             </div>
             <div className="unit-facts">
@@ -1481,7 +1568,9 @@ function Ready(p: any) {
                 <Icon name="measure" />
                 {item
                   ? item.area_m2
-                  : d.proyecto === "garden_house_18"
+                  : isJequitiba
+                    ? "127,84"
+                    : d.proyecto === "garden_house_18"
                     ? 234
                     : d.espacios
                         .reduce((a: number, r: any) => a + (r.area_m2 || 0), 0)
@@ -1490,7 +1579,7 @@ function Ready(p: any) {
               </span>
               <span>
                 <Icon name="bed" />
-                {d.proyecto === "garden_house_18"
+                {d.proyecto === "garden_house_18" || d.proyecto === "jequitiba_final_03"
                   ? "3 suites"
                   : "2 dormitórios"}
               </span>
@@ -1502,11 +1591,15 @@ function Ready(p: any) {
             <p className="plan-dimensions">
               {d.proyecto === "garden_house_18"
                 ? "18,00 × 13,00 m"
-                : "Terraza Luz"}
+                : d.proyecto === "jequitiba_final_03"
+                  ? "127,84 m² · 2 vagas"
+                  : "Terraza Luz"}
               <small>
                 {d.proyecto === "garden_house_18"
                   ? "Terraço perimetral de 2,40 m"
-                  : "Arquitectura · naturaleza · luz"}
+                  : d.proyecto === "jequitiba_final_03"
+                    ? "Final 03 · mobiliário ilustrativo"
+                    : "Arquitectura · naturaleza · luz"}
               </small>
             </p>
             <button className="proposal" onClick={() => setProposal(true)}>
@@ -1515,6 +1608,11 @@ function Ready(p: any) {
           </article>
         </aside>
       </section>
+      {d.proyecto === "jequitiba_final_03" && (
+        <p className="illustrative-disclaimer" role="note">
+          Tipologia ilustrativa compartilhada entre as unidades. Móveis, acabamentos e distribuição são referências, não promessa contratual.
+        </p>
+      )}
       <div className="bottom-tools">
         <button
           className={p.tour ? "active" : ""}

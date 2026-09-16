@@ -4,17 +4,19 @@ All dimensions are provisional metres. Geometry is grouped by material for web.
 import bpy, math, json, os
 from mathutils import Vector
 
-OUT = '/home/rafa/RenderCasa/xixova_atelier_v4/xixova/maquette_web/public/building'
-BLEND_OUT = '/home/rafa/RenderCasa/xixova_atelier_v4/resultados/garden_house_building'
+OUT = os.environ.get('XIXOVA_BUILDING_OUT','/home/rafa/RenderCasa/xixova_atelier_v4/xixova/maquette_web/public/building')
+BLEND_OUT = os.environ.get('XIXOVA_BUILDING_BLEND_OUT','/home/rafa/RenderCasa/xixova_atelier_v4/resultados/garden_house_building')
+MODEL_STEM = os.environ.get('XIXOVA_BUILDING_STEM','xixova-building')
+SCENE_NAME = os.environ.get('XIXOVA_BUILDING_SCENE','XIXOVA_BUILDING')
 os.makedirs(OUT, exist_ok=True)
 os.makedirs(BLEND_OUT, exist_ok=True)
 # Preserve previous working scenes while releasing stable web object names.
 for previous_scene in bpy.data.scenes:
-    if previous_scene.name.startswith('XIXOVA_BUILDING'):
+    if previous_scene.name.startswith(SCENE_NAME):
         for previous_object in previous_scene.objects:
             if not previous_object.name.startswith('ARCHIVE_'):
                 previous_object.name = 'ARCHIVE_' + previous_object.name
-scene = bpy.data.scenes.new('XIXOVA_BUILDING')
+scene = bpy.data.scenes.new(SCENE_NAME)
 bpy.context.window.scene = scene
 root = bpy.data.objects.new('BUILDING', None)
 scene.collection.objects.link(root)
@@ -217,8 +219,9 @@ root['reconstruction']='Interpretación provisional; 18 plantas residenciales, 4
 root['visualModes']='neutral_day,warm_dusk'
 # Provisional depth makes the closed lateral elevation readable in the opening view.
 root.scale.y=1.18
-bpy.ops.wm.save_as_mainfile(filepath=BLEND_OUT+'/xixova-building.blend')
-bpy.ops.export_scene.gltf(filepath=OUT+'/xixova-building.glb',export_format='GLB',use_active_scene=True,export_extras=True,export_yup=True,export_cameras=False,export_lights=False)
-stats={'triangles':sum(len(p.vertices)-2 for o in scene.objects if o.type=='MESH' for p in o.data.polygons),'meshObjects':sum(o.type=='MESH' for o in scene.objects),'materials':len(materials),'unitProxies':72,'residentialFloors':18,'glbBytes':os.path.getsize(OUT+'/xixova-building.glb'),'hierarchy':{n:[o.name for o in groups[n].children] for n in groups}}
-with open(OUT+'/asset-statistics.json','w') as f:json.dump(stats,f,indent=2)
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(BLEND_OUT,MODEL_STEM+'.blend'))
+bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,MODEL_STEM+'.glb'),export_format='GLB',use_active_scene=True,export_extras=True,export_yup=True,export_cameras=False,export_lights=False)
+stats={'triangles':sum(len(p.vertices)-2 for o in scene.objects if o.type=='MESH' for p in o.data.polygons),'meshObjects':sum(o.type=='MESH' for o in scene.objects),'materials':len(materials),'unitProxies':72,'residentialFloors':18,'glbBytes':os.path.getsize(os.path.join(OUT,MODEL_STEM+'.glb')),'hierarchy':{n:[o.name for o in groups[n].children] for n in groups}}
+stats_name='asset-statistics.json' if MODEL_STEM=='xixova-building' else MODEL_STEM+'-asset-statistics.json'
+with open(os.path.join(OUT,stats_name),'w') as f:json.dump(stats,f,indent=2)
 print(json.dumps(stats))

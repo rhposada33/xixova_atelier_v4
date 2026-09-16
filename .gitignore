@@ -70,6 +70,9 @@ xixova/director_web/playwright-report/
 .DS_Store
 Thumbs.db
 
+# Artefactos locales de la variante aislada del edificio Visual V2
+/xixova/maquette_web/public/building/xixova-building-visual-v2-asset-statistics.json
+
 # Configuración local de editores
 .idea/
 .vscode/
