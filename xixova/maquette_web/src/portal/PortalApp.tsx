@@ -1212,7 +1212,7 @@ const formatValues = (values: Record<string, unknown>) =>
     })
     .join(" · ");
 function publicLink(code?: string) {
-  const url = new URL("/", location.origin);
+  const url = new URL("/demo", location.origin);
   url.searchParams.set("vista", "edificio");
   if (code) url.searchParams.set("unidad", code);
   return url.toString();

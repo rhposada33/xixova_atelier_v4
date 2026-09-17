@@ -5,7 +5,7 @@ test.beforeEach(async({page})=>{await page.goto('/');await page.evaluate(()=>{se
 test('portada del edificio, filtros combinados y limpieza accesible',async({page})=>{
   test.setTimeout(60_000);
   await page.goto('/?vista=edificio');
-  await expect(page.getByRole('heading',{name:'Encontre seu apartamento ideal'})).toBeVisible();
+  await expect(page.getByRole('heading',{name:'Encontre seu apartamento ideal'})).toBeVisible({timeout:15_000});
   await expect(page.getByText('54 de 72 unidades disponíveis')).toBeVisible();
   await expect(page.locator('.building-stage canvas')).toBeVisible({timeout:20_000});
   await page.getByRole('region',{name:'Apresentação do empreendimento'}).getByRole('button',{name:'Filtros'}).click();

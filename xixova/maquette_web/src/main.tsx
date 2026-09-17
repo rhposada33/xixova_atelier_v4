@@ -1,22 +1,23 @@
-import {lazy,Suspense,useState,useEffect} from 'react';
+import {lazy,Suspense} from 'react';
 import {createRoot} from 'react-dom/client';
-import {BrowserRouter,Route,Routes} from 'react-router-dom';
-import {BuildingApp} from './building/BuildingApp';
-import {InventoryProvider} from './infrastructure/inventory/InventoryContext';
-import type {PropertyUnit} from './domain/inventory';
-import {AuthProvider} from './auth/AuthContext';
-import {ForgotPasswordPage,LoginPage,ResetPasswordPage} from './auth/AuthPages';
-import {AcceptInvitationPage} from './auth/AcceptInvitationPage';
-import './building/building.css';
-const InteriorApp=lazy(()=>import('./InteriorApp'));
+import {BrowserRouter,Navigate,Route,Routes,useLocation} from 'react-router-dom';
+import {MarketingLanding} from './marketing/MarketingLanding';
+import {demoUrl,legacyDemoTarget} from './routing/demoQuery';
+const DemoApp=lazy(()=>import('./demo/DemoApp'));
+const AuthApp=lazy(()=>import('./auth/AuthApp'));
 const PortalApp=lazy(()=>import('./portal/PortalApp'));
-function PublicViewer(){
-  const [interior,setInterior]=useState(new URLSearchParams(location.search).get('vista')==='interior');
-  useEffect(()=>{const pop=()=>setInterior(new URLSearchParams(location.search).get('vista')==='interior');window.addEventListener('popstate',pop);return()=>window.removeEventListener('popstate',pop);},[]);
-  const navigate=(enter:boolean,unit?:PropertyUnit)=>{const url=new URL(location.href);if(enter&&unit?.interiorProjectId){url.searchParams.set('vista','interior');url.searchParams.set('maqueta',unit.interiorProjectId);url.searchParams.set('piso',String(unit.floor));url.searchParams.set('unidad',unit.code);}else{url.searchParams.set('vista','edificio');url.searchParams.delete('maqueta');url.searchParams.delete('piso');}history.pushState(null,'',url);setInterior(enter);};
-  return interior?<><button className="building-return" onClick={()=>navigate(false)}>← Voltar ao edifício</button><Suspense fallback={<div className="building-loading">Abrindo o interior ilustrativo…</div>}><InteriorApp/></Suspense></>:<BuildingApp onExplore={unit=>navigate(true,unit)}/>;
-}
-function AuthRoute({children}:{children:React.ReactNode}){return <AuthProvider>{children}</AuthProvider>}
-function NotFound(){return <main style={{padding:'3rem',fontFamily:'system-ui'}}><h1>Página não encontrada</h1><p>O endereço informado não existe.</p><a href="/">Voltar ao visualizador</a></main>}
-function App(){return <BrowserRouter><Routes><Route path="/" element={<InventoryProvider><PublicViewer/></InventoryProvider>}/><Route path="/login" element={<AuthRoute><LoginPage/></AuthRoute>}/><Route path="/forgot-password" element={<AuthRoute><ForgotPasswordPage/></AuthRoute>}/><Route path="/reset-password" element={<AuthRoute><ResetPasswordPage/></AuthRoute>}/><Route path="/accept-invitation" element={<AuthRoute><AcceptInvitationPage/></AuthRoute>}/><Route path="/portal/*" element={<AuthRoute><Suspense fallback={<main className="portal-state">Carregando o portal…</main>}><PortalApp/></Suspense></AuthRoute>}/><Route path="*" element={<NotFound/>}/></Routes></BrowserRouter>}
+function Loading({label='Carregando…'}:{label?:string}){return <main className="route-loading" aria-live="polite">{label}</main>}
+function Home(){const {search}=useLocation();const target=legacyDemoTarget(search);return target?<Navigate to={target} replace/>:<MarketingLanding/>}
+function DemoRoute(){const {search}=useLocation(),target=demoUrl(search);return target!==`/demo${search}`?<Navigate to={target} replace/>:<Suspense fallback={<Loading label="Abrindo a experiência 3D…"/>}><DemoApp/></Suspense>}
+function NotFound(){return <main className="route-not-found"><p>404</p><h1>Página não encontrada</h1><p>O endereço informado não existe ou foi alterado.</p><div><a href="/">Voltar ao início</a><a href="/demo">Abrir demonstração</a></div></main>}
+function App(){return <BrowserRouter><Routes>
+  <Route path="/" element={<Home/>}/>
+  <Route path="/demo" element={<DemoRoute/>}/>
+  <Route path="/login" element={<Suspense fallback={<Loading/>}><AuthApp page="login"/></Suspense>}/>
+  <Route path="/forgot-password" element={<Suspense fallback={<Loading/>}><AuthApp page="forgot-password"/></Suspense>}/>
+  <Route path="/reset-password" element={<Suspense fallback={<Loading/>}><AuthApp page="reset-password"/></Suspense>}/>
+  <Route path="/accept-invitation" element={<Suspense fallback={<Loading/>}><AuthApp page="accept-invitation"/></Suspense>}/>
+  <Route path="/portal/*" element={<Suspense fallback={<Loading label="Carregando o portal…"/>}><AuthApp page="portal"><PortalApp/></AuthApp></Suspense>}/>
+  <Route path="*" element={<NotFound/>}/>
+</Routes></BrowserRouter>}
 createRoot(document.getElementById('root')!).render(<App/>);

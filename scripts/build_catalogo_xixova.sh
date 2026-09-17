@@ -30,6 +30,11 @@ uv run xixova_cli.py exportar-catalogo \
   --salida "$OUTPUT_DIR" \
   --perfil premium
 
+# El exportador aporta catálogo/inventario; estos modelos mantenidos por la web
+# complementan el artefacto sin duplicarlos dentro del código fuente.
+install -m 0644 "$WEB_DIR/public/building/xixova-building-visual-v2.glb" "$OUTPUT_DIR/building/xixova-building-visual-v2.glb"
+install -m 0644 "$WEB_DIR/public/building/xixova-building-visual-v2-asset-statistics.json" "$OUTPUT_DIR/building/xixova-building-visual-v2-asset-statistics.json"
+
 install -m 0644 "$REPO_ROOT/vercel.json" "$OUTPUT_DIR/vercel.json"
 
 test -s "$OUTPUT_DIR/index.html"

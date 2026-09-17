@@ -82,6 +82,23 @@ Thumbs.db
 # Contexto local de iteración visual Dream Loop
 .dream-loop/
 
+# Active Promoven V2 sources and shipped, isolated marketing assets
+!/xixova/maquette_web/promoven_building_v2.py
+!/xixova/maquette_web/assets/promoven/promoven-building-v2.blend
+!/xixova/maquette_web/assets/promoven/brushed_concrete_diff_1k.jpg
+!/xixova/maquette_web/assets/promoven/brushed_concrete_rough_1k.jpg
+!/xixova/maquette_web/assets/promoven/brushed_concrete_nor_gl_1k.jpg
+!/xixova/maquette_web/assets/promoven/warm_concrete_1k.jpg
+!/xixova/maquette_web/assets/promoven/window-atlas.png
+!/xixova/maquette_web/assets/promoven/tree-canopy.png
+!/xixova/maquette_web/assets/promoven/window-atlas-optimized.jpg
+!/xixova/maquette_web/assets/promoven/tree-canopy-optimized.png
+!/xixova/maquette_web/public/building/promoven-building-v2.glb
+!/xixova/maquette_web/public/marketing/promoven-building-v2.png
+!/xixova/maquette_web/public/marketing/promoven-tower.jpg
+!/xixova/maquette_web/public/marketing/promoven-interior.jpg
+!/xixova/maquette_web/public/marketing/studio_small_03_1k.hdr
+
 # Revisiones locales del framework (vinculadas al contenido y al equipo)
 /proyectos/*/.revisiones/
 /proyectos/*/.director/**/trabajos/

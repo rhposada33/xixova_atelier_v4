@@ -7,17 +7,18 @@ import './auth.css';
 const authMessage=(message:string)=>/invalid login credentials/i.test(message)?'E-mail ou senha inválidos.':/email not confirmed/i.test(message)?'Confirme seu e-mail antes de entrar.':'Não foi possível concluir a solicitação. Tente novamente.';
 
 export function LoginPage(){
-  const {session,loading}=useAuth();const navigate=useNavigate();const location=useLocation();
+  const {session,loading,configurationError}=useAuth();const navigate=useNavigate();const location=useLocation();
   const requested=new URLSearchParams(location.search).get('returnTo');const returnTo=requested?.startsWith('/')&&!requested.startsWith('//')?requested:(location.state as any)?.from||'/portal';
   const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);
   if(!loading&&session)return <Navigate to={returnTo} replace/>;
   const submit=async(event:FormEvent)=>{event.preventDefault();setBusy(true);setError('');const {error:authError}=await getSupabaseClient().auth.signInWithPassword({email,password});setBusy(false);if(authError)setError(authMessage(authError.message));else navigate(returnTo,{replace:true});};
   return <AuthFrame title="Acesse o Portal Escobar" subtitle="Gestão segura do inventário imobiliário.">
+    {configurationError&&<p className="form-error" role="alert">O portal não está configurado neste ambiente local. Defina as variáveis públicas do Supabase para habilitar o acesso.</p>}
     <form onSubmit={submit} className="auth-form" aria-busy={busy}>
       <label>E-mail<input type="email" autoComplete="email" required value={email} onChange={event=>setEmail(event.target.value)}/></label>
       <label>Senha<input type="password" autoComplete="current-password" required value={password} onChange={event=>setPassword(event.target.value)}/></label>
       {error&&<p className="form-error" role="alert">{error}</p>}
-      <button className="primary-button" disabled={busy}>{busy?'Entrando…':'Entrar'}</button>
+      <button className="primary-button" disabled={busy||configurationError}>{busy?'Entrando…':'Entrar'}</button>
       <Link to="/forgot-password">Esqueci minha senha</Link>
     </form>
   </AuthFrame>;
