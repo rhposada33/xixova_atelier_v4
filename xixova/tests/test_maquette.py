@@ -71,6 +71,19 @@ def test_static_export_is_self_contained_and_does_not_change_source(monkeypatch)
         assert ".blend" not in (root / "data/scene.json").read_text()
 
 
+def test_catalog_export_contains_only_project_data(monkeypatch):
+    monkeypatch.setenv("XIXOVA_MAQUETA_SIN_BLENDER", "1")
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        result = export(garden(), root, include_client=False)
+        assert result["ok"]
+        assert (root / "manifest.json").is_file()
+        assert (root / "data/scene.glb").is_file()
+        assert not (root / "index.html").exists()
+        assert not (root / "assets").exists()
+        assert not (root / "building").exists()
+
+
 def test_director_exposes_maquette_manifest_and_export(monkeypatch):
     monkeypatch.setenv("XIXOVA_MAQUETA_SIN_BLENDER", "1")
     client = TestClient(create_app(ROOT / "proyectos/garden_house/proyecto.yaml", "lujo_contemporaneo"))

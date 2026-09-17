@@ -1,0 +1,12 @@
+{
+  "source": "Blender MCP export, Dream Loop Plus round 3",
+  "triangles": 56504,
+  "meshObjects": 99,
+  "presentationMeshes": 27,
+  "materials": 16,
+  "unitProxies": 72,
+  "residentialFloors": 18,
+  "compression": "none",
+  "textures": 0,
+  "note": "Runtime draw calls and file size are measured by the validation coordinator. Geometry is merged by material within semantic groups."
+}

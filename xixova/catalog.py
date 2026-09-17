@@ -64,11 +64,9 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
             explanations = "; ".join(x.get("explicacion", str(x)) for x in errors)
             raise ValueError(f"{declared['id']}: {explanations}")
         project_destination = staging / "projects" / declared["id"]
-        result = export_maquette(bundle, project_destination, profile)
-        # Cada proyecto sólo necesita datos; el cliente se comparte en la raíz.
-        shutil.rmtree(project_destination / "assets", ignore_errors=True)
-        shutil.rmtree(project_destination / "building", ignore_errors=True)
-        (project_destination / "index.html").unlink(missing_ok=True)
+        # El cliente se comparte en la raíz; no duplicarlo durante la exportación
+        # ni incluirlo en el presupuesto de tamaño de cada proyecto.
+        result = export_maquette(bundle, project_destination, profile, include_client=False)
         public_projects.append({
             "id": declared["id"], "name": declared["name"], "variant": declared["variant"],
             "floors": declared.get("floors", [8]), "units": declared.get("units", ["04"]),
@@ -81,11 +79,11 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
     building_dir.mkdir(exist_ok=True)
     inventory = build_building_inventory()
     (building_dir / "inventory.json").write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    public_url = os.environ.get("ESCOBAR_PUBLIC_URL", "https://escobarpro.vercel.app").rstrip("/")
+    public_url = os.environ.get("ESCOBAR_PUBLIC_URL", "https://www.promoven.online").rstrip("/")
     social_image = f"{public_url}/social/escobar-residences.png"
     for unit in inventory:
         unit_url = f"{public_url}/unidades/{unit['code']}/"
-        app_url = f"/?vista=edificio&unidad={unit['code']}"
+        app_url = f"/demo?vista=edificio&unidad={unit['code']}"
         title = f"Unidade {unit['code']} · Escobar Residences"
         description = (
             f"{unit['privateAreaM2']} m², {unit['bedrooms']} dormitórios, andar {unit['floor']}. "

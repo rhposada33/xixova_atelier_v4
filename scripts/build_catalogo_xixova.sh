@@ -39,6 +39,6 @@ install -m 0644 "$REPO_ROOT/vercel.json" "$OUTPUT_DIR/vercel.json"
 
 test -s "$OUTPUT_DIR/index.html"
 test -s "$OUTPUT_DIR/vercel.json"
-find "$OUTPUT_DIR/assets" -maxdepth 1 -type f -name 'PortalApp-*.js' -print -quit | grep -q .
+find "$OUTPUT_DIR/assets" -maxdepth 1 -type f -name 'portal-*.js' -print -quit | grep -q .
 
 echo "Artefacto preparado en $OUTPUT_DIR"

@@ -226,20 +226,21 @@ def bake(bundle, destination, profile=None):
     return {"ok": True, "archivo": str(target), "metodo": lighting["metodo"]}
 
 
-def export(bundle, destination, profile=None):
+def export(bundle, destination, profile=None, *, include_client=True):
     payload = build_payload(bundle); report = audit(bundle, payload)
     if not report["ok"]: raise ValueError("; ".join(x["explicacion"] for x in report["diagnosticos"] if x["gravedad"] == "error"))
     destination = Path(destination).resolve(); source = Path(__file__).parent / "maquette_web" / "dist"
     if not (source / "index.html").is_file(): raise ValueError("Compila xixova/maquette_web antes de exportar.")
     destination.mkdir(parents=True, exist_ok=True)
-    # Hashed Vite bundles change name on every build. Remove only the generated
-    # assets directory so an incremental export cannot retain obsolete clients.
-    generated_assets = destination / "assets"
-    if generated_assets.is_dir(): shutil.rmtree(generated_assets)
-    for child in source.iterdir():
-        target = destination / child.name
-        if child.is_dir(): shutil.copytree(child, target, dirs_exist_ok=True)
-        else: shutil.copy2(child, target)
+    if include_client:
+        # Standalone exports need their own client. Catalog projects share the
+        # one copied to the catalog root and contain only project data.
+        generated_assets = destination / "assets"
+        if generated_assets.is_dir(): shutil.rmtree(generated_assets)
+        for child in source.iterdir():
+            target = destination / child.name
+            if child.is_dir(): shutil.copytree(child, target, dirs_exist_ok=True)
+            else: shutil.copy2(child, target)
     data = destination / "data"; data.mkdir(exist_ok=True)
     for stale in [*data.glob('assets-*.glb'), *data.glob('assets-*.json'), data/'assets.glb', data/'assets.json']:
         if stale.is_file(): stale.unlink()

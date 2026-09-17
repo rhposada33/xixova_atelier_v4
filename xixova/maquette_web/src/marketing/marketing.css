@@ -30,3 +30,10 @@
 @media(min-width:901px){.marketing .hero{padding:0 0 0 max(5vw,24px);gap:3vw}.marketing .hero-copy{padding:clamp(60px,8vw,120px) 0}.marketing .hero-gallery{min-height:calc(100vh - 76px)}}
 @media(max-width:900px){.marketing .hero{padding:48px max(5vw,24px) 0;gap:2rem}.marketing .hero-gallery{min-height:430px;height:58vh}.marketing .building-feature{grid-template-columns:1fr}.marketing .building-feature .hero-building{height:58vh;min-height:400px}}
 @media(max-width:560px){.marketing .hero{padding-top:32px;gap:24px}.marketing .hero-gallery{min-height:320px;height:43vh;margin:0 calc(-1 * max(5vw,24px))}.marketing .hero-view-switch{top:1rem;left:1rem}.marketing .hero-gallery-note{right:1rem;bottom:1rem}.marketing .building-feature .hero-building{height:46vh;min-height:320px}.marketing .building-feature-activate{white-space:normal;text-align:center;max-width:85%}}
+
+/* Keep the sticky header in the page scroll container and reveal anchor targets. */
+.marketing{overflow-x:clip;overflow-y:visible}
+html:has(.marketing){scroll-behavior:smooth}
+.marketing [id]{scroll-margin-top:88px}
+@media(max-width:560px){.marketing [id]{scroll-margin-top:80px}}
+@media(prefers-reduced-motion:reduce){html:has(.marketing){scroll-behavior:auto}}

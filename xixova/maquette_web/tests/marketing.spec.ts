@@ -10,6 +10,26 @@ test('landing pública apresenta a Promoven e mantém contato não configurado o
   await expect(page.getByRole('link',{name:/Explorar demonstração/}).first()).toHaveAttribute('href','/demo');
 });
 
+test('menu desliza até a seção sem ocultá-la atrás do cabeçalho',async({page})=>{
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveCSS('scroll-behavior','smooth');
+  await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('link',{name:'Soluções'}).click();
+  await expect(page).toHaveURL(/#solucoes$/);
+  await expect.poll(()=>page.locator('#solucoes').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeGreaterThanOrEqual(80);
+  await expect.poll(()=>page.locator('#solucoes').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeLessThanOrEqual(96);
+
+  await page.setViewportSize({width:390,height:844});
+  await page.getByRole('button',{name:'Abrir menu'}).click();
+  await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('link',{name:'Experiência 3D'}).click();
+  await expect(page.getByRole('button',{name:'Abrir menu'})).toHaveAttribute('aria-expanded','false');
+  await expect(page).toHaveURL(/#experiencia$/);
+  await expect.poll(()=>page.locator('#experiencia').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeGreaterThanOrEqual(72);
+  await expect.poll(()=>page.locator('#experiencia').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeLessThanOrEqual(88);
+
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await expect(page.locator('html')).toHaveCSS('scroll-behavior','auto');
+});
+
 test('hero alterna as duas imagens locais sem carregar WebGL, GLB ou HDRI',async({page})=>{
   const requests:string[]=[];page.on('request',request=>requests.push(request.url()));
   await page.goto('/');
