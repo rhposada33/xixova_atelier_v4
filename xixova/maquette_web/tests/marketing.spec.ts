@@ -10,6 +10,36 @@ test('landing pública apresenta a Promoven e mantém contato não configurado o
   await expect(page.getByRole('link',{name:/Explorar demonstração/}).first()).toHaveAttribute('href','/demo');
 });
 
+test('CTAs comerciais e formulário validam localmente sem transmissão',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('link',{name:'Agendar uma apresentação'}).click();
+  await expect(page).toHaveURL(/#contato$/);
+  await expect(page.getByRole('heading',{name:'Vamos avaliar o seu próximo lançamento?'})).toBeVisible();
+  await page.getByRole('button',{name:'Solicitar avaliação inicial'}).click();
+  await expect(page.getByText('Informe WhatsApp ou e-mail corporativo.')).toBeVisible();
+  await page.getByLabel('Nome').fill('Ana Silva');
+  await page.getByLabel('Empresa').fill('Construtora Exemplo');
+  await page.getByLabel('Cidade / UF').fill('São Paulo / SP');
+  await page.getByLabel('E-mail corporativo').fill('ana@exemplo.com');
+  await page.getByLabel('Número de unidades').selectOption({label:'31 a 80'});
+  await page.getByLabel('Previsão de lançamento').selectOption({label:'De 3 a 6 meses'});
+  await page.getByLabel('Possui modelo 3D?').selectOption({label:'Ainda não'});
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button',{name:'Solicitar avaliação inicial'}).click();
+  await expect(page.getByText('Validação local concluída')).toBeVisible();
+  await expect(page.getByText('não foram transmitidos para a Promoven')).toBeVisible();
+  await expect(page.getByRole('link',{name:'Explorar demonstração'}).last()).toHaveAttribute('href','/demo');
+});
+
+test('privacidade é pública e rotas privadas não são incluídas no sitemap',async({page})=>{
+  await page.goto('/privacidade');
+  await expect(page.getByRole('heading',{name:'Política de Privacidade'})).toBeVisible();
+  const sitemap=await page.request.get('/sitemap.xml');
+  const body=await sitemap.text();
+  expect(body).toContain('https://www.promoven.online/privacidade');
+  expect(body).not.toContain('/portal');
+});
+
 test('menu desliza até a seção sem ocultá-la atrás do cabeçalho',async({page})=>{
   await page.goto('/');
   await expect(page.locator('html')).toHaveCSS('scroll-behavior','smooth');

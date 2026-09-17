@@ -50,6 +50,11 @@ export default defineConfig({
   build: {
     assetsDir: "assets",
     rolldownOptions: {
+      input: {
+        index: resolve(__dirname, "index.html"),
+        demo: resolve(__dirname, "demo.html"),
+        privacidade: resolve(__dirname, "privacidade.html"),
+      },
       output: {
         codeSplitting: {
           groups: [
