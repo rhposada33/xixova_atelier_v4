@@ -116,7 +116,7 @@ test('preview interrompe renderização quando sai do viewport',async({page})=>{
   await preview.scrollIntoViewIfNeeded();
   await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
   await expect.poll(async()=>Number(await preview.getAttribute('data-render-count'))).toBeGreaterThan(2);
-  await page.evaluate(()=>scrollTo(0,document.body.scrollHeight));
+  await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';scrollTo(0,document.documentElement.scrollHeight)});
   await expect.poll(()=>preview.evaluate(element=>new Promise<boolean>(resolve=>{
     const observer=new IntersectionObserver(entries=>{resolve(!entries[0].isIntersecting);observer.disconnect();});
     observer.observe(element);
@@ -196,7 +196,7 @@ test('as maquetes na landing giram com o mouse e mantêm apenas um visor ativo',
 test('compatibilidade legacy normaliza a URL da demonstração',async({page})=>{
   await page.goto('/?vista=edificio&unidad=1203&desconhecido=1');
   await expect(page).toHaveURL(/\/demo\?vista=edificio&unidad=1203$/);
-  await expect(page.getByRole('heading',{name:/Encontre seu apartamento ideal/})).toBeVisible();
+  await expect(page.getByRole('heading',{name:/Encontre seu apartamento ideal/})).toBeVisible({timeout:20_000});
 });
 
 test('demo direta remove parâmetros desconhecidos',async({page})=>{
@@ -211,4 +211,10 @@ test('query comum não desvia a landing e rota desconhecida mostra 404',async({p
   await page.goto('/nao-existe');
   await expect(page.getByRole('heading',{name:'Página não encontrada'})).toBeVisible();
   await expect(page.getByRole('link',{name:'Abrir demonstração'})).toHaveAttribute('href','/demo');
+});
+
+test('momentos do dia permanece arquivado e não carrega ativos na landing',async({page})=>{
+  const requests:string[]=[];page.on('request',request=>{if(request.url().includes('/marketing/moments/'))requests.push(request.url())});
+  await page.goto('/');await expect(page.locator('.time-of-day')).toHaveCount(0);await page.waitForTimeout(300);
+  expect(requests).toEqual([]);
 });

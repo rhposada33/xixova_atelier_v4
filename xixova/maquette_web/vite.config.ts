@@ -19,8 +19,16 @@ function catalogFallback(): Plugin {
     name: "xixova-catalog-fallback",
     configureServer(server) {
       const configured = process.env.VITE_E2E_PUBLIC_DIR;
-      if (!configured) return;
-      const root = resolve(configured);
+      // El catálogo publicado vive fuera de `public/`. En desarrollo se usa
+      // como origen local por defecto; E2E puede sustituirlo explícitamente.
+      const root = resolve(
+        configured ?? "../../publicaciones/catalogo_xixova",
+      );
+      try {
+        if (!statSync(root).isDirectory()) return;
+      } catch {
+        return;
+      }
       server.middlewares.use((request, response, next) => {
           const pathname = decodeURIComponent(
             (request.url || "/").split("?")[0],

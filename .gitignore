@@ -98,6 +98,8 @@ Thumbs.db
 !/xixova/maquette_web/public/marketing/promoven-tower.jpg
 !/xixova/maquette_web/public/marketing/promoven-interior.jpg
 !/xixova/maquette_web/public/marketing/studio_small_03_1k.hdr
+!/xixova/maquette_web/public/marketing/moments/
+!/xixova/maquette_web/public/marketing/moments/*.webp
 
 # Revisiones locales del framework (vinculadas al contenido y al equipo)
 /proyectos/*/.revisiones/

@@ -1,4 +1,4 @@
-# Lecciones para producir vídeo en XIXOVÁ
+re# Lecciones para producir vídeo en XIXOVÁ
 
 Guía de recuperación rápida para futuras tareas de vídeo. Resume lo comprobado en el pipeline actual y en las pruebas históricas; no sustituye a los YAML, al estado de la escena ni a una revisión visual. No describe la landing Promoven ni afirma que haya un vídeo nuevo publicado con ella.
 
