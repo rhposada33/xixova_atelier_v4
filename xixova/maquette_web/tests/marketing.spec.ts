@@ -88,7 +88,7 @@ test('seção inferior carrega o GLB exclusivo Promoven sem inventário ou Supab
   expect(requests.some(url=>url.includes('inventory.json')||url.includes('supabase'))).toBe(false);
 });
 
-test('edifício Promoven responde ao mouse e oferece fallback para movimento reduzido',async({page})=>{
+test('ilustração Promoven responde ao mouse e permanece estável com movimento reduzido',async({page})=>{
   await page.goto('/');
   const preview=page.locator('#experiencia .hero-building');
   await preview.scrollIntoViewIfNeeded();
@@ -105,9 +105,13 @@ test('edifício Promoven responde ao mouse e oferece fallback para movimento red
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.reload();
   await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','fallback');
-  await expect(preview.locator('canvas')).toHaveCount(0);
-  await expect(preview.locator('img')).toBeVisible();
+  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
+  const slider=page.getByRole('slider',{name:'Horário da ilustração de iluminação'});
+  await slider.focus();
+  await page.keyboard.press('End');
+  await expect(slider).toHaveAttribute('aria-valuetext','20:00');
+  await page.waitForTimeout(350);
+  await expect(slider).toHaveValue('1200');
 });
 
 test('preview interrompe renderização quando sai do viewport',async({page})=>{
@@ -135,6 +139,59 @@ test('seção 3D usa o poster quando WebGL não está disponível',async({page})
   await expect(preview).toHaveAttribute('data-status','fallback');
   await expect(preview.locator('img')).toBeVisible();
   await expect(page.locator('canvas')).toHaveCount(0);
+});
+
+test('ilustração de iluminação sincroniza presets, slider e pausa explícita',async({page})=>{
+  test.setTimeout(30_000);
+  await page.goto('/');
+  const preview=page.locator('#experiencia .hero-building');
+  await preview.scrollIntoViewIfNeeded();
+  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
+  const slider=page.getByRole('slider',{name:'Horário da ilustração de iluminação'});
+  await page.getByRole('button',{name:'Entardecer'}).click();
+  await expect(slider).toHaveAttribute('aria-valuetext','17:30');
+  await expect(page.getByRole('button',{name:'Entardecer'})).toHaveAttribute('aria-pressed','true');
+  await slider.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(slider).toHaveAttribute('aria-valuetext','17:31');
+  const pause=page.getByRole('button',{name:'Pausar animação de iluminação'});
+  await pause.click();
+  const resume=page.getByRole('button',{name:'Retomar animação de iluminação'});
+  const fixedValue=await slider.inputValue();
+  await page.waitForTimeout(5_200);
+  await expect(slider).toHaveValue(fixedValue);
+  await resume.click();
+  await expect(page.getByRole('button',{name:'Pausar animação de iluminação'})).toBeVisible();
+  await expect(page.getByRole('link',{name:'Conhecer a plataforma 3D'})).toHaveAttribute('href','/demo');
+});
+
+test('ilustração pausa o autoplay quando a página fica oculta',async({page})=>{
+  await page.goto('/');
+  const preview=page.locator('#experiencia .hero-building');
+  await preview.scrollIntoViewIfNeeded();
+  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
+  const slider=page.getByRole('slider',{name:'Horário da ilustração de iluminação'});
+  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'))});
+  const fixedValue=await slider.inputValue();
+  await page.waitForTimeout(500);
+  await expect(slider).toHaveValue(fixedValue);
+});
+
+test('ilustração móvel mantém controles 2×2 e não bloqueia a rolagem',async({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  const preview=page.locator('#experiencia .hero-building');
+  await preview.scrollIntoViewIfNeeded();
+  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
+  const presets=page.locator('.lighting-presets button');
+  const first=await presets.nth(0).boundingBox(),second=await presets.nth(1).boundingBox(),third=await presets.nth(2).boundingBox();
+  expect(first&&second&&third).toBeTruthy();
+  expect(second!.y).toBeCloseTo(first!.y,0);
+  expect(third!.y).toBeGreaterThan(first!.y+20);
+  await expect(preview.locator('canvas')).toHaveCSS('touch-action','pan-y');
+  await page.evaluate(()=>{scrollTo(0,0);scrollBy(0,360)});
+  await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(0);
 });
 
 test('landing móvel oferece navegação acessível e tabs de experiências',async({page})=>{
