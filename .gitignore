@@ -38,7 +38,10 @@ xixova/director_web/playwright-report/
 
 # Imágenes, vídeo y audio generados o externos
 *.png
+!xixova/maquette_web/public/marketing/promoven-view-city.png
+!xixova/maquette_web/public/marketing/promoven-view-coast.png
 *.jpg
+!xixova/maquette_web/public/marketing/promoven-detail.jpg
 *.jpeg
 *.exr
 *.hdr

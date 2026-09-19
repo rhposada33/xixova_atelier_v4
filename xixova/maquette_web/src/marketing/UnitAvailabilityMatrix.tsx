@@ -1,6 +1,7 @@
 import {useState} from 'react';
 
 type AvailabilityStatus='available'|'reserved'|'sold';
+type UnitView='Vista mar'|'Vista cidade'|'Vista jardim'|'Vista panorâmica';
 
 type AvailabilityUnit={
   code:string;
@@ -9,13 +10,19 @@ type AvailabilityUnit={
   status:AvailabilityStatus;
   area:number;
   bedrooms:number;
-  view:string;
+  view:UnitView;
   price:number;
 };
 
 const statusLabel:Record<AvailabilityStatus,string>={available:'Disponível',reserved:'Reservada',sold:'Vendida'};
 const statusOrder:AvailabilityStatus[]=['available','reserved','sold'];
 const summary=Object.freeze([{value:'54',label:'Disponíveis',status:'available'},{value:'6',label:'Reservadas',status:'reserved'},{value:'12',label:'Vendidas',status:'sold'}] as const);
+const viewImages:Record<UnitView,{src:string;alt:string}>={
+  'Vista mar':{src:'/marketing/promoven-view-coast.png',alt:'Vista ilustrativa de uma baía e cidade costeira vista de uma varanda'},
+  'Vista cidade':{src:'/marketing/promoven-view-city.png',alt:'Vista ilustrativa de uma cidade vista de uma varanda'},
+  'Vista jardim':{src:'/marketing/promoven-view-city.png',alt:'Vista ilustrativa de uma cidade arborizada vista de uma varanda'},
+  'Vista panorâmica':{src:'/marketing/promoven-view-city.png',alt:'Vista panorâmica ilustrativa de uma cidade vista de uma varanda'},
+};
 
 const statusFor=(floor:number,position:number):AvailabilityStatus=>{
   if(floor===12&&position===1)return 'available';
@@ -44,6 +51,7 @@ export function UnitAvailabilityMatrix(){
   const [selectedCode,setSelectedCode]=useState('1201');
   const [detailsOpen,setDetailsOpen]=useState(false);
   const selected=units.find(unit=>unit.code===selectedCode)??units[0];
+  const selectedView=viewImages[selected.view];
   const selectUnit=(unit:AvailabilityUnit)=>{setSelectedCode(unit.code);setDetailsOpen(true)};
 
   return <section className="unit-availability" id="disponibilidade" aria-labelledby="availability-title">
@@ -75,7 +83,7 @@ export function UnitAvailabilityMatrix(){
 
       <article className={`availability-card ${detailsOpen?'is-expanded':''}`} aria-label={`Detalhes da unidade ${selected.code}`}>
         <div className="availability-card-summary"><div><h3>Unidade {selected.code}</h3><p>{selected.floor}º pavimento · {selected.area} m²</p></div><strong>{formatBRL(selected.price)}</strong><button type="button" aria-expanded={detailsOpen} aria-controls="availability-card-details" onClick={()=>setDetailsOpen(open=>!open)}>{detailsOpen?'Ocultar detalhes':'Ver detalhes'}</button></div>
-        <div className="availability-card-details" id="availability-card-details"><p className={`availability-status ${selected.status}`}>{statusLabel[selected.status]}</p><p>{selected.bedrooms} dormitórios · {selected.view}</p><div className="availability-view" role="img" aria-label={`Vista ilustrativa associada à unidade ${selected.code}`}><span>Vista ilustrativa</span></div><a className="button primary" href="/demo">Ver unidade <span>→</span></a></div>
+        <div className="availability-card-details" id="availability-card-details"><p className={`availability-status ${selected.status}`}>{statusLabel[selected.status]}</p><p>{selected.bedrooms} dormitórios · {selected.view}</p><div className="availability-view"><img src={selectedView.src} alt={selectedView.alt} loading="lazy" width="1672" height="941"/><span>{selected.view} ilustrativa</span></div><a className="button primary" href="/demo">Ver unidade <span>→</span></a></div>
       </article>
     </div>
     <p className="availability-note">Dados e disponibilidade apresentados apenas para demonstração comercial.</p>

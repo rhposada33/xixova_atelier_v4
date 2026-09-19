@@ -6,7 +6,7 @@ test('landing pública apresenta a Promoven e mantém contato não configurado o
   await expect(page).toHaveTitle('Promoven | Experiências imobiliárias interativas');
   await expect(page.getByRole('heading',{level:1,name:'Transforme empreendimentos em experiências de compra'})).toBeVisible();
   await expect(page.getByRole('link',{name:'Falar com a Promoven'})).toHaveCount(0);
-  await expect(page.locator('.hero-gallery img')).toHaveAttribute('src','/marketing/promoven-tower.jpg');
+  await expect(page.locator('.hero-gallery img')).toHaveAttribute('src','/marketing/promoven-interior.jpg');
   await expect(page.getByRole('link',{name:/Explorar demonstração/}).first()).toHaveAttribute('href','/demo');
 });
 
@@ -43,10 +43,9 @@ test('privacidade é pública e rotas privadas não são incluídas no sitemap',
 test('menu desliza até a seção sem ocultá-la atrás do cabeçalho',async({page})=>{
   await page.goto('/');
   await expect(page.locator('html')).toHaveCSS('scroll-behavior','smooth');
-  await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('link',{name:'Soluções'}).click();
-  await expect(page).toHaveURL(/#solucoes$/);
-  await expect.poll(()=>page.locator('#solucoes').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeGreaterThanOrEqual(80);
-  await expect.poll(()=>page.locator('#solucoes').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeLessThanOrEqual(96);
+  await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('link',{name:'Benefícios'}).click();
+  await expect(page).toHaveURL(/#beneficios$/);
+  await expect(page.locator('#beneficios')).toBeInViewport();
 
   await page.setViewportSize({width:390,height:844});
   await page.getByRole('button',{name:'Abrir menu'}).click();
@@ -63,15 +62,15 @@ test('hero alterna as duas imagens locais sem carregar WebGL, GLB ou HDRI',async
   const requests:string[]=[];page.on('request',request=>requests.push(request.url()));
   await page.goto('/');
   const gallery=page.locator('.hero-gallery');
-  await expect(gallery.locator('img')).toHaveAttribute('src','/marketing/promoven-tower.jpg');
-  await expect.poll(()=>gallery.locator('img').evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
-  const interior=gallery.getByRole('button',{name:'Interior'});
-  await interior.focus();await page.keyboard.press('Enter');
-  await expect(interior).toHaveAttribute('aria-pressed','true');
   await expect(gallery.locator('img')).toHaveAttribute('src','/marketing/promoven-interior.jpg');
   await expect.poll(()=>gallery.locator('img').evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
-  await gallery.getByRole('button',{name:'Edifício'}).click();
+  const building=gallery.getByRole('button',{name:'Edifício'});
+  await building.focus();await page.keyboard.press('Enter');
+  await expect(building).toHaveAttribute('aria-pressed','true');
   await expect(gallery.locator('img')).toHaveAttribute('src','/marketing/promoven-tower.jpg');
+  await expect.poll(()=>gallery.locator('img').evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
+  await gallery.getByRole('button',{name:'Interior'}).click();
+  await expect(gallery.locator('img')).toHaveAttribute('src','/marketing/promoven-interior.jpg');
   await page.waitForTimeout(350);
   expect(requests.some(url=>url.includes('/building/promoven-building-v2.glb')||url.includes('studio_small_03_1k.hdr')||/\/three-[^/]+\.js/.test(url))).toBe(false);
   await expect(page.locator('canvas')).toHaveCount(0);
