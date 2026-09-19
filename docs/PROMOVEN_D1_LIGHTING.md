@@ -1,5 +1,10 @@
 # Promoven — D1: ilustração animada de iluminação
 
+> **Archivada fuera de la landing el 18 de septiembre de 2026.** La
+> implementación permanece disponible para una reactivación controlada; su
+> estado y procedimiento están en
+> [PROMOVEN_D1_LIGHTING_ARCHIVED.md](PROMOVEN_D1_LIGHTING_ARCHIVED.md).
+
 Esta sección es una ilustración visual de iluminación. No es una simulación solar ni
 calcula orientación, ubicación, fecha, estación o coordenadas. El aviso visible
 en la landing aclara que no sustituye un estudio técnico de insolación.
@@ -67,3 +72,44 @@ También se ajustaron el frustum, `bias` y `normalBias` de la sombra antes de
 considerar más resolución. El título se contuvo ligeramente y el dock recibió
 un borde y fondo más separados, sin aumentar su altura. Las capturas finales
 están en `resultados/checkpoint-d1-1/` (ignorado por Git).
+
+## D1.2 — escena nocturna viva
+
+La malla `Promoven | furnished rooms` conserva un único `BufferGeometry` y
+material en el GLB. Solo dentro del preview de marketing se clona esa geometría
+y se añade `aRoomSeed`: un atributo determinista repetido en los cuatro
+vértices de cada uno de sus 120 quads. El shader se aplica al material clonado,
+conserva el atlas original como `emissiveMap` y modula únicamente su emisión.
+Así se evita cualquier cambio al GLB y al renderer de `/demo`.
+
+En Noite quedan activas 52 de 120 celdas (43 %), con intensidad cálida variada
+y una minoría fría. Entardecer las introduce por fases; los pocos cambios de
+actividad usan objetivos cada 2,2 s y transición de 1,9 s. Con movimiento
+reducido el reloj del shader queda en cero y el patrón no se anima.
+
+El contexto de marketing añade solo tres `PointLight` sin sombras para acceso y
+jardines, un receptor de sombras más amplio y una neblina inferior CSS. No hay
+una segunda animación, siluetas urbanas procedurales ni assets nuevos. Al
+desmontar se restauran la geometría y material originales y se liberan los
+clones, atributo, luces y recursos auxiliares junto con el renderer existente.
+
+## Fondos panorámicos pendientes de aprobación
+
+El preview ya contiene un `<picture>` por momento (`Manhã`, `Meio-dia`,
+`Entardecer`, `Noite`) detrás del canvas transparente. La configuración se
+mantiene deliberadamente vacía en `lightingPanoramas.ts`: mientras no existan
+activos aprobados no se crea ninguna solicitud de imagen y el degradado CSS
+sigue siendo el fallback. Al recibirlos, cada momento admite AVIF y WebP para
+escritorio y móvil, sin afectar el GLB ni `/demo`.
+
+Recomendación de entrega por momento:
+
+- Escritorio: 2560 × 1440 px (16:9); AVIF ≤ 250 KB y WebP ≤ 400 KB.
+- Móvil: 1440 × 1200 px (6:5); AVIF ≤ 140 KB y WebP ≤ 220 KB.
+- Encuadre: horizonte/neblina suave solo en el 20–25 % inferior; mantener el
+  60 % central libre de hitos, edificios o fuentes de luz fuertes para no
+  competir con la torre. Usar una atmósfera no identificable, sin ciudad
+  reconocible ni referencias de ubicación.
+- Nombres previstos: `promoven-lighting-{morning|midday|sunset|night}-
+  {desktop|mobile}.{avif|webp}`. La imagen se usará con `object-fit: cover` y
+  el degradado inferior actual disimula el encuentro con el suelo 3D.

@@ -1,6 +1,13 @@
-# Momentos do dia — implementação arquivada
+# Momentos do dia — carrusel reutilizado en la landing
 
-Esta seção foi retirada da landing principal por decisão de produto. Nenhum dos seus componentes ou ativos é importado pela página, portanto não gera solicitações de imagem nem aparece para visitantes. O código, testes de lógica e ativos permanecem no repositório exclusivamente para uma possível retomada.
+El 18 de septiembre de 2026 esta sección se reactivó en la landing, entre
+“Recursos conectados” y “Veja a plataforma em ação”. Reutiliza el componente
+`TimeOfDayCarousel` y sus activos locales; conserva el posicionamiento como
+**ilustración de iluminación**, no como estudio o simulación solar técnica.
+
+Los controles permiten recorrer Manhã, Meio-dia, Entardecer y Noite. La nota
+visible “Imagens meramente ilustrativas.” y los textos alternativos específicos
+por escena siguen siendo obligatorios.
 
 Os quatro PNG fornecidos permanecem fora do bundle público em `/home/rafa/RenderCasa/`. Os derivados públicos usam o mesmo crop `1012×806` em `(564,120)` para manter a torre alinhada e não contêm a interface das referências.
 
@@ -11,7 +18,7 @@ Os quatro PNG fornecidos permanecem fora do bundle público em `/home/rafa/Rende
 | Entardecer | 1012×806, 83.7 KB | 1012×806, 102.7 KB | 640×510, 46.6 KB | 640×510, 51.9 KB |
 | Noite | 1012×806, 92.3 KB | 1012×806, 109.8 KB | 640×510, 51.1 KB | 640×510, 54.4 KB |
 
-Total por formato: AVIF desktop 358.2 KB, AVIF móvel 204.5 KB; WebP desktop 431.9 KB, WebP móvel 219.8 KB. Os ativos estão guardados em `xixova/maquette_web/public/marketing/moments/`, mas não são carregados enquanto a seção permanecer arquivada.
+Total por formato: AVIF desktop 358.2 KB, AVIF móvel 204.5 KB; WebP desktop 431.9 KB, WebP móvel 219.8 KB. Os ativos estão em `xixova/maquette_web/public/marketing/moments/`: Manhã se precarga como estado inicial; al acercarse la sección se carga el activo activo y el siguiente, y los restantes pasan a segundo plano.
 
 ## Variante experimental arquivada
 

@@ -50,11 +50,10 @@ test('menu desliza até a seção sem ocultá-la atrás do cabeçalho',async({pa
 
   await page.setViewportSize({width:390,height:844});
   await page.getByRole('button',{name:'Abrir menu'}).click();
-  await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('link',{name:'Experiência 3D'}).click();
+  await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('link',{name:'Benefícios'}).click();
   await expect(page.getByRole('button',{name:'Abrir menu'})).toHaveAttribute('aria-expanded','false');
-  await expect(page).toHaveURL(/#experiencia$/);
-  await expect.poll(()=>page.locator('#experiencia').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeGreaterThanOrEqual(72);
-  await expect.poll(()=>page.locator('#experiencia').evaluate(element=>Math.round(element.getBoundingClientRect().top))).toBeLessThanOrEqual(88);
+  await expect(page).toHaveURL(/#beneficios$/);
+  await expect(page.locator('#beneficios')).toBeInViewport();
 
   await page.emulateMedia({reducedMotion:'reduce'});
   await expect(page.locator('html')).toHaveCSS('scroll-behavior','auto');
@@ -78,120 +77,15 @@ test('hero alterna as duas imagens locais sem carregar WebGL, GLB ou HDRI',async
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 
-test('seção inferior carrega o GLB exclusivo Promoven sem inventário ou Supabase',async({page})=>{
+test('ilustração de iluminação permanece arquivada e não carrega recursos 3D na landing',async({page})=>{
   const requests:string[]=[];page.on('request',request=>requests.push(request.url()));
   await page.goto('/');
-  await page.locator('#experiencia').scrollIntoViewIfNeeded();
-  await expect(page.locator('#experiencia .hero-building')).toHaveAttribute('data-status','ready',{timeout:30_000});
-  expect(requests.some(url=>url.endsWith('/building/promoven-building-v2.glb'))).toBe(true);
-  expect(requests.some(url=>url.endsWith('/building/xixova-building.glb'))).toBe(false);
-  expect(requests.some(url=>url.includes('inventory.json')||url.includes('supabase'))).toBe(false);
-});
-
-test('ilustração Promoven responde ao mouse e permanece estável com movimento reduzido',async({page})=>{
-  await page.goto('/');
-  const preview=page.locator('#experiencia .hero-building');
-  await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
-  const canvas=preview.locator('canvas');await expect(canvas).toBeVisible();
-  const box=await canvas.boundingBox();expect(box).not.toBeNull();
-  const oldCamera=await preview.getAttribute('data-camera');
-  await page.mouse.move(box!.x+box!.width*.55,box!.y+box!.height*.5);
-  await page.mouse.down();await page.mouse.move(box!.x+box!.width*.75,box!.y+box!.height*.5,{steps:8});await page.mouse.up();
-  await expect.poll(()=>preview.getAttribute('data-camera')).not.toBe(oldCamera);
-  const afterDrag=await preview.getAttribute('data-camera');
-  await page.mouse.wheel(0,-250);
-  await expect.poll(()=>preview.getAttribute('data-camera')).not.toBe(afterDrag);
-  await page.emulateMedia({reducedMotion:'reduce'});
-  await page.reload();
-  await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
-  const slider=page.getByRole('slider',{name:'Horário da ilustração de iluminação'});
-  await slider.focus();
-  await page.keyboard.press('End');
-  await expect(slider).toHaveAttribute('aria-valuetext','20:00');
+  await expect(page.locator('#experiencia,.building-feature,.hero-building,.lighting-preview')).toHaveCount(0);
+  await expect(page.getByRole('navigation',{name:'Navegação principal'}).getByRole('link',{name:'Experiência 3D'})).toHaveCount(0);
+  await expect(page.getByRole('navigation',{name:'Navegação do rodapé'}).getByRole('link',{name:'Experiência 3D'})).toHaveCount(0);
   await page.waitForTimeout(350);
-  await expect(slider).toHaveValue('1200');
-});
-
-test('preview interrompe renderização quando sai do viewport',async({page})=>{
-  await page.goto('/');
-  const preview=page.locator('#experiencia .hero-building');
-  await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
-  await expect.poll(async()=>Number(await preview.getAttribute('data-render-count'))).toBeGreaterThan(2);
-  await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';scrollTo(0,document.documentElement.scrollHeight)});
-  await expect.poll(()=>preview.evaluate(element=>new Promise<boolean>(resolve=>{
-    const observer=new IntersectionObserver(entries=>{resolve(!entries[0].isIntersecting);observer.disconnect();});
-    observer.observe(element);
-  }))).toBe(true);
-  await page.waitForTimeout(150);
-  const stopped=await preview.getAttribute('data-render-count');
-  await page.waitForTimeout(180);
-  await expect(preview).toHaveAttribute('data-render-count',stopped!);
-});
-
-test('seção 3D usa o poster quando WebGL não está disponível',async({page})=>{
-  await page.addInitScript(()=>Object.defineProperty(window,'WebGLRenderingContext',{value:undefined,configurable:true}));
-  await page.goto('/');
-  const preview=page.locator('#experiencia .hero-building');
-  await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','fallback');
-  await expect(preview.locator('img')).toBeVisible();
+  expect(requests.some(url=>url.includes('/building/promoven-building-v2.glb')||url.includes('studio_small_03_1k.hdr')||url.includes('/marketing/lighting/')||/\/three-[^/]+\.js/.test(url))).toBe(false);
   await expect(page.locator('canvas')).toHaveCount(0);
-});
-
-test('ilustração de iluminação sincroniza presets, slider e pausa explícita',async({page})=>{
-  test.setTimeout(30_000);
-  await page.goto('/');
-  const preview=page.locator('#experiencia .hero-building');
-  await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
-  const slider=page.getByRole('slider',{name:'Horário da ilustração de iluminação'});
-  await page.getByRole('button',{name:'Entardecer'}).click();
-  await expect(slider).toHaveAttribute('aria-valuetext','17:30');
-  await expect(page.getByRole('button',{name:'Entardecer'})).toHaveAttribute('aria-pressed','true');
-  await slider.focus();
-  await page.keyboard.press('ArrowRight');
-  await expect(slider).toHaveAttribute('aria-valuetext','17:31');
-  const pause=page.getByRole('button',{name:'Pausar animação de iluminação'});
-  await pause.click();
-  const resume=page.getByRole('button',{name:'Retomar animação de iluminação'});
-  const fixedValue=await slider.inputValue();
-  await page.waitForTimeout(5_200);
-  await expect(slider).toHaveValue(fixedValue);
-  await resume.click();
-  await expect(page.getByRole('button',{name:'Pausar animação de iluminação'})).toBeVisible();
-  await expect(page.getByRole('link',{name:'Conhecer a plataforma 3D'})).toHaveAttribute('href','/demo');
-});
-
-test('ilustração pausa o autoplay quando a página fica oculta',async({page})=>{
-  await page.goto('/');
-  const preview=page.locator('#experiencia .hero-building');
-  await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
-  const slider=page.getByRole('slider',{name:'Horário da ilustração de iluminação'});
-  await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'))});
-  const fixedValue=await slider.inputValue();
-  await page.waitForTimeout(500);
-  await expect(slider).toHaveValue(fixedValue);
-});
-
-test('ilustração móvel mantém controles 2×2 e não bloqueia a rolagem',async({page})=>{
-  await page.setViewportSize({width:390,height:844});
-  await page.emulateMedia({reducedMotion:'reduce'});
-  await page.goto('/');
-  const preview=page.locator('#experiencia .hero-building');
-  await preview.scrollIntoViewIfNeeded();
-  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
-  const presets=page.locator('.lighting-presets button');
-  const first=await presets.nth(0).boundingBox(),second=await presets.nth(1).boundingBox(),third=await presets.nth(2).boundingBox();
-  expect(first&&second&&third).toBeTruthy();
-  expect(second!.y).toBeCloseTo(first!.y,0);
-  expect(third!.y).toBeGreaterThan(first!.y+20);
-  await expect(preview.locator('canvas')).toHaveCSS('touch-action','pan-y');
-  await page.evaluate(()=>{scrollTo(0,0);scrollBy(0,360)});
-  await expect.poll(()=>page.evaluate(()=>scrollY)).toBeGreaterThan(0);
 });
 
 test('landing móvel oferece navegação acessível e tabs de experiências',async({page})=>{
@@ -228,7 +122,6 @@ test('as maquetes na landing giram com o mouse e mantêm apenas um visor ativo',
   test.setTimeout(60_000);
   await page.goto('/');
   await page.getByRole('tab',{name:/Garden House/}).click();
-  await expect(page.locator('#experiencia .hero-building')).toHaveAttribute('data-status','fallback');
   const preview=page.locator('.interior-preview');
   await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
   const canvas=preview.locator('canvas');await expect(canvas).toBeVisible();
@@ -244,9 +137,6 @@ test('as maquetes na landing giram com o mouse e mantêm apenas um visor ativo',
   await page.getByRole('tab',{name:/Terraza Luz/}).click();
   await expect(page.locator('.interior-preview')).toHaveAttribute('data-project','terraza_luz');
   await expect(page.locator('.interior-preview')).toHaveAttribute('data-status','ready',{timeout:30_000});
-  await expect(page.locator('canvas')).toHaveCount(1);
-  await page.locator('#experiencia').getByRole('button',{name:'Ativar visualização 3D do edifício'}).click();
-  await expect(page.locator('#experiencia .hero-building')).toHaveAttribute('data-status','ready',{timeout:30_000});
   await expect(page.locator('canvas')).toHaveCount(1);
 });
 
@@ -268,10 +158,4 @@ test('query comum não desvia a landing e rota desconhecida mostra 404',async({p
   await page.goto('/nao-existe');
   await expect(page.getByRole('heading',{name:'Página não encontrada'})).toBeVisible();
   await expect(page.getByRole('link',{name:'Abrir demonstração'})).toHaveAttribute('href','/demo');
-});
-
-test('momentos do dia permanece arquivado e não carrega ativos na landing',async({page})=>{
-  const requests:string[]=[];page.on('request',request=>{if(request.url().includes('/marketing/moments/'))requests.push(request.url())});
-  await page.goto('/');await expect(page.locator('.time-of-day')).toHaveCount(0);await page.waitForTimeout(300);
-  expect(requests).toEqual([]);
 });
