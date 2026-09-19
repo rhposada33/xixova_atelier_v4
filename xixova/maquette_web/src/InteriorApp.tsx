@@ -474,8 +474,11 @@ function Viewer({
     }
     if (data.web_assets && data.proyecto !== "jequitiba_final_03") {
       const target = data.web_assets!.objetivo,
-        order = ["mobile", target].filter(
-          (x, i, a) => a.indexOf(x) === i && data.web_assets!.niveles[x],
+        order = (
+          data.proyecto === "terraza_luz" ? [target] : ["mobile", target]
+        ).filter(
+          (x, i, a) =>
+            a.indexOf(x) === i && data.web_assets!.niveles[x],
         ),
         progress = document.createElement("div");
       progress.className = "detail-progress";
@@ -509,13 +512,6 @@ function Viewer({
                 if (
                   data.proyecto === "garden_house_18" &&
                   capa === "MOBILIARIO"
-                )
-                  node.visible = false;
-                if (
-                  data.proyecto === "terraza_luz" &&
-                  ["cama_suite", "cama_secundaria"].some((x) =>
-                    String(id || "").startsWith(x),
-                  )
                 )
                   node.visible = false;
                 if (id && proxyRoots.has(id))
@@ -555,6 +551,11 @@ function Viewer({
                   }
                 }
               });
+              if (data.proyecto === "terraza_luz") {
+                // The approved master remains Z-up and Blender exports standard
+                // glTF Y-up. Restore the viewer's Z-up coordinates at runtime.
+                g.scene.rotation.x = Math.PI / 2;
+              }
               if (data.proyecto === "jequitiba_final_03") {
                 // glTF converts Blender's Z-up model to Y-up. The existing
                 // interior viewer uses Z-up, so restore that convention before

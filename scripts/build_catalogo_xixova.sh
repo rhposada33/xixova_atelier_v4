@@ -35,6 +35,10 @@ uv run xixova_cli.py exportar-catalogo \
 install -m 0644 "$WEB_DIR/public/building/xixova-building-visual-v2.glb" "$OUTPUT_DIR/building/xixova-building-visual-v2.glb"
 install -m 0644 "$WEB_DIR/public/building/xixova-building-visual-v2-asset-statistics.json" "$OUTPUT_DIR/building/xixova-building-visual-v2-asset-statistics.json"
 
+# Terraza Luz uses the approved, manually art-directed premium master. Keep the
+# generated mobile/standard levels and replace only the premium web candidate.
+install -m 0644 "$REPO_ROOT/proyectos/terraza_luz/web/assets-premium.glb" "$OUTPUT_DIR/projects/terraza_luz/data/assets-premium.glb"
+
 install -m 0644 "$REPO_ROOT/vercel.json" "$OUTPUT_DIR/vercel.json"
 
 test -s "$OUTPUT_DIR/index.html"
