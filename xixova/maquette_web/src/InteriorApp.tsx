@@ -1052,33 +1052,6 @@ function Viewer({
           <b>N</b>
         </div>
       )}
-      <div className="floating">
-        <button
-          aria-label="Vista inicial"
-          onClick={() => runtime.current?.focus()}
-        >
-          ⌂
-        </button>
-        <button
-          aria-label="Girar 45 graus"
-          onClick={() => runtime.current?.rotate45()}
-        >
-          ↻ 45°
-        </button>
-        <button
-          aria-label="Carregar materiais em alta definição"
-          title="Materiais HD"
-          onClick={() => runtime.current?.upgrade?.()}
-        >
-          HD
-        </button>
-        <button
-          aria-label="Salvar imagem"
-          onClick={() => runtime.current?.capture()}
-        >
-          ▣
-        </button>
-      </div>
       <div className="simulation-badge">
         <span>ⓘ</span> Visualização simulada
       </div>
@@ -1346,7 +1319,7 @@ function Ready(p: any) {
   const openWhatsApp = () => {
     const shareUrl = `${location.origin}/unidades/${p.unit}/`;
     const message = [
-      `Olá! Tenho interesse na Unidade ${p.unit} do Escobar Residences.`,
+      `Olá! Tenho interesse na Unidade ${p.unit} da demonstração Promoven.`,
       `Tipologia ilustrativa: ${d.nombre}`,
       `Andar: ${p.floor}`,
       `Link: ${shareUrl}`,
@@ -1391,13 +1364,13 @@ function Ready(p: any) {
       ].join(" ")}
     >
       <header>
-        <div className="brand">
-          <b>{isJequitiba ? "JQ" : "ES"}</b>
+        <a className="brand promoven-brand" href="/" aria-label="Promoven, início">
+          <b>P</b>
           <span>
-            <strong>{isJequitiba ? "JEQUITIBÁ" : "ESCOBAR"}</strong>
-            <small>MAQUETE INTERATIVA</small>
+            <strong>PROMOVEN</strong>
+            <small>Experiências imobiliárias</small>
           </span>
-        </div>
+        </a>
         <div className="title">
           <strong>{d.nombre.toUpperCase()}</strong>
           <small>Luxo contemporâneo</small>
@@ -1700,7 +1673,7 @@ function Ready(p: any) {
             >
               ×
             </button>
-            <small>ESCOBAR · SEU PRÓXIMO LAR</small>
+            <small>PROMOVEN · EXPERIÊNCIAS IMOBILIÁRIAS</small>
             <h2>
               {d.nombre} · Unidade {p.unit}
             </h2>
