@@ -1,8 +1,6 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import atlasURL from "./assets/garden-material-atlas.png?url";
-import oakNormalURL from "../../../cache/pbr/wood_floor/wood_floor_normal_1k.jpg?url";
-import linenNormalURL from "../../../cache/pbr/rough_linen/rough_linen_normal_1k.jpg?url";
 
 // A separate, metre-based architectural contract. North is +Y; the entire plate is 18 × 13 m.
 const rect = (
@@ -270,15 +268,11 @@ export function gardenDetails(
   const oak = new THREE.MeshStandardMaterial({
     color: "#ffe9bf",
     map: atlas(0, 0.5),
-    normalMap: texture(oakNormalURL, 1, true),
-    normalScale: new THREE.Vector2(0.22, 0.22),
     roughness: 0.38,
   });
   const linen = new THREE.MeshStandardMaterial({
     color: "#fffdf7",
     map: atlas(0.5, 0.5),
-    normalMap: texture(linenNormalURL, 3, true),
-    normalScale: new THREE.Vector2(0.24, 0.24),
     roughness: 0.9,
   });
   const stone = new THREE.MeshStandardMaterial({

@@ -1,0 +1,39 @@
+{
+  "schema": 2,
+  "nivel": "standard",
+  "arquitectura": true,
+  "compresion_geometria": "sin_meshopt",
+  "texturas": "webp",
+  "activos": [
+    "armario_suite_2",
+    "armario_suite_principal",
+    "bano_2_mueble",
+    "bano_3_mueble",
+    "bano_principal_mueble",
+    "cama_principal",
+    "cama_suite_2",
+    "cama_suite_3",
+    "cocina_gourmet",
+    "comedor_ocho",
+    "comedor_terraza",
+    "mesa_social"
+  ],
+  "proxies": [
+    "sofa_social",
+    "sofa_terraza"
+  ],
+  "caras_fuente": 41234,
+  "ratio": 0.68,
+  "materiales": 421,
+  "imagenes": 17,
+  "diagnosticos": [
+    {
+      "codigo": "WEB_MESHOPT_NO_DISPONIBLE",
+      "gravedad": "aviso",
+      "elemento": "exportador",
+      "explicacion": "gltfpack no está instalado; se exporta GLB optimizado sin compresión Meshopt."
+    }
+  ],
+  "archivo": "assets-standard.glb",
+  "bytes": 12776588
+}

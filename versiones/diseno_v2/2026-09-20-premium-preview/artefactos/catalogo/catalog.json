@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "defaultProject": "garden_house_18",
+  "defaultView": "building",
+  "building": {
+    "organizationSlug": "escobar",
+    "projectSlug": "escobar-residences",
+    "defaultUnitCode": "1203",
+    "model": "building/xixova-building.glb",
+    "inventory": "building/inventory.json",
+    "visualModes": [
+      "neutral_day",
+      "warm_dusk"
+    ],
+    "statistics": "building/asset-statistics.json",
+    "residentialFloors": 18,
+    "units": 72,
+    "provisional": true
+  },
+  "projects": [
+    {
+      "id": "garden_house_18",
+      "name": "Garden House",
+      "variant": "lujo_contemporaneo",
+      "floors": [
+        6,
+        8,
+        10
+      ],
+      "units": [
+        "01",
+        "04"
+      ],
+      "scene": "projects/garden_house_18/data/scene.json",
+      "manifest": "projects/garden_house_18/manifest.json",
+      "thumbnail": "projects/garden_house_18/data/miniatura.svg",
+      "bytes": 44561907
+    },
+    {
+      "id": "terraza_luz",
+      "name": "Terraza Luz",
+      "variant": "editorial_jardin",
+      "floors": [
+        6,
+        8,
+        10
+      ],
+      "units": [
+        "01",
+        "04"
+      ],
+      "scene": "projects/terraza_luz/data/scene.json",
+      "manifest": "projects/terraza_luz/manifest.json",
+      "thumbnail": "projects/terraza_luz/data/miniatura.svg",
+      "bytes": 40048542
+    }
+  ]
+}

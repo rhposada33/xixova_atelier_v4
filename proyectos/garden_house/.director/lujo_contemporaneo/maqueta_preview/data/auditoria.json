@@ -8,8 +8,8 @@
     "limite_movil": 200000,
     "activos": 11,
     "espacios": 9,
-    "bytes_totales": 29279632,
-    "bytes_carga_inicial": 29279632,
+    "bytes_totales": 35213416,
+    "bytes_carga_inicial": 35213416,
     "limite_carga_inicial": 8388608
   },
   "diagnosticos": [
@@ -35,7 +35,7 @@
       "codigo": "MAQUETA_CARGA_INICIAL",
       "gravedad": "aviso",
       "elemento": "paquete",
-      "explicacion": "La carga inicial ocupa 27.9 MB."
+      "explicacion": "La carga inicial ocupa 33.6 MB."
     }
   ]
 }

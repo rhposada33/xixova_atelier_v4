@@ -1,0 +1,4 @@
+61c9dc500c8f3e61731b3bbd4d19ac64b428d0eebf750a48d8b7e380fce0f069  versiones/diseno_v2/2026-09-20-premium-preview/rollback/originales-antes-de-aprobacion/src/InteriorApp.tsx
+bb350fb0e1f5dc0d6315757505442079ffa986e5df85126885b1f09a9d15d03b  versiones/diseno_v2/2026-09-20-premium-preview/rollback/originales-antes-de-aprobacion/src/garden.ts
+7c4d088d3a224d683f89ab0ff344de842f904240dfd01b5757ef8d1ec88b2122  versiones/diseno_v2/2026-09-20-premium-preview/rollback/originales-antes-de-aprobacion/src/editorial.ts
+b2025b035540006a01aa4e1baad3c3a2b6989d707ba1abfada8031943415ace4  versiones/diseno_v2/2026-09-20-premium-preview/rollback/originales-antes-de-aprobacion/src/solar/light.ts

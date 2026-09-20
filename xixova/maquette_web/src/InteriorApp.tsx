@@ -25,6 +25,8 @@ import { jequitibaInterior } from "./jequitiba";
 import type { CatalogManifest, CatalogProject, SceneData, SceneElement, WallMode } from "./contracts";
 import { loadCatalog, loadScene, selectionFromURL, updateSelection } from "./catalog";
 import "./atelier.css";
+import "./premium-v2.css";
+import { installTerrazaEnvironment, finishTerrazaMaterials } from "./terrazaPremiumV2";
 const roomNamePT=(name:string)=>({
   "Terraza Jardin":"Terraço Jardim","Terraza Jardín":"Terraço Jardim","Entrada":"Entrada","Lavanderia":"Lavanderia",
   "Baño social":"Banheiro social","Baño Social":"Banheiro social","Baño 2":"Banheiro 2","Baño 3":"Banheiro 3","Cocina":"Cozinha","Cocina gourmet":"Cozinha gourmet",
@@ -212,14 +214,14 @@ function Viewer({
       labelRoot = labelsHost.current!,
       world = new THREE.Scene();
     world.background = new THREE.Color(
-      data.proyecto === "garden_house_18" ? "#f7f2e8" : "#f2efe6",
+      data.proyecto === "garden_house_18" ? "#f7f2e8" : data.proyecto === "terraza_luz" ? "#c7c4ba" : "#f2efe6",
     );
     const camera = new THREE.OrthographicCamera(-8, 8, 5, -5, 0.1, 100),
       renderer = new THREE.WebGLRenderer({
         antialias: true,
         preserveDrawingBuffer: false,
       });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, data.proyecto === "jequitiba_final_03" ? 1.5 : 1));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, (data.proyecto === "jequitiba_final_03" || data.proyecto === "terraza_luz") ? 1.5 : 1));
     renderer.localClippingEnabled = true;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.autoUpdate = false;
@@ -237,7 +239,7 @@ function Viewer({
     const center = bounds.getCenter(new THREE.Vector3()),
       size = bounds.getSize(new THREE.Vector3()),
       radius = Math.max(size.x, size.y),
-      frustum = radius * (data.proyecto === "garden_house_18" ? 0.47 : 0.59);
+      frustum = radius * (data.proyecto === "garden_house_18" ? 0.47 : data.proyecto === "terraza_luz" ? 0.61 : 0.59);
     camera.position.set(
       center.x + radius * (data.proyecto === "garden_house_18" ? -0.1 : 0.9),
       center.y - radius * (data.proyecto === "garden_house_18" ? 0.76 : 1.15),
@@ -259,6 +261,8 @@ function Viewer({
     controls.zoomToCursor = true;
     controls.screenSpacePanning = true;
     const ambient = new THREE.HemisphereLight("#fff7e7", "#8d8675", 1.15);
+    // Interior geometry and camera use Z-up: align the sky hemisphere to it.
+    ambient.position.set(0, 0, 1);
     world.add(ambient);
     world.environmentIntensity = 0.35;
     const editorialSun = editorialDetails(world, data);
@@ -276,10 +280,23 @@ function Viewer({
       renderer.toneMappingExposure = 1.0;
       camera.position.set(center.x + radius * .70, center.y - radius * .88, radius * 1.7);
     }
+    if (data.proyecto === "terraza_luz") {
+      disposeInteriorEnvironment = installTerrazaEnvironment(renderer, world);
+      ambient.color.set("#fffaf1");
+      ambient.groundColor.set("#c4bba8");
+      ambient.intensity = 1.65;
+      editorialSun.color.set("#fff1db");
+      editorialSun.intensity = 3.05;
+      editorialSun.position.set(-3, -5, 15);
+      editorialSun.shadow.radius = 4;
+      renderer.toneMappingExposure = 1.02;
+      world.background = new THREE.Color("#c7c4ba");
+      finishTerrazaMaterials(world, renderer);
+    }
     // Contact shading grounds upholstery, joinery and table legs in the cutaway.
     // A bounded render ratio and smaller kernel retain responsive orbit controls.
     const premiumComposer =
-      data.proyecto === "jequitiba_final_03" &&
+      (data.proyecto === "jequitiba_final_03" || data.proyecto === "terraza_luz") &&
       el.clientWidth >= 640 &&
       (navigator.hardwareConcurrency || 4) >= 4
         ? new EffectComposer(renderer)
@@ -289,23 +306,23 @@ function Viewer({
       premiumComposer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
       premiumComposer.addPass(new RenderPass(world, camera));
       contactPass = new SSAOPass(world, camera, el.clientWidth, el.clientHeight, 12);
-      contactPass.kernelRadius = 9;
-      contactPass.minDistance = .001;
-      contactPass.maxDistance = .075;
+      contactPass.kernelRadius = data.proyecto === "terraza_luz" ? 16 : 9;
+      contactPass.minDistance = .0005;
+      contactPass.maxDistance = .10;
       premiumComposer.addPass(contactPass);
       premiumComposer.addPass(new SMAAPass());
       premiumComposer.addPass(new OutputPass());
     }
     if (data.proyecto === "garden_house_18") {
       gardenDetails(world, { surfaces: false, furniture: true });
-      // The textured scene is already lit by the editorial sun and hemisphere.
-      // Avoid a synchronous PMREM render during first paint on large plans.
-      world.environmentIntensity = 0.55;
-      ambient.intensity = 3.35;
+      disposeInteriorEnvironment = installTerrazaEnvironment(renderer, world);
+      world.environmentIntensity = 0.48;
+      ambient.groundColor.set("#c5bba8");
+      ambient.intensity = 2.35;
       editorialSun.intensity = 3.75;
       editorialSun.position.set(-7, -6, 24);
       editorialSun.target.position.set(9, 6, 0);
-      renderer.toneMappingExposure = 1.38;
+      renderer.toneMappingExposure = 1.15;
     }
     const walls: THREE.Mesh[] = [],
       blockers: THREE.Object3D[] = [],
@@ -555,6 +572,7 @@ function Viewer({
                 // The approved master remains Z-up and Blender exports standard
                 // glTF Y-up. Restore the viewer's Z-up coordinates at runtime.
                 g.scene.rotation.x = Math.PI / 2;
+                finishTerrazaMaterials(g.scene, renderer);
               }
               if (data.proyecto === "jequitiba_final_03") {
                 // glTF converts Blender's Z-up model to Y-up. The existing
@@ -746,7 +764,7 @@ function Viewer({
       center,
       radius,
       targetBackground: new THREE.Color(
-        data.proyecto === "garden_house_18" ? "#f7f2e8" : "#f2efe6",
+        data.proyecto === "garden_house_18" ? "#f7f2e8" : data.proyecto === "terraza_luz" ? "#c7c4ba" : "#f2efe6",
       ),
       setPath(n: THREE.Group) {
         if (this.path) {
@@ -946,7 +964,7 @@ function Viewer({
     r.editorialSun.visible = !solar;
     if (!solar) {
       if (r.path) r.path.visible = false;
-      r.targetBackground.set("#f2efe6");
+      r.targetBackground.set(data.proyecto === "terraza_luz" ? "#c7c4ba" : "#f2efe6");
       r.floors.forEach(
         (m: THREE.MeshStandardMaterial) => (m.emissiveIntensity = 0),
       );
@@ -962,8 +980,8 @@ function Viewer({
       : Math.max(0, Math.min(1, (8 - solar.position.elevationDegrees) / 8));
     r.ambient.intensity = solar.position.daylight
       ? data.proyecto === "garden_house_18"
-        ? 3.15
-        : 2.1
+        ? 2.35
+        : data.proyecto === "terraza_luz" ? 1.65 : 2.1
       : 0.48;
     r.worldEnvironmentIntensity = solar.position.daylight ? 1 : 0.22;
     r.world.environmentIntensity =
@@ -971,15 +989,15 @@ function Viewer({
         ? solar.position.daylight
           ? 0.65
           : 0.2
-        : r.worldEnvironmentIntensity;
+        : data.proyecto === "terraza_luz" ? (solar.position.daylight ? .62 : .12) : r.worldEnvironmentIntensity;
     r.practicals.forEach((x: THREE.PointLight) => {
       x.intensity = twilight * 5.5;
       x.visible = twilight > 0;
     });
     r.renderer.toneMappingExposure = solar.position.daylight
       ? data.proyecto === "garden_house_18"
-        ? 1.3
-        : 1.08
+        ? 1.15
+        : data.proyecto === "terraza_luz" ? 1.02 : 1.08
       : 0.72;
     if (r.path?.userData.date !== solar.date)
       r.setPath(
@@ -1002,6 +1020,8 @@ function Viewer({
         ? "#cbd4dc"
         : data.proyecto === "garden_house_18"
           ? "#f7f2e8"
+          : data.proyecto === "terraza_luz"
+            ? (solar.minutes > 960 ? "#cfc1ac" : "#c7c4ba")
           : solar.minutes < 600
             ? "#eee6d6"
             : solar.minutes > 960
@@ -1358,7 +1378,7 @@ function Ready(p: any) {
   return (
     <main
       className={[
-        "atelier",
+        "atelier premium-v2",
         p.solarOpen ? "solar-active" : "",
         p.menu ? "menu-active" : "",
         p.selected ? "selection-active" : "",
@@ -1374,7 +1394,7 @@ function Ready(p: any) {
         </a>
         <div className="title">
           <strong>{d.nombre.toUpperCase()}</strong>
-          <small>Luxo contemporâneo</small>
+          <small>Luxo contemporâneo <span className="v2-identity">Vista previa V2</span></small>
         </div>
         <div className="project-selectors">
           <label>

@@ -1,0 +1,37 @@
+ M AGENTS.md
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/AuthApp-1G7MRHdI.js
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/DemoApp-BWFlmXh_.css
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/DemoApp-qX2k4BrS.js
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/InteractiveInteriorPreview-C_lP76N8.js
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/InteriorApp-Bp5XI694.css
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/InteriorApp-C36XtB7w.js
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/index-BDD0fiog.css
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/index-BDyq-F9H.js
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/portal-BgtYI60D.js
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/supabase-DPMKXOdF.js
+ D proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/three-CIr_Dq0Q.js
+ M proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/data/auditoria.json
+ M proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/index.html
+ M xixova/maquette_web/dist/index.html
+ M xixova/maquette_web/src/building/BuildingApp.tsx
+ M xixova/maquette_web/src/building/building.css
+ M xixova/maquette_web/src/marketing/MarketingLanding.tsx
+?? docs/APARTMENT_PRODUCTION_LESSONS.md
+?? docs/CONTEXTO_IA_COMPACTO.md
+?? docs/INFORME_AUDITORIA_CODIGO_Y_FUNCIONALIDADES_2026-09-19.md
+?? docs/apartamentos/
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/AuthApp-DJGTdWVk.js
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/DemoApp-BJA9sGTB.css
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/DemoApp-Ch9JRrdS.js
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/InteriorApp-B3s1qPOL.js
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/InteriorApp-BJiFnHQ9.css
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/main-BKLFeW3P.js
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/main-C1VcXRWU.css
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/portal-b0CbZojS.js
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/assets/three-19dBpOjf.js
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/demo.html
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/marketing/
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/privacidade.html
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/robots.txt
+?? proyectos/garden_house/.director/lujo_contemporaneo/maqueta_preview/sitemap.xml
+?? versiones/

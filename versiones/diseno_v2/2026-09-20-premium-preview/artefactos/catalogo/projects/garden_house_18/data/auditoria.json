@@ -1,0 +1,42 @@
+{
+  "schema": 2,
+  "ok": true,
+  "hash": "b486ff3eaaacdfc5c550dd6b4627109fc05b444d14209258b1b066da21426762",
+  "perfil_web": "premium_editorial",
+  "metricas": {
+    "triangulos_estimados": 82792,
+    "limite_movil": 200000,
+    "activos": 14,
+    "espacios": 20,
+    "caras_activos_fuente": 41234,
+    "bytes_totales": 44561907,
+    "bytes_carga_inicial": 38432,
+    "limite_carga_inicial": 8388608
+  },
+  "diagnosticos": [
+    {
+      "codigo": "MAQUETA_SOLAR_DEMO",
+      "gravedad": "aviso",
+      "elemento": "solar",
+      "explicacion": "Ubicación y norte de demostración; el resultado es una estimación por calibrar."
+    },
+    {
+      "codigo": "MAQUETA_PROXY_LICENCIA",
+      "gravedad": "aviso",
+      "elemento": "sofa_social",
+      "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."
+    },
+    {
+      "codigo": "MAQUETA_PROXY_LICENCIA",
+      "gravedad": "aviso",
+      "elemento": "sofa_terraza",
+      "explicacion": "Se publicará sólo el proxy procedural; la malla fuente queda fuera."
+    },
+    {
+      "codigo": "WEB_MESHOPT_NO_DISPONIBLE",
+      "gravedad": "aviso",
+      "elemento": "exportador",
+      "explicacion": "gltfpack no está instalado; se exporta GLB optimizado sin compresión Meshopt."
+    }
+  ]
+}

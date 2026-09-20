@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /portal/
+Disallow: /login
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /accept-invitation
+Sitemap: https://www.promoven.online/sitemap.xml

@@ -1,0 +1,155 @@
+{
+  "triangles": 56504,
+  "meshObjects": 99,
+  "materials": 16,
+  "unitProxies": 72,
+  "residentialFloors": 18,
+  "glbBytes": 3035784,
+  "hierarchy": {
+    "PODIUM": [
+      "PODIUM_ground",
+      "PODIUM_slab",
+      "PODIUM_wood"
+    ],
+    "ENTRANCE": [
+      "ENTRANCE_bronze",
+      "ENTRANCE_ivory",
+      "ENTRANCE_light",
+      "ENTRANCE_window",
+      "ENTRANCE_wood"
+    ],
+    "FACADE_SHARED": [
+      "FACADE_SHARED_bronze",
+      "FACADE_SHARED_curtain",
+      "FACADE_SHARED_glass",
+      "FACADE_SHARED_graphite",
+      "FACADE_SHARED_interior_glow",
+      "FACADE_SHARED_ivory",
+      "FACADE_SHARED_joint",
+      "FACADE_SHARED_leaf",
+      "FACADE_SHARED_light",
+      "FACADE_SHARED_slab",
+      "FACADE_SHARED_window",
+      "FACADE_SHARED_wood"
+    ],
+    "ROOFTOP": [
+      "ROOFTOP_bronze",
+      "ROOFTOP_graphite",
+      "ROOFTOP_ivory",
+      "ROOFTOP_light"
+    ],
+    "LANDSCAPE": [
+      "LANDSCAPE_leaf",
+      "LANDSCAPE_leaf_light",
+      "LANDSCAPE_trunk"
+    ],
+    "FLOOR_01": [
+      "UNIT_101_PROXY",
+      "UNIT_102_PROXY",
+      "UNIT_103_PROXY",
+      "UNIT_104_PROXY"
+    ],
+    "FLOOR_02": [
+      "UNIT_201_PROXY",
+      "UNIT_202_PROXY",
+      "UNIT_203_PROXY",
+      "UNIT_204_PROXY"
+    ],
+    "FLOOR_03": [
+      "UNIT_301_PROXY",
+      "UNIT_302_PROXY",
+      "UNIT_303_PROXY",
+      "UNIT_304_PROXY"
+    ],
+    "FLOOR_04": [
+      "UNIT_401_PROXY",
+      "UNIT_402_PROXY",
+      "UNIT_403_PROXY",
+      "UNIT_404_PROXY"
+    ],
+    "FLOOR_05": [
+      "UNIT_501_PROXY",
+      "UNIT_502_PROXY",
+      "UNIT_503_PROXY",
+      "UNIT_504_PROXY"
+    ],
+    "FLOOR_06": [
+      "UNIT_601_PROXY",
+      "UNIT_602_PROXY",
+      "UNIT_603_PROXY",
+      "UNIT_604_PROXY"
+    ],
+    "FLOOR_07": [
+      "UNIT_701_PROXY",
+      "UNIT_702_PROXY",
+      "UNIT_703_PROXY",
+      "UNIT_704_PROXY"
+    ],
+    "FLOOR_08": [
+      "UNIT_801_PROXY",
+      "UNIT_802_PROXY",
+      "UNIT_803_PROXY",
+      "UNIT_804_PROXY"
+    ],
+    "FLOOR_09": [
+      "UNIT_901_PROXY",
+      "UNIT_902_PROXY",
+      "UNIT_903_PROXY",
+      "UNIT_904_PROXY"
+    ],
+    "FLOOR_10": [
+      "UNIT_1001_PROXY",
+      "UNIT_1002_PROXY",
+      "UNIT_1003_PROXY",
+      "UNIT_1004_PROXY"
+    ],
+    "FLOOR_11": [
+      "UNIT_1101_PROXY",
+      "UNIT_1102_PROXY",
+      "UNIT_1103_PROXY",
+      "UNIT_1104_PROXY"
+    ],
+    "FLOOR_12": [
+      "UNIT_1201_PROXY",
+      "UNIT_1202_PROXY",
+      "UNIT_1203_PROXY",
+      "UNIT_1204_PROXY"
+    ],
+    "FLOOR_13": [
+      "UNIT_1301_PROXY",
+      "UNIT_1302_PROXY",
+      "UNIT_1303_PROXY",
+      "UNIT_1304_PROXY"
+    ],
+    "FLOOR_14": [
+      "UNIT_1401_PROXY",
+      "UNIT_1402_PROXY",
+      "UNIT_1403_PROXY",
+      "UNIT_1404_PROXY"
+    ],
+    "FLOOR_15": [
+      "UNIT_1501_PROXY",
+      "UNIT_1502_PROXY",
+      "UNIT_1503_PROXY",
+      "UNIT_1504_PROXY"
+    ],
+    "FLOOR_16": [
+      "UNIT_1601_PROXY",
+      "UNIT_1602_PROXY",
+      "UNIT_1603_PROXY",
+      "UNIT_1604_PROXY"
+    ],
+    "FLOOR_17": [
+      "UNIT_1701_PROXY",
+      "UNIT_1702_PROXY",
+      "UNIT_1703_PROXY",
+      "UNIT_1704_PROXY"
+    ],
+    "FLOOR_18": [
+      "UNIT_1801_PROXY",
+      "UNIT_1802_PROXY",
+      "UNIT_1803_PROXY",
+      "UNIT_1804_PROXY"
+    ]
+  }
+}

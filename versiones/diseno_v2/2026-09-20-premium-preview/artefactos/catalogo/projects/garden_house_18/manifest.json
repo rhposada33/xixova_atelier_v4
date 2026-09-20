@@ -1,0 +1,87 @@
+{
+  "schema": 2,
+  "proyecto": "garden_house_18",
+  "variante": "lujo_contemporaneo",
+  "hash": "b486ff3eaaacdfc5c550dd6b4627109fc05b444d14209258b1b066da21426762",
+  "escena": "data/scene.json",
+  "glb": "data/scene.glb",
+  "activos": {
+    "inicial": "mobile",
+    "objetivo": "premium",
+    "niveles": {
+      "mobile": {
+        "url": "data/assets-mobile.glb",
+        "bytes": 10789420,
+        "activos": [
+          "armario_suite_2",
+          "armario_suite_principal",
+          "bano_2_mueble",
+          "bano_3_mueble",
+          "bano_principal_mueble",
+          "cama_principal",
+          "cama_suite_2",
+          "cama_suite_3",
+          "cocina_gourmet",
+          "comedor_ocho",
+          "comedor_terraza",
+          "mesa_social"
+        ]
+      },
+      "standard": {
+        "url": "data/assets-standard.glb",
+        "bytes": 12776588,
+        "activos": [
+          "armario_suite_2",
+          "armario_suite_principal",
+          "bano_2_mueble",
+          "bano_3_mueble",
+          "bano_principal_mueble",
+          "cama_principal",
+          "cama_suite_2",
+          "cama_suite_3",
+          "cocina_gourmet",
+          "comedor_ocho",
+          "comedor_terraza",
+          "mesa_social"
+        ]
+      },
+      "premium": {
+        "url": "data/assets-premium.glb",
+        "bytes": 20954900,
+        "activos": [
+          "armario_suite_2",
+          "armario_suite_principal",
+          "bano_2_mueble",
+          "bano_3_mueble",
+          "bano_principal_mueble",
+          "cama_principal",
+          "cama_suite_2",
+          "cama_suite_3",
+          "cocina_gourmet",
+          "comedor_ocho",
+          "comedor_terraza",
+          "mesa_social"
+        ]
+      }
+    },
+    "proxies": [
+      "sofa_social",
+      "sofa_terraza"
+    ]
+  },
+  "iluminacion": "data/lighting.json",
+  "miniatura": "data/miniatura.svg",
+  "auditoria": "data/auditoria.json",
+  "atribuciones": "data/atribuciones.json",
+  "capacidades": [
+    "paredes_inteligentes",
+    "puertas",
+    "espacios",
+    "puntos_interes",
+    "captura",
+    "tour",
+    "carga_progresiva",
+    "materiales_pbr",
+    "estudio_solar"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/demo", "dest": "/demo.html" },
+    { "src": "/privacidade", "dest": "/privacidade.html" },
+    { "src": "/.*", "dest": "/index.html" }
+  ]
+}
