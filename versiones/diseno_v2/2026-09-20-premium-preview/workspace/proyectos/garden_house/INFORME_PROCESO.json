@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "proyecto": "garden_house",
+  "objetivo": "Escena regenerable, animática de 20 s y quince pilotos Cycles.",
+  "intervenciones_ia": 1,
+  "etapas": [
+    {
+      "etapa": "validacion",
+      "resultado": "ok"
+    },
+    {
+      "etapa": "arquitectura",
+      "resultado": "blend, planta SVG y cinco vistas"
+    },
+    {
+      "etapa": "composicion",
+      "resultado": "escena regenerable"
+    },
+    {
+      "etapa": "preflight",
+      "resultado": "GPU, recursos, UV y memoria ok"
+    },
+    {
+      "etapa": "animatica",
+      "resultado": "480/480, 20.000 s"
+    },
+    {
+      "etapa": "pilotos",
+      "resultado": "15/15"
+    },
+    {
+      "etapa": "auditoria_fotografica",
+      "resultado": "ok con 3 avisos de ocupacion en cocina_comedor"
+    }
+  ],
+  "problemas_iniciales": [
+    {
+      "categoria": "plano",
+      "diagnostico": "Alturas, espesores y cotas verticales ausentes.",
+      "correccion": "Valores inferidos documentados en arquitectura.yaml.",
+      "mejora_framework": "Incluir nivel de confianza por cota y superficie."
+    },
+    {
+      "categoria": "biblioteca",
+      "diagnostico": "La biblioteca curada contiene un único asiento publicado.",
+      "correccion": "Usar ese activo en veranda y catálogo histórico validado para los faltantes.",
+      "mejora_framework": "Completar las categorías prioritarias de la biblioteca antes de exigir sustitución automática."
+    },
+    {
+      "categoria": "geometría",
+      "diagnostico": "La primera validación marcó muebles contra puertas de estancias vecinas porque la reserva de maniobra no considera qué espacios conecta cada abertura.",
+      "correccion": "Se despejaron las reservas y se compactaron armarios y equipos sanitarios para esta versión.",
+      "mejora_framework": "Asociar cada puerta con sus espacios adyacentes y validar la maniobra sólo contra elementos de esos espacios."
+    },
+    {
+      "categoria": "camaras",
+      "diagnostico": "La primera animática fue estructuralmente válida, pero veranda y dormitorios quedaron dominados por paredes y respaldos.",
+      "correccion": "Reposicionar cámaras, abrir lentes privadas y apuntar directamente a protagonistas antes de Cycles.",
+      "mejora_framework": "Analizar ocupación de pared, respaldo y protagonista sobre fotogramas Workbench antes de aprobar pilotos."
+    },
+    {
+      "categoria": "fotografia",
+      "diagnostico": "Auditoría de pilotos: cocina 10,7–12 % de ocupación; dormitorios 72,6–82,5 %; veranda y suite con exposición alta y detalle bajo.",
+      "correccion": "Cámara de cocina dentro de la estancia, veranda sin muro interpuesto, lentes privadas de 24 mm y exposición por toma reducida.",
+      "mejora_framework": "La auditoría debe proponer comandos de Director directamente y evaluar recortes reales de pared."
+    },
+    {
+      "categoria": "camaras",
+      "diagnostico": "La cámara de cocina corregida eliminó la oclusión pero mostró el costado del activo lineal.",
+      "correccion": "Alinear la cámara con el frente +Y declarado por el catálogo y probar sólo la toma afectada.",
+      "mejora_framework": "El planificador debe usar siempre el campo frente del activo al generar candidatos."
+    },
+    {
+      "categoria": "validacion",
+      "diagnostico": "Una cámara a 4 cm del respaldo del activo pasó la comprobación al no intersectar su volumen, pero produjo un cuadro negro.",
+      "correccion": "Mover cámara a veranda y conservar alineación con el frente del activo.",
+      "mejora_framework": "Añadir distancia mínima cámara-activo y penalización por respaldos, además de la colisión binaria."
+    },
+    {
+      "categoria": "catalogo",
+      "diagnostico": "La orientación frontal declarada para XVA3_Cocina_premium no coincide con la cara visible tras su rotación.",
+      "correccion": "Ensayar encuadre perpendicular desde sala y conservar el activo sólo como recurso provisional.",
+      "mejora_framework": "Auditar y corregir orientación frontal de todos los activos heredados antes de selección automática."
+    },
+    {
+      "categoria": "activos",
+      "diagnostico": "XVA3_Cocina_premium carece de detalle frontal útil para una toma protagonista.",
+      "correccion": "Encuadre estático de comedor con cocina como fondo provisional.",
+      "mejora_framework": "Bloquear activos con puntuación fotográfica insuficiente para distancia hero y buscar sustituto curado."
+    }
+  ],
+  "resultado": {
+    "estado": "pilotos_generados_con_advertencia",
+    "hash_salida": "3cefd4c187de755735eb",
+    "arquitectura_hash": "91fe04f7ea0fa22c061c5932db3250a7052883cff5afdd838bc14f03c99b5ddc",
+    "animatica_fotogramas": 480,
+    "animatica_duracion_s": 20.0,
+    "pilotos": 15,
+    "contexto_director_bytes": 659,
+    "contexto_agente_bytes": 8024,
+    "advertencias_pendientes": [
+      "cocina_comedor: ocupacion 0.154; activo de cocina provisional"
+    ]
+  }
+}

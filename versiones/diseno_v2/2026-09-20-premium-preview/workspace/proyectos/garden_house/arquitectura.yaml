@@ -1,0 +1,355 @@
+schema: 1
+id: garden_house
+version: 0.1-borrador
+unidades: m
+fuentes:
+- archivo: plano_garden_house_usuario_2026-09-08.png
+  descripcion: Planta amueblada y acotada aportada por el usuario; la imagen original
+    permanece en la conversación.
+cota_referencia:
+  valor_m: 10.05
+  descripcion: Ancho exterior superior rotulado 10,05 m.
+  fiable: true
+dudas:
+- Altura, espesores, alturas de ventanas y antepechos inferidos para visualización.
+- Las superficies rotuladas y algunas cotas parciales no cierran exactamente entre
+  sí.
+- La orientación solar real no está indicada; la incidencia desde la veranda es una
+  decisión artística.
+- La planta es apta para visualización, no para documentación constructiva.
+espacios:
+- id: veranda
+  contorno:
+  - - 0
+    - 5.55
+  - - 10.05
+    - 5.55
+  - - 10.05
+    - 7.0
+  - - 0
+    - 7.0
+  altura: 2.7
+  cubierto: false
+- id: area_servicio
+  contorno:
+  - - 0
+    - 4.05
+  - - 1.5
+    - 4.05
+  - - 1.5
+    - 5.55
+  - - 0
+    - 5.55
+  altura: 2.7
+  cubierto: true
+- id: cocina
+  contorno:
+  - - 0
+    - 0
+  - - 1.5
+    - 0
+  - - 1.5
+    - 4.05
+  - - 0
+    - 4.05
+  altura: 2.7
+  cubierto: true
+- id: sala_comedor
+  contorno:
+  - - 1.5
+    - 0.85
+  - - 4.72
+    - 0.85
+  - - 4.72
+    - 5.55
+  - - 1.5
+    - 5.55
+  altura: 2.7
+  cubierto: true
+- id: circulacion
+  contorno:
+  - - 4.72
+    - 1.35
+  - - 7.57
+    - 1.35
+  - - 7.57
+    - 2.7
+  - - 4.72
+    - 2.7
+  altura: 2.7
+  cubierto: true
+- id: dormitorio
+  contorno:
+  - - 4.72
+    - 2.7
+  - - 7.57
+    - 2.7
+  - - 7.57
+    - 5.55
+  - - 4.72
+    - 5.55
+  altura: 2.7
+  cubierto: true
+- id: suite
+  contorno:
+  - - 7.57
+    - 1.2
+  - - 10.05
+    - 1.2
+  - - 10.05
+    - 5.55
+  - - 7.57
+    - 5.55
+  altura: 2.7
+  cubierto: true
+- id: bano_social
+  contorno:
+  - - 4.72
+    - 0
+  - - 7.19
+    - 0
+  - - 7.19
+    - 1.2
+  - - 4.72
+    - 1.2
+  altura: 2.7
+  cubierto: true
+- id: bano_suite
+  contorno:
+  - - 7.6
+    - 0
+  - - 10.05
+    - 0
+  - - 10.05
+    - 1.2
+  - - 7.6
+    - 1.2
+  altura: 2.7
+  cubierto: true
+paredes:
+- id: fachada_sur
+  a:
+  - 0
+  - 0
+  b:
+  - 10.05
+  - 0
+  espesor: 0.18
+  altura: 2.7
+  aberturas:
+  - id: entrada_principal
+    tipo: puerta
+    distancia: 3.82
+    ancho: 0.9
+    alto: 2.1
+    antepecho: 0
+- id: fachada_oeste
+  a:
+  - 0
+  - 0
+  b:
+  - 0
+  - 7
+  espesor: 0.18
+  altura: 2.7
+  aberturas: []
+- id: fachada_este
+  a:
+  - 10.05
+  - 0
+  b:
+  - 10.05
+  - 7
+  espesor: 0.18
+  altura: 2.7
+  aberturas: []
+- id: fachada_norte
+  a:
+  - 0
+  - 7
+  b:
+  - 10.05
+  - 7
+  espesor: 0.18
+  altura: 2.7
+  aberturas: []
+- id: frente_veranda
+  a:
+  - 0
+  - 5.55
+  b:
+  - 10.05
+  - 5.55
+  espesor: 0.18
+  altura: 2.7
+  aberturas:
+  - id: ventana_servicio
+    tipo: ventana
+    distancia: 0.2
+    ancho: 1.05
+    alto: 1.1
+    antepecho: 1.0
+  - id: ventanal_social
+    tipo: ventana
+    distancia: 1.75
+    ancho: 2.45
+    alto: 2.2
+    antepecho: 0.25
+  - id: puerta_veranda
+    tipo: puerta
+    distancia: 4.3
+    ancho: 0.9
+    alto: 2.1
+    antepecho: 0
+  - id: ventana_dormitorio
+    tipo: ventana
+    distancia: 5.95
+    ancho: 1.25
+    alto: 1.2
+    antepecho: 1.0
+  - id: ventana_suite
+    tipo: ventana
+    distancia: 8.0
+    ancho: 1.5
+    alto: 1.2
+    antepecho: 1.0
+- id: division_cocina
+  a:
+  - 1.5
+  - 0
+  b:
+  - 1.5
+  - 5.55
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: paso_cocina_sala
+    tipo: puerta
+    distancia: 2.3
+    ancho: 1.6
+    alto: 2.1
+    antepecho: 0
+  - id: puerta_area_servicio
+    tipo: puerta
+    distancia: 4.4
+    ancho: 0.8
+    alto: 2.1
+    antepecho: 0
+- id: eje_privado
+  a:
+  - 4.72
+  - 0
+  b:
+  - 4.72
+  - 5.55
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: paso_entrada_circulacion
+    tipo: puerta
+    distancia: 1.55
+    ancho: 0.9
+    alto: 2.1
+    antepecho: 0
+  - id: puerta_dormitorio
+    tipo: puerta
+    distancia: 3.1
+    ancho: 0.8
+    alto: 2.1
+    antepecho: 0
+- id: division_dormitorios
+  a:
+  - 7.57
+  - 1.2
+  b:
+  - 7.57
+  - 5.55
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_suite
+    tipo: puerta
+    distancia: 0.35
+    ancho: 0.8
+    alto: 2.1
+    antepecho: 0
+- id: cabecera_banos
+  a:
+  - 4.72
+  - 1.2
+  b:
+  - 10.05
+  - 1.2
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: puerta_bano_social
+    tipo: puerta
+    distancia: 1.55
+    ancho: 0.8
+    alto: 2.1
+    antepecho: 0
+  - id: paso_privado
+    tipo: puerta
+    distancia: 2.75
+    ancho: 0.8
+    alto: 2.1
+    antepecho: 0
+  - id: puerta_bano_suite
+    tipo: puerta
+    distancia: 4.43
+    ancho: 0.8
+    alto: 2.1
+    antepecho: 0
+- id: base_dormitorio
+  a:
+  - 4.72
+  - 2.7
+  b:
+  - 7.57
+  - 2.7
+  espesor: 0.12
+  altura: 2.7
+  aberturas:
+  - id: acceso_dormitorio
+    tipo: puerta
+    distancia: 0.35
+    ancho: 0.8
+    alto: 2.1
+    antepecho: 0
+- id: separa_servicio
+  a:
+  - 0
+  - 4.05
+  b:
+  - 1.5
+  - 4.05
+  espesor: 0.12
+  altura: 2.7
+  aberturas: []
+pilares: []
+instalaciones:
+- id: agua_cocina
+  tipo: agua_y_desague
+  posicion:
+  - 0.15
+  - 1.0
+  - 0.55
+- id: agua_area_servicio
+  tipo: agua_y_desague
+  posicion:
+  - 0.15
+  - 4.75
+  - 0.55
+- id: agua_bano_social
+  tipo: agua_y_desague
+  posicion:
+  - 5.1
+  - 0.15
+  - 0.3
+- id: agua_bano_suite
+  tipo: agua_y_desague
+  posicion:
+  - 8.0
+  - 0.15
+  - 0.3

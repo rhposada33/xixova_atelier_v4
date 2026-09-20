@@ -1,0 +1,18 @@
+/*
+ * Variante experimental não importada.
+ *
+ * Para avaliar no futuro, importe este arquivo depois de marketing.css e
+ * acrescente data-transition-style="light-flash" ao .time-of-day-visual.
+ * Não use junto com imagens que tenham diferenças estruturais evidentes.
+ */
+.time-of-day-visual[data-transition-style="light-flash"] img{
+  transition:
+    opacity 220ms cubic-bezier(.4,0,.2,1),
+    filter 220ms cubic-bezier(.4,0,.2,1);
+}
+
+.time-of-day-visual[data-transition-style="light-flash"].fading-out img,
+.time-of-day-visual[data-transition-style="light-flash"].fading-in img{
+  opacity:0;
+  filter:brightness(1.12) saturate(.82);
+}

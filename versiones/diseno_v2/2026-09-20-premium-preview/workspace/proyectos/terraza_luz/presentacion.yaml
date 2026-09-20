@@ -1,0 +1,244 @@
+schema: 1
+exposicion: -0.25
+entorno:
+  color:
+  - 0.58
+  - 0.68
+  - 0.82
+  intensidad: 0.4
+  archivo: ../../cache/sunset_jhbcentral/entorno_4k.hdr
+  rotacion_grados: 220
+sol:
+  azimut_grados: 90
+  elevacion_grados: 11
+  energia: 1.5
+  angulo_grados: 3.2
+  temperatura_k: 4200
+color:
+  look: Medium High Contrast
+  balance_blancos_k: 5100
+  tinte: 0.02
+postproduccion:
+  contraste: 1.06
+  saturacion: 1.02
+  vineta: 0.1
+  grano: 1.0
+  bloom: 0.025
+luces:
+- id: luz_social
+  posicion:
+  - 3.2
+  - 3.4
+  - 2.52
+  objetivo:
+  - 3.2
+  - 3.4
+  - 0.7
+  potencia: 264
+  tamano: 1.4
+  color:
+  - 1
+  - 0.86
+  - 0.7
+  temperatura_k: 2850
+  forma: DISK
+- id: luz_cocina
+  posicion:
+  - 0.75
+  - 2.1
+  - 2.48
+  objetivo:
+  - 0.75
+  - 2.1
+  - 0.8
+  potencia: 198
+  tamano: 0.8
+  color:
+  - 1
+  - 0.88
+  - 0.75
+  temperatura_k: 3000
+  forma: RECTANGLE
+  tamano_y: 2.2
+- id: luz_dormitorio
+  posicion:
+  - 6.15
+  - 4.05
+  - 2.48
+  objetivo:
+  - 6.15
+  - 4.05
+  - 0.7
+  potencia: 143
+  tamano: 0.8
+  color:
+  - 1
+  - 0.84
+  - 0.68
+  temperatura_k: 2800
+  forma: DISK
+- id: luz_suite
+  posicion:
+  - 8.8
+  - 3.65
+  - 2.48
+  objetivo:
+  - 8.8
+  - 3.65
+  - 0.7
+  potencia: 154
+  tamano: 0.9
+  color:
+  - 1
+  - 0.84
+  - 0.68
+  temperatura_k: 2800
+  forma: DISK
+- id: luz_veranda
+  posicion:
+  - 7.6
+  - 6.3
+  - 2.55
+  objetivo:
+  - 7.6
+  - 6.3
+  - 0.7
+  potencia: 99
+  tamano: 0.7
+  color:
+  - 1
+  - 0.8
+  - 0.62
+  temperatura_k: 2700
+  forma: DISK
+tomas:
+- id: social_terraza
+  lente: 32
+  fotogramas: 120
+  interpolacion: suave
+  puntos:
+  - posicion:
+    - 4.1
+    - 0.45
+    - 1.45
+    objetivo:
+    - 7
+    - 1.5
+    - 0.75
+  - posicion:
+    - 4.5
+    - 0.55
+    - 1.45
+    objetivo:
+    - 7.4
+    - 1.6
+    - 0.75
+- id: suite_jardin
+  lente: 35
+  fotogramas: 120
+  interpolacion: suave
+  puntos:
+  - posicion:
+    - 6.15
+    - 4.35
+    - 1.45
+    objetivo:
+    - 8
+    - 5.55
+    - 0.75
+  - posicion:
+    - 6.4
+    - 4.5
+    - 1.45
+    objetivo:
+    - 8.1
+    - 5.55
+    - 0.75
+- id: terraza
+  lente: 32
+  fotogramas: 120
+  interpolacion: suave
+  puntos:
+  - posicion:
+    - 8.6
+    - 0.2
+    - 1.4
+    objetivo:
+    - 10.2
+    - 3.5
+    - 0.7
+  - posicion:
+    - 9.0
+    - 0.2
+    - 1.4
+    objetivo:
+    - 10.2
+    - 4.2
+    - 0.7
+- id: cocina
+  lente: 30
+  fotogramas: 120
+  interpolacion: suave
+  puntos:
+  - posicion:
+    - 2.8
+    - 4.2
+    - 1.45
+    objetivo:
+    - 1.1
+    - 5.4
+    - 0.8
+  - posicion:
+    - 2.7
+    - 4.5
+    - 1.45
+    objetivo:
+    - 1.1
+    - 5.7
+    - 0.8
+detalles_ventanas:
+  activo: true
+  cobertura_lateral: 0.15
+maqueta:
+  perfil: editorial_calido
+  camara: isometrica
+  fondo: cielo_suave
+  techo_visible: false
+  paredes:
+    modo: inteligentes
+    transicion_ms: 220
+  etiquetas:
+    espacios: true
+    superficies: true
+    objetos: seleccionables
+  interaccion:
+    puertas: true
+    filtros_espacios: true
+    puntos_interes: true
+  semilla: 1974
+  solar:
+    enabled: true
+    calibrationStatus: demo_unverified
+    location:
+      latitude: -23.99
+      longitude: -46.41
+      timezone: America/Sao_Paulo
+    building:
+      northOffsetDegrees: -18
+      groundElevationMeters: 0
+    unit:
+      floorNumber: 6
+      elevationMeters: 18
+    exposureThreshold: 0.2
+    environment:
+      obstacles: []
+  calidad_web:
+    perfil: premium_editorial
+    presupuesto_mb: 60
+    carga_inicial_mb: 8
+    nivel_inicial: mobile
+    nivel_objetivo: premium
+    lightmaps: true
+    reflejos_entorno: true
+    sombras_contacto: true
+    vegetacion: alta

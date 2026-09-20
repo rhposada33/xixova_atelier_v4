@@ -1,0 +1,70 @@
+/* V2 is isolated at the workspace level; these finishes never enter production. */
+.premium-v2 { --forest:#285b4e; --gold:#ad7c2d; --ink:#202c2d; }
+.premium-v2>header { background:#fffefa; box-shadow:0 2px 12px #3a382406; }
+.premium-v2 .title small { display:flex; align-items:center; gap:10px; }
+.premium-v2 .v2-identity { color:#64786a; border:1px solid #dbe2d7; background:#f1f4ed; border-radius:20px; padding:3px 7px; font:9px/1.2 Arial,sans-serif; letter-spacing:.3px; white-space:nowrap; }
+.premium-v2 .viewer:after { box-shadow:inset 0 0 65px 10px #fffdf820; }
+.premium-v2 .miniplan { background:linear-gradient(135deg,#f3f2ec,#eeeee8); border-radius:9px; }
+.premium-v2 .bottom-tools { background:#fffef9f5; border-color:#ece5d6; box-shadow:0 8px 24px #403c2920; }
+.premium-v2 .bottom-tools button.active { background:#f1eadb; }
+.premium-v2 .layout nav button { border-radius:8px; transition:background .18s,color .18s,transform .18s; }
+.premium-v2 .layout nav button:hover { background:#f2f3ec; transform:translateX(2px); }
+.premium-v2 button:focus-visible,.premium-v2 select:focus-visible { outline:2px solid #9e7939; outline-offset:3px; }
+.premium-v2 .solar-result,.premium-v2 .unit-card { background:linear-gradient(145deg,#fffefa,#fdfcf8); border-color:#e7e1d6; }
+.premium-v2 .compass { box-shadow:0 4px 18px #4b493017; border:1px solid #eae6db; }
+@media(min-width:1251px) {
+ .premium-v2 .layout,.premium-v2.solar-active .layout { grid-template-columns:17% minmax(0,1fr) 24%; }
+ .premium-v2 .bottom-tools { left:46.5%; }
+ .premium-v2 .layout>.info { padding:26px 21px!important; }
+ .premium-v2 .layout>aside:first-child { padding-top:24px; }
+ .premium-v2 .solar-heading h2 { letter-spacing:-.55px; }
+}
+@media(max-width:1100px) { .premium-v2 .v2-identity { font-size:8px; padding:2px 5px; } .premium-v2 .title small { gap:5px; } }
+@media(max-width:760px) { .premium-v2 .v2-identity { font-size:7px; } }
+@media(prefers-reduced-motion:reduce) { .premium-v2 .layout nav button { transition:none; } }
+
+/* Second visual pass: neutral framing keeps the natural materials in focus. */
+.premium-v2 .viewer:after { box-shadow:none; }
+.premium-v2>header,.premium-v2 .layout>aside:first-child,.premium-v2 .layout>.info { background:#fffefd; }
+.premium-v2 .solar-result,.premium-v2 .unit-card { background:#fffefd; }
+.premium-v2 .solar-presets button { box-shadow:0 1px 2px #31261404; }
+.premium-v2 .solar-presets button:hover { border-color:#b58c47; }
+.premium-v2 .bottom-tools button { transition:background .18s,color .18s; }
+.premium-v2 .bottom-tools button:hover { background:#f1ede3; color:#86622c; }
+.premium-v2 .bottom-tools button.active { color:#a57222; }
+@media(min-width:1251px) {
+ .premium-v2 .layout>.info { border-radius:0; }
+ .premium-v2 .layout>aside:first-child>h2 { font-size:24px; }
+ .premium-v2 .layout nav button { min-height:37px; }
+ .premium-v2 .solar-intro { margin-top:15px; margin-bottom:22px; }
+ .premium-v2 .solar-heading h2 { font-size:25px; }
+ .premium-v2 .solar-clock { margin:22px 0; }
+ .premium-v2 .solar-result { padding:17px 15px; }
+ .premium-v2 .bottom-tools { background:#fffefaee; box-shadow:0 8px 24px #39352823; }
+}
+
+/* Third pass: keep the reference proportions at both laptop and large desktop sizes. */
+@media(min-width:1251px) {
+ .premium-v2 .v2-identity { display:inline-flex; }
+ .premium-v2 .layout>aside:first-child>h2 { font-size:25px; }
+ .premium-v2 .layout aside>p { font-size:13px; line-height:1.5; }
+ .premium-v2 .layout nav button { min-height:38px; font-size:12px; }
+ .premium-v2 .miniplan { height:145px; padding:16px; }
+ .premium-v2 .solar-heading h2 { font-size:25px; letter-spacing:-.6px; }
+ .premium-v2 .solar-clock>strong { color:#1e2c2e; font-size:49px; }
+ .premium-v2 .solar-intro { line-height:1.55; }
+ .premium-v2 .solar-result { margin-top:19px; }
+ .premium-v2 .unit-card { margin-top:21px; }
+ .premium-v2 .bottom-tools { border:1px solid #e7e0d2; backdrop-filter:blur(12px); }
+}
+@media(min-width:1500px) {
+ .premium-v2 .miniplan { height:160px; }
+ .premium-v2 .layout nav button { min-height:42px; font-size:13px; }
+ .premium-v2 .layout aside>p { font-size:14px; }
+ .premium-v2 .solar-intro { font-size:13px; margin-bottom:26px; }
+ .premium-v2 .solar-clock { margin:25px 0; }
+ .premium-v2 .solar-presets button { height:42px; }
+ .premium-v2 .solar-play .solar-main { min-height:50px; }
+ .premium-v2 .solar-secondary { margin:15px auto; }
+ .premium-v2 .solar-result { margin-top:23px; padding:19px 16px; }
+}

@@ -1,0 +1,11 @@
+import{describe,expect,it}from'vitest';import{directionFromSolar,SolarEngine}from'./engine';import{validateSolarConfig}from'./types';
+const south={enabled:true,calibrationStatus:'verified' as const,location:{latitude:-23.99,longitude:-46.41,timezone:'America/Sao_Paulo'},building:{northOffsetDegrees:0},exposureThreshold:.2};
+describe('SolarEngine',()=>{
+ it('convierte azimut y elevación a Z-up',()=>{expect(directionFromSolar(0,0)).toEqual([0,1,0]);const east=directionFromSolar(90,0);expect(east[0]).toBeCloseTo(1);expect(east[1]).toBeCloseTo(0)});
+ it('aplica norte horario',()=>{const north=directionFromSolar(0,0,90);expect(north[0]).toBeCloseTo(1);expect(north[1]).toBeCloseTo(0)});
+ it('usa la zona configurada y detecta noche',()=>{const e=new SolarEngine(south);const p=e.calculate('2026-01-15',0);expect(p.daylight).toBe(false);expect(p.azimuthDegrees).toBeGreaterThanOrEqual(0);expect(p.azimuthDegrees).toBeLessThan(360);expect(p.elevationDegrees).toBeGreaterThan(-90);expect(p.elevationDegrees).toBeLessThan(90);expect(e.localParts(e.instant('2026-01-15',720)).minutes).toBe(720)});
+ it('calcula presets desde eventos',()=>{const e=new SolarEngine(south),a=e.eventMinutes('2026-01-15','morning'),b=e.eventMinutes('2026-01-15','noon'),c=e.eventMinutes('2026-01-15','sunset');expect(a).toBeLessThan(b);expect(b).toBeLessThan(c)});
+ it('invierte estaciones por hemisferio',()=>{expect(new SolarEngine(south).seasonDate(2026,'summer')).toBe('2026-12-21');expect(new SolarEngine({...south,location:{...south.location,latitude:40}}).seasonDate(2026,'summer')).toBe('2026-06-21')});
+ it('valida configuración',()=>{expect(validateSolarConfig(south)).toEqual([]);expect(validateSolarConfig({...south,location:{...south.location,latitude:100}}).length).toBeGreaterThan(0)});
+ it('rechaza zonas desconocidas y conserva hora local entre DST',()=>{expect(validateSolarConfig({...south,location:{...south.location,timezone:'Mars/Olympus'}}).length).toBeGreaterThan(0);const e=new SolarEngine({...south,location:{latitude:40.7,longitude:-74,timezone:'America/New_York'}});expect(e.localParts(e.instant('2026-01-15',720)).minutes).toBe(720);expect(e.localParts(e.instant('2026-07-15',720)).minutes).toBe(720)});
+});

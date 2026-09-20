@@ -1,0 +1,255 @@
+schema: 1
+id: lujo_contemporaneo
+arquitectura:
+  id: garden_house
+  version: 0.1-borrador
+  hash: 91fe04f7ea0fa22c061c5932db3250a7052883cff5afdd838bc14f03c99b5ddc
+materiales:
+  yeso_calido:
+    color:
+    - 0.74
+    - 0.72
+    - 0.68
+    rugosidad: 0.72
+    escala_m: 0.3
+    normal_fuerza: 0.2
+    microdetalle: 0.2
+    proyeccion: uv
+    normal_convencion: OpenGL
+  nogal:
+    color:
+    - 0.25
+    - 0.12
+    - 0.055
+    rugosidad: 0.42
+    escala_m: 2.0
+    normal_fuerza: 0.35
+    microdetalle: 0.08
+    mapas:
+      color: ../../cache/pbr/wood_floor/wood_floor_base_color_1k.jpg
+      roughness: ../../cache/pbr/wood_floor/wood_floor_roughness_1k.jpg
+      normal: ../../cache/pbr/wood_floor/wood_floor_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
+  piedra_crema:
+    color:
+    - 0.67
+    - 0.62
+    - 0.53
+    rugosidad: 0.36
+    escala_m: 1.5
+    normal_fuerza: 0.22
+    microdetalle: 0.05
+    mapas:
+      color: ../../cache/pbr/marble_01/marble_01_base_color_1k.jpg
+      roughness: ../../cache/pbr/marble_01/marble_01_roughness_1k.jpg
+      normal: ../../cache/pbr/marble_01/marble_01_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
+  metal_oscuro:
+    color:
+    - 0.035
+    - 0.03
+    - 0.025
+    rugosidad: 0.25
+    metalico: 0.8
+    microdetalle: 0.02
+    proyeccion: uv
+    normal_convencion: OpenGL
+  textil_greige:
+    color:
+    - 0.38
+    - 0.34
+    - 0.31
+    rugosidad: 0.82
+    escala_m: 1
+    normal_fuerza: 0.12
+    microdetalle: 0.08
+    mapas:
+      color: ../../cache/pbr/rough_linen/rough_linen_base_color_1k.jpg
+      roughness: ../../cache/pbr/rough_linen/rough_linen_roughness_1k.jpg
+      normal: ../../cache/pbr/rough_linen/rough_linen_normal_1k.jpg
+    proyeccion: uv
+    normal_convencion: OpenGL
+    tinte:
+    - 0.62
+    - 0.7
+    - 0.78
+  techo:
+    color:
+    - 0.84
+    - 0.82
+    - 0.78
+    rugosidad: 0.84
+    microdetalle: 0.12
+    proyeccion: uv
+    normal_convencion: OpenGL
+acabados:
+  fachada_sur: yeso_calido
+  fachada_oeste: yeso_calido
+  fachada_este: yeso_calido
+  fachada_norte: yeso_calido
+  frente_veranda: yeso_calido
+  division_cocina: yeso_calido
+  eje_privado: yeso_calido
+  division_dormitorios: yeso_calido
+  cabecera_banos: yeso_calido
+  base_dormitorio: yeso_calido
+  separa_servicio: yeso_calido
+  veranda:piso: piedra_crema
+  veranda:techo: techo
+  area_servicio:piso: piedra_crema
+  area_servicio:techo: techo
+  cocina:piso: piedra_crema
+  cocina:techo: techo
+  sala_comedor:piso: nogal
+  sala_comedor:techo: techo
+  circulacion:piso: nogal
+  circulacion:techo: techo
+  dormitorio:piso: nogal
+  dormitorio:techo: techo
+  suite:piso: nogal
+  suite:techo: techo
+  bano_social:piso: piedra_crema
+  bano_social:techo: techo
+  bano_suite:piso: piedra_crema
+  bano_suite:techo: techo
+elementos:
+- id: cocina_lineal
+  activo: XVA3_Cocina_premium
+  espacio: cocina
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 0.55
+    - 2.0
+    - 0
+    rotacion: 90
+  escala: 0.9
+  nivel_detalle: hero
+- id: comedor_seis
+  activo: comedor
+  espacio: sala_comedor
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 3.0
+    - 1.65
+    - 0
+    rotacion: 90
+  escala: 0.98
+  nivel_detalle: hero
+- id: sofa_principal
+  activo: sofa_recto
+  espacio: sala_comedor
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 3.72
+    - 3.7
+    - 0
+    rotacion: 90
+  escala: 1.0
+  nivel_detalle: hero
+  materiales_partes:
+    tapiceria: textil_greige
+- id: mesa_centro
+  activo: mesa_centro
+  espacio: sala_comedor
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 2.65
+    - 3.72
+    - 0
+    rotacion: 90
+  escala: 0.95
+  nivel_detalle: standard
+- id: cama_dormitorio
+  activo: XVA3_Cama_doble
+  espacio: dormitorio
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 6.15
+    - 4.12
+    - 0
+    rotacion: 0
+  escala: 0.92
+  nivel_detalle: hero
+- id: armario_dormitorio
+  activo: XVA3_Armario_principal
+  espacio: dormitorio
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 7.25
+    - 3.3
+    - 0
+    rotacion: 90
+  escala: 0.6
+  nivel_detalle: standard
+  materiales_partes:
+    madera: nogal
+- id: cama_suite
+  activo: XVA3_Cama_king
+  espacio: suite
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.8
+    - 3.78
+    - 0
+    rotacion: 0
+  escala: 0.94
+  nivel_detalle: hero
+- id: armario_suite
+  activo: XVA3_Armario_principal
+  espacio: suite
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.5
+    - 1.75
+    - 0
+    rotacion: 90
+  escala: 0.6
+  nivel_detalle: standard
+  materiales_partes:
+    madera: nogal
+- id: bano_social_equipo
+  activo: XVA3_Bano_principal
+  espacio: bano_social
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 5.35
+    - 0.59
+    - 0
+    rotacion: 90
+  escala: 0.4
+  nivel_detalle: standard
+- id: bano_suite_equipo
+  activo: XVA3_Bano_principal
+  espacio: bano_suite
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 8.7
+    - 0.59
+    - 0
+    rotacion: 90
+  escala: 0.4
+  nivel_detalle: standard
+- id: sofa_veranda
+  activo: bk_48fc2eae_d95a_4952_9f5a_ca1dc696020c
+  espacio: veranda
+  colocacion:
+    tipo: explicita
+    posicion:
+    - 7.65
+    - 6.28
+    - 0
+    rotacion: 0
+  escala: 0.65
+  nivel_detalle: hero

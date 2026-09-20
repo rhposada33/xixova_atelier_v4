@@ -1,0 +1,55 @@
+/* This entire presentation is scoped to the explicitly enabled development preview. */
+.building-visual-v2{--escobar-ink:#111d24;--escobar-green:#00624e}
+.building-visual-v2 .building-stage{background-image:none;background-color:#cbd1cb}
+.building-visual-v2 .building-stage.warm_dusk{background-image:none;background-color:#b5aba3}
+.building-visual-v2 .building-header-actions>button:not(.b-gold){display:none}
+.building-visual-v2 .building-header-actions .b-gold{font-size:17px;padding:16px 24px;background:#ab7300;box-shadow:none}
+.building-visual-v2 .building-brand{gap:11px;min-width:228px}.building-visual-v2 .building-brand>b{width:39px;height:39px;border-color:#b58a43;color:#173b30;font-size:22px}.building-visual-v2 .building-brand>span{font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;letter-spacing:2px;color:#173b30}.building-visual-v2 .building-brand small{margin-top:3px;font-size:8px;letter-spacing:.2px;color:#557066}
+.building-visual-v2 .building-header nav{gap:43px}
+.building-visual-v2 .b-intro{top:38px;left:3.1%;width:344px;padding:24px 29px 22px;background:#fffefbf5;box-shadow:0 14px 42px #342a1c0c}
+.building-visual-v2 .b-intro h1{font-size:38px;line-height:1.05;letter-spacing:-1.6px}
+.building-visual-v2 .b-intro-copy{display:none}
+.building-visual-v2 .b-intro .b-availability{font-size:19px;letter-spacing:-.6px}
+.building-visual-v2 .b-intro .b-availability strong{font-size:27px}
+.building-visual-v2 .b-filter-trigger{margin-top:20px;font-size:17px;font-weight:400}
+.building-visual-v2 .building-details{top:40px;right:3%;width:394px;padding:15px 14px 12px;background:#fffefbf7;box-shadow:0 16px 40px #342a1c0d}
+.building-visual-v2 .b-unit-card{padding:16px}
+.building-visual-v2 .b-card-heading h2{font-size:37px;letter-spacing:-1.4px}
+.building-visual-v2 .b-status{font-size:12px;padding:8px 12px;background:#d9eee0}
+.building-visual-v2 .b-floor-subtitle{font-size:16px;margin:9px 0 27px}
+.building-visual-v2 .b-unit-facts{gap:24px 14px;margin-bottom:22px}
+.building-visual-v2 .b-unit-facts strong{font-size:21px}
+.building-visual-v2 .b-unit-facts i{width:51px;height:51px;border-radius:14px}
+.building-visual-v2 .b-unit-facts small{font-size:12px}
+.building-visual-v2 .b-price{padding-top:17px}
+.building-visual-v2 .b-price>strong{font-size:29px}
+.building-visual-v2 .b-unit-extras{font-size:14px;line-height:1.8;margin:16px 0 22px}
+.building-visual-v2 .b-primary,.building-visual-v2 .b-outline{min-height:51px;border-radius:9px;font-size:17px}
+.building-visual-v2 .b-primary{background:#00624e}
+.building-visual-v2 .b-compare-link{font-size:13px;margin-top:21px;margin-bottom:8px}
+.building-visual-v2 .b-light-controls{right:calc(3% + 436px);top:41px;border-radius:20px;box-shadow:none}
+.building-visual-v2 .b-light-controls button{width:76px;height:78px;font-size:12px}
+.building-visual-v2 .b-view-trigger{position:absolute;z-index:5;top:205px;right:calc(3% + 436px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:76px;height:62px;border:0;border-radius:18px;background:#fffefbf2;color:#202834;font-size:12px;box-shadow:0 6px 18px #1e2c231f}.building-visual-v2 .b-view-trigger:hover{background:#f2eadb}.building-visual-v2 .b-view-trigger svg{width:25px;height:25px}
+.building-visual-v2 .b-camera-tools{bottom:29px;padding:13px 20px;border-radius:42px;box-shadow:0 9px 25px #1e2c2330}
+.building-visual-v2 .b-camera-tools button{min-width:90px;border:0;font-size:11px}
+.building-visual-v2 .b-reset-view{right:3%;bottom:124px;color:#fff!important;text-shadow:0 1px 4px #0009}
+.building-visual-v2 .b-model-note{text-align:left;left:20px;right:auto;bottom:12px;padding:5px 9px;border-radius:4px;background:#fffefac9;color:#34463a;font-size:9px;letter-spacing:.4px}
+.building-visual-v2 .b-unit-facts{grid-template-columns:1fr 1.1fr;gap:24px 12px;margin-bottom:24px}
+.building-visual-v2 .b-unit-facts>div{gap:14px}
+.building-visual-v2 .b-unit-facts>div:last-child strong{font-size:20px;white-space:nowrap;letter-spacing:-.65px}
+.building-visual-v2 .b-unit-facts small{font-size:14px;color:#50565d}
+.building-visual-v2 .b-unit-extras{border-top:1px solid #ddd8ce;padding-top:15px;font-size:16px;line-height:1.7;margin:0 0 23px;color:#4b5159}
+.building-visual-v2 .building-details .b-primary,.building-visual-v2 .building-details .b-outline{min-height:52px;font-size:18px;border-radius:9px}
+.building-visual-v2 .building-details .b-primary{background:#00624e}
+.building-visual-v2 .b-v2-card-actions{display:grid;grid-template-columns:1fr 1fr;margin-top:22px;margin-bottom:0}
+.building-visual-v2 .b-v2-card-actions button{display:flex;align-items:center;justify-content:center;gap:12px;padding:1px 4px;border:0;background:none;color:#414852;font-size:15px;cursor:pointer}
+.building-visual-v2 .b-v2-card-actions button+button{border-left:1px solid #d5cbbc}
+.building-visual-v2 .b-v2-card-actions button[aria-pressed=true]{color:#00624e}
+.building-visual-v2 .building-unit-label{font-size:17px;padding:8px 13px;background:#00624e;border-color:#fff9e8}
+.building-visual-v2 .b-v2-zoom{position:absolute;right:3.15%;bottom:31px;display:flex;flex-direction:column;gap:9px;z-index:4}
+.building-visual-v2 .b-v2-zoom button{width:48px;height:48px;display:grid;place-items:center;border:0;border-radius:50%;background:#fffefb;color:#19242a;font-size:31px;line-height:1;box-shadow:0 4px 16px #13292226;cursor:pointer}
+.building-visual-v2 .b-v2-zoom button:hover{background:#f2eadb}
+.building-visual-v2 button:focus-visible{outline:3px solid #bd870e;outline-offset:4px}
+@media(max-width:850px){.building-visual-v2 .b-v2-zoom{right:14px;bottom:20px;gap:7px}.building-visual-v2 .b-v2-zoom button{width:39px;height:39px;font-size:27px}.building-visual-v2 .b-reset-view{bottom:122px}.building-visual-v2 .b-view-trigger{top:140px;right:14px;width:53px;height:53px;border-radius:17px;font-size:10px}.building-visual-v2 .b-view-trigger svg{width:21px;height:21px}.building-visual-v2 .building-details.mobile-open{z-index:10}}
+@media(max-width:1300px) and (min-width:851px){.building-visual-v2 .building-details{width:328px;right:24px}.building-visual-v2 .b-intro{width:296px;left:24px}.building-visual-v2 .b-intro h1{font-size:32px}.building-visual-v2 .b-intro .b-availability{font-size:16px}.building-visual-v2 .b-card-heading h2{font-size:29px}.building-visual-v2 .b-light-controls,.building-visual-v2 .b-view-trigger{right:375px}.building-visual-v2 .building-header nav{gap:22px}.building-visual-v2 .building-header-actions .b-gold{font-size:13px}}
+@media(max-width:850px){.building-visual-v2 .building-header-actions .b-gold{font-size:11px;padding:11px}.building-visual-v2 .building-brand>span{font-size:20px;letter-spacing:2px}.building-visual-v2 .b-intro{top:13px;left:13px;width:auto;padding:0;background:none;box-shadow:none}.building-visual-v2 .b-filter-trigger{margin-top:0;font-size:12px}.building-visual-v2 .b-light-controls{top:16px;right:14px}.building-visual-v2 .b-light-controls button{width:53px;height:56px;font-size:10px}.building-visual-v2 .building-details{top:auto;bottom:0;right:0;width:100%;max-height:75%;padding:12px 18px}.building-visual-v2 .b-card-heading h2{font-size:30px}.building-visual-v2 .b-unit-facts{gap:16px}.building-visual-v2 .b-camera-tools{bottom:30px;padding:11px}.building-visual-v2 .b-camera-tools button{min-width:64px;padding:0 8px}.building-visual-v2 .b-reset-view{bottom:108px;right:17px}.building-visual-v2 .b-model-note{bottom:6px;left:8px;font-size:8px}.building-visual-v2 .building-stage{background-position:48% center}}
