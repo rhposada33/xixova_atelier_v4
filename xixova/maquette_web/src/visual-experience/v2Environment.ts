@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import type {VisualExperienceController,VisualQualityProfile} from './types';
 
-type Options = { sun: THREE.DirectionalLight; quality: VisualQualityProfile };
+type Options = { sun: THREE.DirectionalLight; quality: VisualQualityProfile; invalidate?: () => void };
 
 const disposeObject = (root:THREE.Object3D) => {
   const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();
@@ -80,7 +80,7 @@ function addInstancedPlants(root:THREE.Group,template:THREE.Object3D,positions:P
  * An abstract context only: it never represents a surveyed neighbourhood or a photographic backdrop.
  * Assets can replace the low-poly horizon in checkpoint C without changing this controller contract.
  */
-export function createVisualExperienceV2(scene:THREE.Scene, {sun,quality}:Options):VisualExperienceController {
+export function createVisualExperienceV2(scene:THREE.Scene, {sun,quality,invalidate}:Options):VisualExperienceController {
   const root = new THREE.Group();
   root.name = 'visual-experience-v2';
   scene.add(root);
@@ -148,7 +148,7 @@ export function createVisualExperienceV2(scene:THREE.Scene, {sun,quality}:Option
       const template=gltf.scene.getObjectByName(plantRoots[kind]);
       if(template)resources+=addInstancedPlants(landscape,template,plantPositions(kind,plantCounts[quality.tier][kind]));
     });
-    diagnostics.resources=resources;if(resources>0)root.add(landscape);
+    diagnostics.resources=resources;if(resources>0)root.add(landscape);invalidate?.();
   },undefined,()=>{diagnostics.resources=0;});
   return {
     diagnostics,

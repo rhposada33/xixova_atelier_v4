@@ -58,3 +58,21 @@ test('modo atardecer y navegación móvil',async({page})=>{
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
+
+test('la maqueta deja de dibujar en reposo y despierta al cambiar la luz',async({page})=>{
+  test.setTimeout(60_000);
+  await page.goto('/demo?vista=edificio');
+  const stage=page.locator('.building-stage');
+  await expect.poll(async()=>Number(await stage.getAttribute('data-render-count')),{timeout:20_000}).toBeGreaterThan(0);
+  await expect(stage.locator('.building-loading')).toHaveCount(0,{timeout:20_000});
+  await page.waitForTimeout(1800);
+  const idle=Number(await stage.getAttribute('data-render-count'));
+  await page.waitForTimeout(500);
+  expect(Number(await stage.getAttribute('data-render-count'))).toBe(idle);
+  await page.getByRole('button',{name:'Entardecer',exact:true}).click();
+  await expect.poll(async()=>Number(await stage.getAttribute('data-render-count'))).toBeGreaterThan(idle);
+  await page.waitForTimeout(3000);
+  const settled=Number(await stage.getAttribute('data-render-count'));
+  await page.waitForTimeout(500);
+  expect(Number(await stage.getAttribute('data-render-count'))).toBe(settled);
+});
