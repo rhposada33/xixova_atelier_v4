@@ -9,6 +9,9 @@ import './refinement.css';
 import './visual-v2.css';
 import {visualV2} from './visualV2';
 import {createProceduralEnvironment} from './proceduralEnvironment';
+import {activeVisualExperience} from '../visual-experience/resolveVisualExperience';
+import {selectVisualQuality} from '../visual-experience/quality';
+import type {VisualExperienceController,VisualQualityTier} from '../visual-experience/types';
 
 type Props={units:BuildingUnit[];selected:BuildingUnit;matches:string[];filtered:boolean;mode:'neutral_day'|'warm_dusk';onSelect:(u:BuildingUnit)=>void;command:{type:string;nonce:number};};
 export function BuildingScene(props:Props){
@@ -18,17 +21,27 @@ export function BuildingScene(props:Props){
   live.current=props;
   useEffect(()=>{
     const el=host.current!;
+    const useVisualExperienceV2=activeVisualExperience==='v2'&&buildingConfig.projectSlug==='escobar-residences';
+    const requestedQuality=new URLSearchParams(location.search).get('visualQuality');
+    const quality=selectVisualQuality(el.clientWidth||window.innerWidth,devicePixelRatio,requestedQuality==='premium'?'premium':undefined as VisualQualityTier|undefined);
     let renderer:THREE.WebGLRenderer;
     try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});}catch{setError('Seu navegador não conseguiu iniciar o 3D. Você pode selecionar todas as unidades pela matriz.');setLoading(false);return;}
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+    renderer.setPixelRatio(useVisualExperienceV2?quality.maxPixelRatio:Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
     renderer.domElement.setAttribute('aria-label','Maquete 3D do edifício. Arraste para girar e use a roda para aproximar. Você também pode selecionar unidades pela matriz.');renderer.domElement.tabIndex=0;
     el.appendChild(renderer.domElement);
+    el.dataset.visualExperience=activeVisualExperience;
     const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.1,500);
-    const proceduralEnvironment=visualV2?createProceduralEnvironment(scene,{water:false}):null;
+    const proceduralEnvironment=!useVisualExperienceV2&&visualV2?createProceduralEnvironment(scene,{water:false}):null;
+    if(useVisualExperienceV2){scene.background=new THREE.Color('#d5dfdd');scene.fog=new THREE.Fog('#d5dfdd',118,390);el.dataset.visualProfile=quality.tier;el.dataset.visualEnvironment='loading';}
     const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.minDistance=30;controls.maxDistance=180;controls.maxPolarAngle=visualV2?Math.PI*.49:Math.PI*.53;controls.minPolarAngle=.45;controls.enablePan=true;
     const pmrem=new THREE.PMREMGenerator(renderer),environment=new RoomEnvironment();const env=pmrem.fromScene(environment,.06);scene.environment=env.texture;scene.environmentIntensity=.5;environment.dispose();
     const ambient=new THREE.HemisphereLight('#d9e7fa','#746e55',.85);scene.add(ambient);
     const sun=new THREE.DirectionalLight('#fff1d9',3.4);sun.position.set(-35,70,55);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-45,right:45,top:70,bottom:-40,near:.5,far:180});sun.shadow.bias=-.0005;scene.add(sun);
+    let visualEnvironment:VisualExperienceController|undefined;
+    if(useVisualExperienceV2)void import('../visual-experience/v2Environment').then(({createVisualExperienceV2})=>{
+      if(disposed)return;
+      visualEnvironment=createVisualExperienceV2(scene,{sun,quality});el.dataset.visualEnvironment='ready';
+    }).catch(()=>{if(!disposed)el.dataset.visualEnvironment='fallback';});
     const ground=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),new THREE.ShadowMaterial({color:'#6d746b',opacity:.18}));ground.rotation.x=-Math.PI/2;ground.position.y=-.62;ground.receiveShadow=true;if(!visualV2)scene.add(ground);else{ground.geometry.dispose();ground.material.dispose();}
     const proxies:THREE.Mesh[]=[],outlines=new Map<string,THREE.LineSegments>(),centers=new Map<string,THREE.Vector3>();let disposed=false,frame=0,modeBefore='';
     let targetCamera:THREE.Vector3|null=null,targetLook:THREE.Vector3|null=null;
@@ -73,10 +86,10 @@ export function BuildingScene(props:Props){
         if(visualV2){const hovered=u.code===hoveredCode&&(!p.filtered||match);m.opacity=selected?.16:hovered?.10:0;edge.opacity=selected?1:hovered?.65:0;}
       }
       const center=centers.get(p.selected.code);if(label.current&&center){const point=center.clone().project(camera);label.current.style.left=`${(point.x*.5+.5)*el.clientWidth}px`;label.current.style.top=`${(-point.y*.5+.5)*el.clientHeight}px`;label.current.style.display=point.z<1?'block':'none';}
-      controls.update();proceduralEnvironment?.update(performance.now()*.001,p.mode==='warm_dusk',camera);renderer.render(scene,camera);
+      controls.update();proceduralEnvironment?.update(performance.now()*.001,p.mode==='warm_dusk',camera);visualEnvironment?.update(performance.now()*.001,p.mode,camera);renderer.render(scene,camera);
     };animate();
     const cancel=()=>{targetCamera=null;targetLook=null;};controls.addEventListener('start',cancel);
-    return()=>{try{sessionStorage.setItem(visualV2?'xixova-building-camera-v2':'xixova-building-camera',JSON.stringify({position:camera.position.toArray(),target:controls.target.toArray()}));}catch{}disposed=true;cancelAnimationFrame(frame);observer.disconnect();controls.dispose();el.removeEventListener('pointermove',onMove);el.removeEventListener('pointerdown',onDown);el.removeEventListener('pointerup',onUp);el.removeEventListener('pointerleave',leave);scene.traverse(o=>{if(o instanceof THREE.Mesh||o instanceof THREE.LineSegments){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});env.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();engine.current=null;};
+    return()=>{try{sessionStorage.setItem(visualV2?'xixova-building-camera-v2':'xixova-building-camera',JSON.stringify({position:camera.position.toArray(),target:controls.target.toArray()}));}catch{}disposed=true;cancelAnimationFrame(frame);observer.disconnect();controls.dispose();el.removeEventListener('pointermove',onMove);el.removeEventListener('pointerdown',onDown);el.removeEventListener('pointerup',onUp);el.removeEventListener('pointerleave',leave);visualEnvironment?.dispose();scene.traverse(o=>{if(o instanceof THREE.Mesh||o instanceof THREE.LineSegments){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});env.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();engine.current=null;};
   },[]);
   useEffect(()=>{engine.current?.command(props.command.type);},[props.command]);
   useEffect(()=>{engine.current?.select(props.selected.code);},[props.selected.code]);
