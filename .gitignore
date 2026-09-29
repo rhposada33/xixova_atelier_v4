@@ -58,6 +58,9 @@ xixova/director_web/playwright-report/
 # Modelos y paquetes binarios externos
 *.glb
 !proyectos/terraza_luz/web/assets-premium.glb
+!/xixova/maquette_web/public/environments/
+!/xixova/maquette_web/public/environments/visual-v2/
+!/xixova/maquette_web/public/environments/visual-v2/visual-v2-landscape.glb
 *.gltf
 *.bin
 *.zip
