@@ -1,34 +1,35 @@
 import {expect,test} from '@playwright/test';
 
-test('landing pública apresenta a Promoven e mantém contato não configurado oculto',async({page})=>{
+test('landing pública apresenta a Promoven e mantém captação desativada sem dados legais',async({page})=>{
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('/');
   await expect(page).toHaveTitle('Promoven | Experiências imobiliárias interativas');
   await expect(page.getByRole('heading',{level:1,name:'Transforme empreendimentos em experiências de compra'})).toBeVisible();
-  await expect(page.getByRole('link',{name:'Falar com a Promoven'})).toHaveCount(0);
+  await expect(page.getByRole('link',{name:'Agendar uma apresentação'})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Solicitar avaliação inicial'})).toHaveCount(0);
   await expect(page.locator('.hero-gallery img')).toHaveAttribute('src','/marketing/promoven-interior.jpg');
   await expect(page.getByRole('link',{name:/Explorar demonstração/}).first()).toHaveAttribute('href','/demo');
 });
 
-test('CTAs comerciais e formulário validam localmente sem transmissão',async({page})=>{
+test('a página explica que o canal comercial ainda está em preparação',async({page})=>{
   await page.goto('/');
-  await page.getByRole('link',{name:'Agendar uma apresentação'}).click();
-  await expect(page).toHaveURL(/#contato$/);
-  await expect(page.getByRole('heading',{name:'Vamos avaliar o seu próximo lançamento?'})).toBeVisible();
-  await page.getByRole('button',{name:'Solicitar avaliação inicial'}).click();
-  await expect(page.getByText('Informe WhatsApp ou e-mail corporativo.')).toBeVisible();
-  await page.getByLabel('Nome').fill('Ana Silva');
-  await page.getByLabel('Empresa').fill('Construtora Exemplo');
-  await page.getByLabel('Cidade / UF').fill('São Paulo / SP');
-  await page.getByLabel('E-mail corporativo').fill('ana@exemplo.com');
-  await page.getByLabel('Número de unidades').selectOption({label:'31 a 80'});
-  await page.getByLabel('Previsão de lançamento').selectOption({label:'De 3 a 6 meses'});
-  await page.getByLabel('Possui modelo 3D?').selectOption({label:'Ainda não'});
-  await page.getByRole('checkbox').check();
-  await page.getByRole('button',{name:'Solicitar avaliação inicial'}).click();
-  await expect(page.getByText('Validação local concluída')).toBeVisible();
-  await expect(page.getByText('não foram transmitidos para a Promoven')).toBeVisible();
+  await expect(page.getByText('O canal de solicitações comerciais está em preparação.')).toBeVisible();
   await expect(page.getByRole('link',{name:'Explorar demonstração'}).last()).toHaveAttribute('href','/demo');
+});
+
+test('a disponibilidade ilustrativa é coerente e não promete abrir uma unidade real',async({page})=>{
+  await page.goto('/');
+  const cells=page.locator('.availability-cell');
+  const available=await cells.filter({hasText:/Disponível/}).count();
+  const reserved=await cells.filter({hasText:/Reservada/}).count();
+  const sold=await cells.filter({hasText:/Vendida/}).count();
+  expect(available+reserved+sold).toBe(60);
+  await expect(page.locator('.availability-summary strong').nth(0)).toHaveText(String(available));
+  await expect(page.locator('.availability-summary strong').nth(1)).toHaveText(String(reserved));
+  await expect(page.locator('.availability-summary strong').nth(2)).toHaveText(String(sold));
+  await expect(page.getByText('Filtrar unidades')).toHaveCount(0);
+  await expect(page.locator('.availability-card').getByRole('link',{name:/Explorar demonstração/})).toHaveAttribute('href','/demo');
+  await expect(page.locator('.availability-card')).toContainText('preço ilustrativo');
 });
 
 test('privacidade é pública e rotas privadas não são incluídas no sitemap',async({page})=>{
@@ -87,56 +88,19 @@ test('ilustração de iluminação permanece arquivada e não carrega recursos 3
   await expect(page.locator('canvas')).toHaveCount(0);
 });
 
-test('landing móvel oferece navegação acessível e tabs de experiências',async({page})=>{
+test('landing móvel oferece navegação, disponibilidade e acesso à demonstração',async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.goto('/');
   const menu=page.getByRole('button',{name:'Abrir menu'});await menu.click();
   await expect(page.getByRole('navigation',{name:'Navegação principal'})).toBeVisible();
-  await page.getByRole('tab',{name:/Terraza Luz/}).click();
-  await expect(page.locator('.browser img')).toHaveAttribute('src','/marketing/terraza-luz.jpg');
-  await expect.poll(()=>page.locator('.browser img').evaluate((image:HTMLImageElement)=>image.naturalWidth)).toBeGreaterThan(0);
-  await expect(page.getByRole('link',{name:'Abrir experiência 3D'})).toHaveAttribute('href','/demo?vista=interior&maqueta=terraza_luz&piso=6&unidad=601');
+  await expect(page.locator('.menu-button')).toHaveCSS('min-height','44px');
+  await page.getByRole('button',{name:/Unidade 1201/}).click();
+  await expect(page.locator('.availability-card')).toContainText('preço ilustrativo');
+  await page.locator('.availability-view img').scrollIntoViewIfNeeded();
+  await expect.poll(()=>page.locator('.availability-view img').evaluate((image:HTMLImageElement)=>image.currentSrc)).toContain('promoven-view-coast-mobile.webp');
   await expect(page.locator('body')).not.toHaveCSS('overflow-x','scroll');
-});
-
-for(const demo of [
-  {tab:'Garden House',image:'/marketing/garden-house.jpg',project:'garden_house_18'},
-  {tab:'Terraza Luz',image:'/marketing/terraza-luz.jpg',project:'terraza_luz'},
-])test(`${demo.tab} mostra imagem local e abre a maqueta correta`,async({page})=>{
-  await page.emulateMedia({reducedMotion:'reduce'});
-  await page.goto('/');
-  await page.getByRole('tab',{name:new RegExp(demo.tab)}).click();
-  const image=page.locator('.browser img');
-  await expect(image).toHaveAttribute('src',demo.image);
-  await expect.poll(()=>image.evaluate((element:HTMLImageElement)=>element.naturalWidth)).toBeGreaterThan(0);
-  await page.getByRole('link',{name:'Abrir experiência 3D'}).click();
-  await expect(page).toHaveURL(/\/demo\?/);
-  await expect.poll(()=>new URL(page.url()).searchParams.get('maqueta')).toBe(demo.project);
-  await expect.poll(()=>new URL(page.url()).searchParams.get('unidad')).toBe('601');
-  await expect(page.getByRole('combobox',{name:'Selecionar maquete'})).toHaveValue(demo.project,{timeout:20_000});
-});
-
-test('as maquetes na landing giram com o mouse e mantêm apenas um visor ativo',async({page})=>{
-  test.setTimeout(60_000);
-  await page.goto('/');
-  await page.getByRole('tab',{name:/Garden House/}).click();
-  const preview=page.locator('.interior-preview');
-  await expect(preview).toHaveAttribute('data-status','ready',{timeout:30_000});
-  const canvas=preview.locator('canvas');await expect(canvas).toBeVisible();
-  const box=await canvas.boundingBox();expect(box).not.toBeNull();
-  await page.mouse.move(box!.x+box!.width*.45,box!.y+box!.height*.5);
-  await page.mouse.down();await page.mouse.move(box!.x+box!.width*.7,box!.y+box!.height*.5,{steps:8});await page.mouse.up();
-  await expect(preview).toHaveAttribute('data-camera',/.+/);
-  const firstCamera=await preview.getAttribute('data-camera');
-  await page.mouse.move(box!.x+box!.width*.7,box!.y+box!.height*.5);
-  await page.mouse.down();await page.mouse.move(box!.x+box!.width*.4,box!.y+box!.height*.5,{steps:8});await page.mouse.up();
-  await expect.poll(()=>preview.getAttribute('data-camera')).not.toBe(firstCamera);
-  await expect(page.locator('canvas')).toHaveCount(1);
-  await page.getByRole('tab',{name:/Terraza Luz/}).click();
-  await expect(page.locator('.interior-preview')).toHaveAttribute('data-project','terraza_luz');
-  await expect(page.locator('.interior-preview')).toHaveAttribute('data-status','ready',{timeout:30_000});
-  await expect(page.locator('canvas')).toHaveCount(1);
+  await expect(page.getByRole('link',{name:/Explorar demonstração/}).first()).toHaveAttribute('href','/demo');
 });
 
 test('compatibilidade legacy normaliza a URL da demonstração',async({page})=>{

@@ -115,3 +115,6 @@ Thumbs.db
 # Dependencias reproducibles de los lanzadores uv
 !xixova_cli.py.lock
 !scripts/informe_framework.py.lock
+
+# Optimized Promoven marketing views
+!xixova/maquette_web/public/marketing/promoven-view-*.webp

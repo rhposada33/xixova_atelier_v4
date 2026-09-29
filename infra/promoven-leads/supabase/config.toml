@@ -21,3 +21,9 @@ enabled = false
 [auth]
 enabled = true
 enable_signup = false
+
+[functions.submit-commercial-lead]
+verify_jwt = false
+
+[functions.send-commercial-notifications]
+verify_jwt = false

@@ -16,7 +16,7 @@ type AvailabilityUnit={
 
 const statusLabel:Record<AvailabilityStatus,string>={available:'Disponível',reserved:'Reservada',sold:'Vendida'};
 const statusOrder:AvailabilityStatus[]=['available','reserved','sold'];
-const summary=Object.freeze([{value:'54',label:'Disponíveis',status:'available'},{value:'6',label:'Reservadas',status:'reserved'},{value:'12',label:'Vendidas',status:'sold'}] as const);
+const summaryLabel:Record<AvailabilityStatus,string>={available:'Disponíveis',reserved:'Reservadas',sold:'Vendidas'};
 const viewImages:Record<UnitView,{src:string;alt:string}>={
   'Vista mar':{src:'/marketing/promoven-view-coast.png',alt:'Vista ilustrativa de uma baía e cidade costeira vista de uma varanda'},
   'Vista cidade':{src:'/marketing/promoven-view-city.png',alt:'Vista ilustrativa de uma cidade vista de uma varanda'},
@@ -43,6 +43,7 @@ const units:readonly AvailabilityUnit[]=Object.freeze(Array.from({length:15},(_,
     });
   });
 }).flat());
+const summary=statusOrder.map(status=>({status,label:summaryLabel[status],value:units.filter(unit=>unit.status===status).length}));
 
 const formatBRL=(price:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(price);
 const floorUnits=(floor:number)=>units.filter(unit=>unit.floor===floor);
@@ -59,13 +60,9 @@ export function UnitAvailabilityMatrix(){
       <div className="availability-intro">
         <p className="eyebrow">Disponibilidade comercial</p>
         <h2 id="availability-title">Encontre a unidade certa</h2>
-        <p>Consulte disponibilidade, compare características e localize cada unidade por pavimento.</p>
+        <p>Explore um exemplo ilustrativo de disponibilidade, características e localização por pavimento.</p>
         <div className="availability-summary" aria-label="Resumo ilustrativo de disponibilidade">
           {summary.map(item=><article key={item.status} className={`availability-summary-${item.status}`}><strong>{item.value}</strong><span>{item.label}</span></article>)}
-        </div>
-        <div className="availability-filters" role="note" aria-label="Filtros ilustrativos: todas as unidades">
-          <span className="availability-filter-label"><b aria-hidden="true">☷</b> Filtrar unidades</span>
-          <span className="availability-filter-value">Todas <b aria-hidden="true">⌄</b></span>
         </div>
         <table className="availability-table"><caption>Exemplo de unidades por disponibilidade</caption><thead><tr><th>Unidade</th><th>Área</th><th>Quartos</th><th>Status</th></tr></thead><tbody>{floorUnits(12).map(unit=><tr key={unit.code} className={unit.code===selected.code?'is-selected':''}><td>{unit.code}</td><td>{unit.area} m²</td><td>{unit.bedrooms}</td><td><span className={`availability-status ${unit.status}`}>{statusLabel[unit.status]}</span></td></tr>)}</tbody></table>
       </div>
@@ -82,8 +79,8 @@ export function UnitAvailabilityMatrix(){
       </div>
 
       <article className={`availability-card ${detailsOpen?'is-expanded':''}`} aria-label={`Detalhes da unidade ${selected.code}`}>
-        <div className="availability-card-summary"><div><h3>Unidade {selected.code}</h3><p>{selected.floor}º pavimento · {selected.area} m²</p></div><strong>{formatBRL(selected.price)}</strong><button type="button" aria-expanded={detailsOpen} aria-controls="availability-card-details" onClick={()=>setDetailsOpen(open=>!open)}>{detailsOpen?'Ocultar detalhes':'Ver detalhes'}</button></div>
-        <div className="availability-card-details" id="availability-card-details"><p className={`availability-status ${selected.status}`}>{statusLabel[selected.status]}</p><p>{selected.bedrooms} dormitórios · {selected.view}</p><div className="availability-view"><img src={selectedView.src} alt={selectedView.alt} loading="lazy" width="1672" height="941"/><span>{selected.view} ilustrativa</span></div><a className="button primary" href="/demo">Ver unidade <span>→</span></a></div>
+        <div className="availability-card-summary"><div><h3>Unidade {selected.code}</h3><p>{selected.floor}º pavimento · {selected.area} m²</p></div><strong>{formatBRL(selected.price)} <small>preço ilustrativo</small></strong><button type="button" aria-expanded={detailsOpen} aria-controls="availability-card-details" onClick={()=>setDetailsOpen(open=>!open)}>{detailsOpen?'Ocultar detalhes':'Ver detalhes'}</button></div>
+        <div className="availability-card-details" id="availability-card-details"><p className={`availability-status ${selected.status}`}>{statusLabel[selected.status]}</p><p>{selected.bedrooms} dormitórios · {selected.view}</p><div className="availability-view"><picture><source srcSet={selectedView.src.replace('.png','-mobile.webp')} media="(max-width: 780px)" type="image/webp"/><source srcSet={selectedView.src.replace('.png','.webp')} type="image/webp"/><img src={selectedView.src} alt={selectedView.alt} loading="lazy" width="1672" height="941"/></picture><span>{selected.view} ilustrativa</span></div><a className="button primary" href="/demo">Explorar demonstração <span>→</span></a></div>
       </article>
     </div>
     <p className="availability-note">Dados e disponibilidade apresentados apenas para demonstração comercial.</p>

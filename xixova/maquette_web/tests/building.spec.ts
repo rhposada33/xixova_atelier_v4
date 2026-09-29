@@ -52,7 +52,7 @@ test('modo atardecer y navegación móvil',async({page})=>{
   await expect(page.locator('.building-stage')).toHaveClass(/warm_dusk/);
   await page.getByRole('region',{name:'Apresentação do empreendimento'}).getByRole('button',{name:'Filtros'}).click();
   await expect(page.getByRole('heading',{name:'Filtros de busca'})).toBeVisible();
-  await page.getByRole('button',{name:'Fechar filtros'}).click();
+  await page.locator('.b-mobile-close[aria-label="Fechar filtros"]').click();
   await page.locator('.building-mobile-tabs').getByRole('button',{name:'Unidades',exact:true}).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');

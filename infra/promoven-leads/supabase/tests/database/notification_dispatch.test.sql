@@ -1,0 +1,16 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(9);
+select has_function('public','claim_commercial_notifications',array['integer'],'claim function exists');
+select has_function('public','mark_commercial_notification',array['uuid','public.commercial_notification_status'],'mark function exists');
+select ok(not has_function_privilege('anon','public.claim_commercial_notifications(integer)','execute'),'anon cannot claim');
+select ok(not has_function_privilege('authenticated','public.claim_commercial_notifications(integer)','execute'),'authenticated cannot claim');
+select ok(has_function_privilege('service_role','public.claim_commercial_notifications(integer)','execute'),'service role can claim');
+select ok(not has_function_privilege('anon','public.mark_commercial_notification(uuid,public.commercial_notification_status)','execute'),'anon cannot mark');
+select ok(has_function_privilege('service_role','public.mark_commercial_notification(uuid,public.commercial_notification_status)','execute'),'service role can mark');
+set local role service_role;
+select is((select count(*)::integer from public.claim_commercial_notifications(10)),0,'empty queue returns no rows');
+select throws_ok($$select public.mark_commercial_notification(gen_random_uuid(),'pending')$$,'22023','invalid_status','only final statuses allowed');
+reset role;
+select * from finish();
+rollback;
