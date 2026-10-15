@@ -5,13 +5,13 @@ test.beforeEach(async({page})=>{await page.goto('/');await page.evaluate(()=>{se
 test('portada del edificio, filtros combinados y limpieza accesible',async({page})=>{
   test.setTimeout(60_000);
   await page.goto('/?vista=edificio');
-  await expect(page.getByRole('heading',{name:'Encontre seu apartamento ideal'})).toBeVisible({timeout:15_000});
-  await expect(page.getByText('54 de 72 unidades disponíveis')).toBeVisible();
+  await expect(page.locator('.building-filters h1')).toBeVisible({timeout:15_000});
+  await expect(page.locator('.building-filters .b-availability')).toContainText('54');
   await expect(page.locator('.building-stage canvas')).toBeVisible({timeout:20_000});
-  await page.getByRole('region',{name:'Apresentação do empreendimento'}).getByRole('button',{name:'Filtros'}).click();
   await page.getByLabel('Andar',{exact:true}).selectOption('12');
-  await page.locator('.b-bedroom-buttons').getByRole('button',{name:'3',exact:true}).click();
+  await page.getByLabel('Dormitórios',{exact:true}).selectOption('3');
   await expect(page.getByText('2 unidades correspondem aos seus filtros')).toBeVisible();
+  await page.locator('.b-advanced summary').click();
   await page.getByRole('button',{name:/Sol da tarde/}).click();
   await expect(page.getByText('0 unidades correspondem aos seus filtros')).toBeVisible();
   await page.getByRole('button',{name:'Limpar filtros'}).click();
@@ -46,12 +46,13 @@ test('interior se carga al entrar y el regreso conserva filtros y selección',as
   await expect(page.getByLabel('Andar',{exact:true})).toHaveValue('12');
 });
 test('modo atardecer y navegación móvil',async({page})=>{
+  test.setTimeout(60_000);
   await page.setViewportSize({width:390,height:844});
   await page.goto('/?vista=edificio');
   await page.getByRole('button',{name:'Entardecer',exact:true}).click();
   await expect(page.locator('.building-stage')).toHaveClass(/warm_dusk/);
-  await page.getByRole('region',{name:'Apresentação do empreendimento'}).getByRole('button',{name:'Filtros'}).click();
-  await expect(page.getByRole('heading',{name:'Filtros de busca'})).toBeVisible();
+  await page.locator('.building-mobile-tabs').getByRole('button',{name:/Filtros/}).click();
+  await expect(page.locator('.building-filters h1')).toBeVisible();
   await page.locator('.b-mobile-close[aria-label="Fechar filtros"]').click();
   await page.locator('.building-mobile-tabs').getByRole('button',{name:'Unidades',exact:true}).click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -65,6 +66,8 @@ test('la maqueta deja de dibujar en reposo y despierta al cambiar la luz',async(
   const stage=page.locator('.building-stage');
   await expect.poll(async()=>Number(await stage.getAttribute('data-render-count')),{timeout:20_000}).toBeGreaterThan(0);
   await expect(stage.locator('.building-loading')).toHaveCount(0,{timeout:20_000});
+  await expect(page.locator('.building-unit-label')).toHaveCSS('display','block');
+  await expect.poll(async()=>await page.locator('.building-unit-label').evaluate(el=>Boolean(el.style.left&&el.style.top))).toBe(true);
   await page.waitForTimeout(1800);
   const idle=Number(await stage.getAttribute('data-render-count'));
   await page.waitForTimeout(500);

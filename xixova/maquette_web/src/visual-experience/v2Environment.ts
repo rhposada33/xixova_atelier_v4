@@ -18,7 +18,7 @@ type PlantKind='tree'|'palm'|'shrub';
 type PlantPlacement={position:THREE.Vector3;rotation:number;scale:number};
 const plantRoots:Record<PlantKind,string>={tree:'V2_TREE_ORNAMENTAL',palm:'V2_PALM_DISCREET',shrub:'V2_SHRUB_LOW'};
 const plantCounts:Record<VisualQualityProfile['tier'],Record<PlantKind,number>>={
-  mobile:{tree:3,palm:1,shrub:6},standard:{tree:6,palm:2,shrub:12},premium:{tree:9,palm:3,shrub:16},
+  mobile:{tree:24,palm:5,shrub:10},standard:{tree:48,palm:10,shrub:18},premium:{tree:64,palm:14,shrub:24},
 };
 
 /** Fixed clusters leave the entrance, facade and 1203's presentation marker clear. */
@@ -55,7 +55,12 @@ const landscapePlacements:Record<PlantKind,PlantPlacement[]>={
     {position:new THREE.Vector3(-61,-.67,60),rotation:-.49,scale:.70},
   ],
 };
-function plantPositions(kind:PlantKind,count:number){return landscapePlacements[kind].slice(0,count);}
+function plantPositions(kind:PlantKind,count:number){
+  const placements=[...landscapePlacements[kind]];
+  // Reuse authored meshes for a generic coastal park, outside the selection footprint.
+  while(placements.length<count){const i=placements.length,angle=i*2.399;placements.push({position:new THREE.Vector3(Math.sin(angle)*(42+i*1.9),-.67,-35-Math.abs(Math.cos(angle))*65),rotation:angle,scale:kind==='tree'?1.3+(i%4)*.26:.85+(i%3)*.15});}
+  return placements.slice(0,count);
+}
 
 function addInstancedPlants(root:THREE.Group,template:THREE.Object3D,positions:PlantPlacement[]){
   template.updateWorldMatrix(true,true);
@@ -88,7 +93,7 @@ export function createVisualExperienceV2(scene:THREE.Scene, {sun,quality,invalid
   // The sky sphere intentionally fades at the lower edge. Keep an opaque haze behind it so the renderer never clears black.
   const background=new THREE.Color('#d8e1da');
   scene.background = background;
-  const fog = new THREE.Fog('#d9dfd8', 108, 420);
+  const fog = new THREE.Fog('#c8dce0',155,440);
   scene.fog = fog;
   const skyUniforms = {
     top: {value:new THREE.Color('#559fc9')},
@@ -104,7 +109,7 @@ export function createVisualExperienceV2(scene:THREE.Scene, {sun,quality,invalid
     fragmentShader:`varying vec3 direction;uniform vec3 top,horizon,haze,glow,sunDirection;uniform float time;
       float hash(vec2 p){return fract(sin(dot(p,vec2(41.13,289.71)))*143758.5453);}
       float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1.,0.)),f.x),mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.)),f.x),f.y);}
-      void main(){vec3 d=normalize(direction);float low=smoothstep(-.16,.13,d.y),high=smoothstep(.10,.72,d.y);vec3 c=mix(horizon,haze,low);c=mix(c,top,high);float s=pow(max(dot(d,normalize(sunDirection)),0.),20.);float halo=pow(max(dot(d,normalize(sunDirection)),0.),3.);c=mix(c,glow,s*.84+halo*.10);float n=noise(d.xz/(max(.22,d.y+.31))*2.+vec2(time*.001,0.));float cloud=smoothstep(.48,.65,n)*(1.-smoothstep(.30,.78,d.y));c=mix(c,mix(haze,glow,.12),cloud*.17);gl_FragColor=vec4(c,1.);
+      void main(){vec3 d=normalize(direction);float high=smoothstep(-.05,.48,d.y);vec3 c=mix(haze,top,high);c=mix(c,horizon,(1.-smoothstep(-.05,.05,d.y))*.28);float s=pow(max(dot(d,normalize(sunDirection)),0.),20.);float halo=pow(max(dot(d,normalize(sunDirection)),0.),3.);c=mix(c,glow,s*.84+halo*.10);vec2 uv=d.xz/max(.17,d.y+.23);float n=noise(uv*2.2)*.57+noise(uv*5.5)*.28+noise(uv*12.)*.15;float cloud=smoothstep(.48,.66,n)*smoothstep(-.015,.12,d.y)*(1.-smoothstep(.55,.85,d.y));c=mix(c,mix(haze,vec3(.98,.975,.94),.8),cloud*.88);gl_FragColor=vec4(c,1.);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>}`,
   }));
@@ -116,28 +121,38 @@ export function createVisualExperienceV2(scene:THREE.Scene, {sun,quality,invalid
   ground.rotation.x=-Math.PI/2;ground.position.y=-.70;
   root.add(ground);
   const forecourtMaterial = new THREE.MeshStandardMaterial({color:'#d1c8b8',roughness:.93});
-  const forecourt = new THREE.Mesh(new THREE.BoxGeometry(106,.12,98),forecourtMaterial);
+  const forecourt = new THREE.Mesh(new THREE.BoxGeometry(72,.12,68),forecourtMaterial);
   forecourt.position.set(0,-.62,0);forecourt.receiveShadow=true;root.add(forecourt);
   // Low planted islands keep the exterior court legible without entering the building footprint or access route.
   const gardenMasses=new THREE.InstancedMesh(new THREE.BoxGeometry(1,.12,1),groundMaterial,3);
   const gardenTransform=new THREE.Object3D();
   [[-35,23,13,8],[35,23,13,8],[0,51,20,7]].forEach(([x,z,width,depth],index)=>{gardenTransform.position.set(x,-.56,z);gardenTransform.scale.set(width,1,depth);gardenTransform.rotation.set(0,0,0);gardenTransform.updateMatrix();gardenMasses.setMatrixAt(index,gardenTransform.matrix);});
   gardenMasses.instanceMatrix.needsUpdate=true;root.add(gardenMasses);
-  const horizon = new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial({color:'#b4c0b8',roughness:1,vertexColors:true}),quality.horizonInstances);
-  const transform = new THREE.Object3D();
-  const horizonBlocks=[
-    [-128,62,31,5,17,.08],[-89,85,40,7,20,-.12],[83,85,37,6,19,.16],[136,57,28,4,16,-.08],[-155,38,24,4,15,.14],[159,31,22,3,14,-.16],
-    [-237,142,65,8,31,.05],[-155,204,54,6,29,-.11],[-54,230,72,9,34,.07],[78,220,62,7,31,-.09],[180,170,58,6,28,.13],[250,112,67,8,34,-.04],
-  ] as const;
-  const horizonCount=Math.min(quality.horizonInstances,horizonBlocks.length);
-  for(let index=0;index<horizonCount;index++){
-    const [x,z,width,height,depth,rotation]=horizonBlocks[index];
-    transform.position.set(x,height*.5-1.45,z);transform.scale.set(width,height,depth);transform.rotation.y=rotation;transform.updateMatrix();horizon.setMatrixAt(index,transform.matrix);
-    horizon.setColorAt(index,new THREE.Color(index<6?'#9ead9f':'#d5d9d1'));
+  // Generic atmospheric city, not a surveyed neighbourhood. Instance both shells
+  // and facade bands so the contextual detail stays inexpensive on mobile.
+  const count=quality.tier==='mobile'?30:54;
+  const city=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial({color:'#e1ddd1',roughness:.85}),count);
+  const windows=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial({color:'#7b969b',roughness:.42,metalness:.22}),count*7*6);
+  const roofs=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),new THREE.MeshStandardMaterial({color:'#b8b8aa',roughness:.9}),count);
+  const transform=new THREE.Object3D();let windowIndex=0;
+  for(let i=0;i<count;i++){
+    const row=Math.floor(i/18),col=i%18;
+    const x=(col-8.5)*16+(row%2)*7,z=-72-row*48-(i%3)*8;
+    const width=7+(i%4)*2,height=8+((i*7)%24),depth=9+(i%3)*3;
+    transform.position.set(x,height/2-.7,z);transform.rotation.set(0,0,0);transform.scale.set(width,height,depth);transform.updateMatrix();city.setMatrixAt(i,transform.matrix);
+    city.setColorAt(i,new THREE.Color(['#dedbd1','#c6d2ce','#e8e1d4','#afc1bf'][i%4]));
+    transform.position.set(x,height+.1,z);transform.scale.set(width*1.04,.22,depth*1.04);transform.updateMatrix();roofs.setMatrixAt(i,transform.matrix);
+    for(let level=0;level<Math.min(7,Math.floor(height/3));level++){
+      for(let bay=0;bay<3;bay++){
+        transform.position.set(x+(bay-1)*width*.29,2+level*3,z+depth/2+.025);transform.scale.set(width*.22,1.55,.06);transform.updateMatrix();windows.setMatrixAt(windowIndex++,transform.matrix);
+        transform.position.set(x+width/2+.025,2+level*3,z+(bay-1)*depth*.29);transform.scale.set(.06,1.55,depth*.22);transform.updateMatrix();windows.setMatrixAt(windowIndex++,transform.matrix);
+      }
+    }
   }
-  horizon.count=horizonCount;horizon.instanceMatrix.needsUpdate=true;if(horizon.instanceColor)horizon.instanceColor.needsUpdate=true;
-  root.add(horizon);
-  const day={top:new THREE.Color('#559fc9'),horizon:new THREE.Color('#f6e2bf'),haze:new THREE.Color('#d8e1da'),glow:new THREE.Color('#ffe5ad'),ground:new THREE.Color('#c3cbb9'),paving:new THREE.Color('#d1c8b8')};
+  windows.count=windowIndex;city.instanceMatrix.needsUpdate=true;windows.instanceMatrix.needsUpdate=true;root.add(city,windows,roofs);
+  const sea=new THREE.Mesh(new THREE.PlaneGeometry(1500,640),new THREE.MeshStandardMaterial({color:'#7bafb5',roughness:.4,metalness:.16}));sea.rotation.x=-Math.PI/2;sea.position.set(0,-.65,-510);root.add(sea);
+  const road=new THREE.Mesh(new THREE.PlaneGeometry(530,10),new THREE.MeshStandardMaterial({color:'#a8aaa0',roughness:.98}));road.rotation.x=-Math.PI/2;road.position.set(0,-.55,-46);root.add(road);
+  const day={top:new THREE.Color('#62a8d0'),horizon:new THREE.Color('#e9e5d5'),haze:new THREE.Color('#c8dce0'),glow:new THREE.Color('#ffe5ad'),ground:new THREE.Color('#8b9e7e'),paving:new THREE.Color('#d1c8b8')};
   const dusk={top:new THREE.Color('#607797'),horizon:new THREE.Color('#e2bd9a'),haze:new THREE.Color('#b8b2ac'),glow:new THREE.Color('#ffb978'),ground:new THREE.Color('#9aa18f'),paving:new THREE.Color('#bcae9d')};
   const diagnostics={profile:quality.tier,resources:0};let previousTime:number|undefined,disposed=false;
   const landscape=new THREE.Group();landscape.name='visual-v2-landscape-instances';

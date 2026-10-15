@@ -1,0 +1,65 @@
+PROMOVEN /demo — revisión premium local — 15 de octubre de 2026
+
+Resultado
+Integración sobre React/Three.js existente, sin nueva aplicación ni despliegue.
+Tres pasadas Dream Loop con capturas reales: composición comercial, entorno y pulido.
+Panel de búsqueda con andar/dormitórios/precio y filtros avanzados; ficha de seis
+características, precio destacado, favoritos, comparación y compartir. Diseño
+adaptativo con paneles desplazables en móvil. Datos comerciales del inventario.
+
+Blender y activos
+Sesión inicial conservada en output/promoven-session-before.blend.
+Modelo original: public/building/xixova-building-visual-v2.glb (sin sobrescribir).
+Nuevo: xixova/maquette_web/public/building/promoven-premium.glb.
+Maestro: xixova/maquette_web/assets/promoven/promoven-premium-materials.blend.
+Refinamiento mediante Blender MCP: fachada, losas, bronce, ventanas/vidrio,
+paleta vegetal y textura normal de concreto existente; UV de presentación.
+72 proxies con exactamente los mismos límites mundiales, diferencia máxima 0 m.
+56.504 triángulos del edificio antes/después. GLB: 3.035.784 -> 4.133.568 bytes.
+Reproducción: xixova/maquette_web/scripts/refine_promoven_materials.py.
+Verificación: node xixova/maquette_web/scripts/verify_promoven_model.mjs.
+Hashes: xixova/maquette_web/assets/promoven/premium-materials-manifest.json.
+
+Componentes
+src/building/BuildingApp.tsx: búsqueda, ficha, estados, accesibilidad, enlace WhatsApp.
+src/building/BuildingScene.tsx: activo, encuadre, sombras, limpieza de recursos,
+y actualización del marcador después de cargar.
+src/building/premium.css: presentación editorial y paneles adaptativos.
+src/visual-experience/v2Environment.ts: cielo procedural, ciudad ilustrativa,
+agua y vegetación instanciada; día/entardecer.
+src/demo/DemoApp.tsx: integración de estilos.
+tests/building.spec.ts y tests/building-premium.spec.ts: regresiones del visor.
+
+Inspección visual y recursos
+Capturas en output/playwright/promoven-final-{desktop,laptop,tablet,mobile}.png.
+Resoluciones 1600x960, 1366x768, 768x1024 y 390x844.
+Sin desbordamiento horizontal; un canvas por vista; marcador posicionado.
+Capturas adicionales: mobile-filters, mobile-detail y dusk.
+270 llamadas de dibujo en vista inicial frente a 256 antes (+5,5%).
+Renderizado bajo demanda conservado; se liberan texturas al desmontar.
+Consola del visor final sin errores en la inspección; no se midió FPS en GPU real.
+Selección directa 3D comprobada: unidad 903 sincroniza URL, marcador y ficha.
+WhatsApp se verifica interceptando la apertura; no se envió ningún mensaje.
+
+Diferencias y límites
+La ciudad y vegetación siguen siendo estilizadas, no fotorrealistas como la
+referencia. El entorno es ilustrativo: no representa un emplazamiento levantado.
+Vista restaura la cámara; no se presenta una panorámica inexistente.
+No se añadieron amenidades, geolocalización ni datos comerciales inventados.
+El interior sigue siendo la tipología ilustrativa existente. La integración
+Supabase se conserva, pero no se validó contra un backend real de producción.
+No se publicó ni se hizo commit.
+
+Comprobaciones finales
+npm run build: correcto (avisos existentes de tamaño de chunk y configLoader).
+npm run lint: correcto.
+npm run test:unit: 89 correctas, 4 omitidas (integraciones sin entorno conectado).
+npm run test:e2e -- tests/building.spec.ts tests/building-premium.spec.ts:
+7 correctas, incluida persistencia de favoritos, comparación de unidades,
+enlace de WhatsApp navegable, filtros/limpieza, estados comerciales, interior
+con retorno, panel móvil/entardecer y reposo/reanudación del renderizado.
+El marcador inicial se comprueba explícitamente después de cargar el modelo.
+Giro por arrastre y zoom comprobados en navegador: el marcador cambia de posición
+con la cámara y mantiene unidad 1203 en la ficha; restauración de vista accionada.
+Captura adicional: output/playwright/promoven-final-orbit.png.
+Avisos de GPU ReadPixels del navegador de automatización; sin errores de consola.

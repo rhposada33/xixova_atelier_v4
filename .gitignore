@@ -118,3 +118,7 @@ Thumbs.db
 
 # Optimized Promoven marketing views
 !xixova/maquette_web/public/marketing/promoven-view-*.webp
+
+# Premium interactive viewer: isolated Blender master and browser export
+!/xixova/maquette_web/assets/promoven/promoven-premium-materials.blend
+!/xixova/maquette_web/public/building/promoven-premium.glb

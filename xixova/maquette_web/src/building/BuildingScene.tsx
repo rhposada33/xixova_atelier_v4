@@ -13,6 +13,12 @@ import {activeVisualExperience} from '../visual-experience/resolveVisualExperien
 import {selectVisualQuality} from '../visual-experience/quality';
 import type {VisualExperienceController,VisualQualityTier} from '../visual-experience/types';
 
+function disposeSceneResources(root:THREE.Object3D){
+  const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>(),textures=new Set<THREE.Texture>();
+  root.traverse(object=>{if(object instanceof THREE.Mesh||object instanceof THREE.LineSegments){geometries.add(object.geometry);for(const material of Array.isArray(object.material)?object.material:[object.material]){materials.add(material);for(const value of Object.values(material))if(value instanceof THREE.Texture)textures.add(value);}}});
+  textures.forEach(texture=>texture.dispose());materials.forEach(material=>material.dispose());geometries.forEach(geometry=>geometry.dispose());
+}
+
 type Props={units:BuildingUnit[];selected:BuildingUnit;matches:string[];filtered:boolean;mode:'neutral_day'|'warm_dusk';onSelect:(u:BuildingUnit)=>void;command:{type:string;nonce:number};};
 export function BuildingScene(props:Props){
   const host=useRef<HTMLDivElement>(null),live=useRef(props),engine=useRef<{command:(type:string)=>void;select:(code:string)=>void;refresh:()=>void}|null>(null);
@@ -21,7 +27,7 @@ export function BuildingScene(props:Props){
   live.current=props;
   useEffect(()=>{
     const el=host.current!;
-    const useVisualExperienceV2=activeVisualExperience==='v2'&&buildingConfig.projectSlug==='escobar-residences';
+    const useVisualExperienceV2=visualV2&&buildingConfig.projectSlug==='escobar-residences';
     const requestedQuality=new URLSearchParams(location.search).get('visualQuality');
     const quality=selectVisualQuality(el.clientWidth||window.innerWidth,devicePixelRatio,requestedQuality==='premium'?'premium':undefined as VisualQualityTier|undefined);
     let renderer:THREE.WebGLRenderer;
@@ -47,13 +53,13 @@ export function BuildingScene(props:Props){
     let targetCamera:THREE.Vector3|null=null,targetLook:THREE.Vector3|null=null;
     let paletteUntil=0;
     const requestRender=()=>{if(!disposed&&document.visibilityState==='visible'&&!frame)frame=requestAnimationFrame(draw);};
-    const home=()=>{const aspect=el.clientWidth/el.clientHeight,tall=buildingConfig.floors>18;const distance=visualV2?Math.max(tall?154:125,76/Math.max(.5,aspect)):Math.max(123,87/Math.max(.5,aspect));targetLook=new THREE.Vector3(0,tall?38:32,0);targetCamera=new THREE.Vector3(visualV2?72:110,0,visualV2?125:92).normalize().multiplyScalar(distance).add(targetLook);targetCamera.y=visualV2?(tall?42:36):23;};
+    const home=()=>{const aspect=el.clientWidth/el.clientHeight,tall=buildingConfig.floors>18;const distance=visualV2?Math.max(tall?165:129,76/Math.max(.5,aspect)):Math.max(123,87/Math.max(.5,aspect));targetLook=new THREE.Vector3(0,tall?38:32,0);targetCamera=new THREE.Vector3(visualV2?72:110,0,visualV2?125:92).normalize().multiplyScalar(distance).add(targetLook);targetCamera.y=visualV2?(tall?46:41):23;};
     home();camera.position.copy(targetCamera!);controls.target.copy(targetLook!);targetCamera=null;targetLook=null;
     try{const saved=visualV2?null:JSON.parse(sessionStorage.getItem('xixova-building-camera')||'null');if(saved?.position?.length===3&&saved?.target?.length===3){camera.position.fromArray(saved.position);controls.target.fromArray(saved.target);}}catch{/* A missing camera snapshot uses the full-building framing. */}controls.update();
     const resize=()=>{renderer.setSize(el.clientWidth,el.clientHeight);camera.aspect=el.clientWidth/el.clientHeight;camera.updateProjectionMatrix();requestRender();};const observer=new ResizeObserver(resize);observer.observe(el);resize();
-    const modelUrl=visualV2&&buildingConfig.projectSlug==='escobar-residences'?'building/xixova-building-visual-v2.glb':buildingConfig.modelUrl;
+    const modelUrl=visualV2&&buildingConfig.projectSlug==='escobar-residences'?'building/promoven-premium.glb':buildingConfig.modelUrl;
     const loader=new GLTFLoader();loader.load(new URL(modelUrl,document.baseURI).href,gltf=>{
-      if(disposed){gltf.scene.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});return;}
+      if(disposed){disposeSceneResources(gltf.scene);return;}
       const model=gltf.scene;model.updateMatrixWorld(true);const bindings=bindUnitsToScene(live.current.units,model);
       model.traverse(o=>{
         if(!(o instanceof THREE.Mesh))return;
@@ -67,7 +73,7 @@ export function BuildingScene(props:Props){
           for(const m of Array.isArray(o.material)?o.material:[o.material])if(m instanceof THREE.MeshStandardMaterial){m.envMapIntensity=.8;if(o.name.includes('leaf'))m.side=THREE.DoubleSide;if(o.name.endsWith('_glass')){m.transparent=true;m.opacity=.48;m.depthWrite=false;m.color.set('#a0b6bc');}if(o.name.endsWith('_light'))m.emissiveIntensity=3.8;}
         }
       });
-      if(visualV2)model.traverse(o=>{if(!(o instanceof THREE.Mesh)||o.name.startsWith('UNIT_'))return;for(const m of Array.isArray(o.material)?o.material:[o.material]){if(!(m instanceof THREE.MeshStandardMaterial))continue;m.envMapIntensity=1.15;if(m.name.includes('ivory')||m.name.includes('slab')){m.color.set('#e4ddca');m.roughness=.72;}if(m.name.includes('bronze')){m.color.set('#6b4527');m.metalness=.55;m.roughness=.3;}if(m.name.includes('window')){m.color.set('#344a50');m.metalness=.55;m.roughness=.19;}if(m.name.includes('glass')){m.opacity=.33;m.color.set('#91b9c5');}if(m.name.includes('leaf'))m.color.set(m.name.includes('light')?'#536b29':'#263f20');if(m.name.endsWith('_light'))m.emissiveIntensity=1.8;}});
+      if(visualV2)model.traverse(o=>{if(!(o instanceof THREE.Mesh)||o.name.startsWith('UNIT_'))return;for(const m of Array.isArray(o.material)?o.material:[o.material]){if(!(m instanceof THREE.MeshStandardMaterial))continue;m.envMapIntensity=1.15;if(m.name.includes('ivory')||m.name.includes('slab')){m.roughness=.72;}if(m.name.includes('bronze')){m.metalness=.65;m.roughness=.3;}if(m.name.includes('window')){m.metalness=.48;m.roughness=.19;}if(m.name.includes('glass')){m.opacity=.33;m.color.set('#90acaf');}if(m.name.includes('leaf'))m.color.set(m.name.includes('light')?'#536b29':'#263f20');if(m.name.endsWith('_light'))m.emissiveIntensity=1.8;}});
       scene.add(model);renderer.shadowMap.needsUpdate=true;appearanceBefore='';requestRender();setLoading(false);
     },undefined,()=>{setError('Não foi possível carregar a maquete. Recarregue a página ou explore a matriz de unidades.');setLoading(false);});
     const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down={x:0,y:0},hoveredCode:string|undefined;
@@ -94,10 +100,10 @@ export function BuildingScene(props:Props){
     }requestRender();
     const cancel=()=>{targetCamera=null;targetLook=null;};controls.addEventListener('start',cancel);
     const onControlsChange=()=>requestRender();const onVisibility=()=>{if(document.visibilityState==='visible')requestRender();else{cancelAnimationFrame(frame);frame=0;}};controls.addEventListener('change',onControlsChange);document.addEventListener('visibilitychange',onVisibility);const onReducedMotion=()=>{if(reducedMotion.matches)controls.autoRotate=false;};reducedMotion.addEventListener('change',onReducedMotion);
-    return()=>{try{sessionStorage.setItem(visualV2?'xixova-building-camera-v2':'xixova-building-camera',JSON.stringify({position:camera.position.toArray(),target:controls.target.toArray()}));}catch{}disposed=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',onControlsChange);document.removeEventListener('visibilitychange',onVisibility);reducedMotion.removeEventListener('change',onReducedMotion);controls.dispose();el.removeEventListener('pointermove',onMove);el.removeEventListener('pointerdown',onDown);el.removeEventListener('pointerup',onUp);el.removeEventListener('pointerleave',leave);visualEnvironment?.dispose();scene.traverse(o=>{if(o instanceof THREE.Mesh||o instanceof THREE.LineSegments){o.geometry.dispose();(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());}});env.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();engine.current=null;};
+    return()=>{try{sessionStorage.setItem(visualV2?'xixova-building-camera-v2':'xixova-building-camera',JSON.stringify({position:camera.position.toArray(),target:controls.target.toArray()}));}catch{}disposed=true;cancelAnimationFrame(frame);observer.disconnect();controls.removeEventListener('change',onControlsChange);document.removeEventListener('visibilitychange',onVisibility);reducedMotion.removeEventListener('change',onReducedMotion);controls.dispose();el.removeEventListener('pointermove',onMove);el.removeEventListener('pointerdown',onDown);el.removeEventListener('pointerup',onUp);el.removeEventListener('pointerleave',leave);visualEnvironment?.dispose();disposeSceneResources(scene);env.dispose();pmrem.dispose();renderer.dispose();renderer.domElement.remove();engine.current=null;};
   },[]);
   const matchesKey=props.matches.join(',');
-  useEffect(()=>{engine.current?.refresh();},[props.selected.code,props.filtered,matchesKey,props.mode]);
+  useEffect(()=>{engine.current?.refresh();},[props.selected.code,props.filtered,matchesKey,props.mode,loading]);
   useEffect(()=>{engine.current?.command(props.command.type);},[props.command]);
   useEffect(()=>{engine.current?.select(props.selected.code);},[props.selected.code]);
   return <div className={`building-stage ${props.mode}`} ref={host}>

@@ -3,6 +3,7 @@ import {BuildingApp} from '../building/BuildingApp';
 import {InventoryProvider} from '../infrastructure/inventory/InventoryContext';
 import type {PropertyUnit} from '../domain/inventory';
 import '../building/building.css';
+import '../building/premium.css';
 const InteriorApp=lazy(()=>import('../InteriorApp'));
 function DemoViewer(){
   const [interior,setInterior]=useState(new URLSearchParams(location.search).get('vista')==='interior');

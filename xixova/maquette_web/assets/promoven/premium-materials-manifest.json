@@ -1,0 +1,28 @@
+{
+  "proxies": 72,
+  "maxBoundsDifferenceMetres": 0,
+  "sourceTriangles": 56504,
+  "refinedTriangles": 56504,
+  "files": {
+    "public/building/xixova-building-visual-v2.glb": {
+      "bytes": 3035784,
+      "sha256": "003ab678af116360552ef355e76130d3cc63292c22b3dde60bff49da181ade9c"
+    },
+    "public/building/promoven-premium.glb": {
+      "bytes": 4133568,
+      "sha256": "80f816c9b5fc91cf88173780c88ec7f24bbb20a07d286c9f5d69f41a72676926"
+    },
+    "assets/promoven/promoven-premium-materials.blend": {
+      "bytes": 7690238,
+      "sha256": "a09b1d6433b52bd2762d7a0d20a9c8d02015b255b1197eb72b9391e314c51691"
+    }
+  },
+  "method": "Blender MCP: material and UV refinement of the actual interactive GLB; independent GLTFLoader comparison after export.",
+  "changes": [
+    "ivory/slab roughness and concrete normal map",
+    "bronze metallic response",
+    "window and glass finish",
+    "landscape material palette"
+  ],
+  "reproduce": "blender --background --python scripts/refine_promoven_materials.py (from xixova/maquette_web)"
+}
