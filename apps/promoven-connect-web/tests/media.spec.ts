@@ -7,10 +7,11 @@ test("upload Connect validado, publicação e URL pública curta", async ({page}
   await page.getByLabel("E-mail").fill(process.env.CONNECT_E2E_EMAIL!);
   await page.getByLabel("Senha",{exact:true}).fill(process.env.CONNECT_E2E_PASSWORD!);
   await page.getByRole("button",{name:"Entrar no portal"}).click();
+  await page.getByRole("combobox", { name: "Organização ativa" }).selectOption({ label: "Organização piloto" });
   await expect(page.getByRole("heading",{name:"Seu espaço comercial"})).toBeVisible();
-  const result=await page.evaluate(async()=>{
+  const organizationId=await page.getByRole("combobox",{name:"Organização ativa"}).inputValue();
+  const result=await page.evaluate(async(org)=>{
     const modulePath="/src/supabase.ts";const {connectClient}=await import(/* @vite-ignore */ modulePath);const client=connectClient();
-    const org=(await client.from("organization_members").select("organization_id").eq("user_id",(await client.auth.getUser()).data.user!.id).limit(1)).data![0].organization_id;
     const slug=`media-e2e-${Date.now()}`;
     const created=await client.rpc("connect_create_project",{p_data:{organizationId:org,name:"Mídia E2E",slug,publicSlug:slug,city:"São Paulo",state:"SP"}});
     if(created.error)throw created.error;
@@ -37,7 +38,7 @@ test("upload Connect validado, publicação e URL pública curta", async ({page}
     const invalid=new FormData();invalid.set("action","upload");invalid.set("projectId",projectId);invalid.set("role","cover");invalid.set("file",new File([new Uint8Array(2048)],"forged.png",{type:"image/png"}));
     const bad=await client.functions.invoke("asset-media",{body:invalid});
     return {projectId,assetId,privateBefore:publicBefore.data,privateUrl:!!privateUrl.data?.url,publicStatus:guest.status,urlExpires:guestBody.expiresIn,downloadStatus:image.status,contentType:image.headers.get("content-type"),badStatus:bad.error?422:200,sessionPresent:!!anon.data.session};
-  });
+  },organizationId);
   expect(result.privateBefore).toBe(false);
   expect(result.privateUrl).toBe(true);
   expect(result.publicStatus).toBe(200);

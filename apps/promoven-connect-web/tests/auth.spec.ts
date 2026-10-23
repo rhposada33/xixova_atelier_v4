@@ -42,6 +42,7 @@ test("login, organização e perfil reais no Connect local", async ({ page }) =>
   await page.getByLabel("E-mail").fill(process.env.CONNECT_E2E_EMAIL!);
   await page.getByLabel("Senha", { exact: true }).fill(process.env.CONNECT_E2E_PASSWORD!);
   await page.getByRole("button", { name: "Entrar no portal" }).click();
+  await page.getByRole("combobox", { name: "Organização ativa" }).selectOption({ label: "Organização piloto" });
   await expect(page.getByRole("heading", { name: "Seu espaço comercial" })).toBeVisible();
   await expect(page.getByText("Organização piloto", { exact: true }).first()).toBeVisible();
   await page.getByRole("combobox", { name: "Organização ativa" }).selectOption({ label: "Segundo piloto" });

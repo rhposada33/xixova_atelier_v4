@@ -67,7 +67,7 @@ reset role;
 
 select set_config('request.jwt.claim.sub','a1000000-0000-4000-8000-000000000006',true); set local role authenticated;
 select is((select count(*)::int from public.connect_create_organization('Organização C','org-c')),1,'platform admin creates organization');
-select is((select count(*)::int from public.audit_events where action='organization.created'),1,'organization creation is audited');
+select is((select count(*)::int from public.audit_events where action='organization.created' and actor_id='a1000000-0000-4000-8000-000000000006'),1,'organization creation is audited');
 select is((select count(*)::int from public.organization_members where user_id='a1000000-0000-4000-8000-000000000006'),1,'creator becomes organization admin');
 select * from finish();
 rollback;

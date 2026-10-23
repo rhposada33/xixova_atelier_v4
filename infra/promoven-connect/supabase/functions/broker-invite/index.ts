@@ -1,3 +1,4 @@
+import { operationalHandler } from "../_shared/operations.mjs";
 import { createClient } from "npm:@supabase/supabase-js@2.109.0";
 
 const allowedOrigin = Deno.env.get("CONNECT_APP_ORIGIN") ?? "http://127.0.0.1:5178";
@@ -29,7 +30,7 @@ async function sendLocal(email: string, authLink: string, inviteLink: string) {
   } finally { conn.close(); }
 }
 
-Deno.serve(async (request) => {
+Deno.serve(operationalHandler("broker-invite",async (request) => {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
   if (request.method !== "POST") return respond(405, { error: "method_not_allowed" });
   if (Deno.env.get("CONNECT_DELIVERY_MODE") !== "local") return respond(503, { error: "delivery_not_configured" });
@@ -67,4 +68,4 @@ Deno.serve(async (request) => {
     return respond(503, { error: "delivery_failed" });
   }
   return respond(200, { id: invitation.id, status: invitation.status, expiresAt: invitation.expires_at });
-});
+}, {limit: 8192,mode:Deno.env.get("CONNECT_DELIVERY_MODE")??"local",proxySecret:Deno.env.get("CONNECT_PROXY_SECRET")}));

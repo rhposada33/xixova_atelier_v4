@@ -1,3 +1,5 @@
+import { validImage } from "../_shared/media.mjs";
+import { operationalHandler } from "../_shared/operations.mjs";
 import { createClient } from "npm:@supabase/supabase-js@2.109.0";
 
 const origin = Deno.env.get("CONNECT_APP_ORIGIN") ?? "http://127.0.0.1:5178";
@@ -6,46 +8,10 @@ const maxBytes = 5_242_880;
 const cors = {"Access-Control-Allow-Origin":origin,"Access-Control-Allow-Headers":"authorization,apikey,content-type,x-client-info","Access-Control-Allow-Methods":"POST,OPTIONS","Cache-Control":"no-store","Content-Type":"application/json","Referrer-Policy":"no-referrer"};
 const reply=(status:number,body:Record<string,unknown>)=>new Response(JSON.stringify(body),{status,headers:cors});
 const hex=(bytes:Uint8Array)=>Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
-const u32=(b:Uint8Array,i:number)=>((b[i]*2**24)+(b[i+1]<<16)+(b[i+2]<<8)+b[i+3])>>>0;
 
-function png(b:Uint8Array){
-  if(b.length<67||hex(b.slice(0,8))!=="89504e470d0a1a0a")return false;
-  let pos=8,head=false,data=false,end=false;
-  while(pos+12<=b.length){const len=u32(b,pos),kind=new TextDecoder().decode(b.slice(pos+4,pos+8));pos+=8;if(len>b.length-pos-4)return false;
-    if(!["IHDR","PLTE","tRNS","IDAT","IEND"].includes(kind))return false;
-    if(!head){if(kind!=="IHDR"||len!==13)return false;const w=u32(b,pos),h=u32(b,pos+4);if(!w||!h||w>8000||h>8000||w*h>20_000_000)return false;head=true;}
-    if(kind==="IDAT")data=true;
-    pos+=len+4;
-    if(kind==="IEND"){end=len===0;break;}
-  }
-  return head&&data&&end&&pos===b.length;
-}
-function jpeg(b:Uint8Array){
-  if(b.length<100||b[0]!==255||b[1]!==216||b.at(-2)!==255||b.at(-1)!==217)return false;
-  let pos=2,dimensions=false,scan=false;
-  while(pos<b.length-2){if(b[pos++]!==255)return false;while(b[pos]===255)pos++;const marker=b[pos++];
-    if(marker===0xda){scan=true;break;}
-    if(marker===0xd9||marker===0x00||marker===0xd8||marker>=0xd0&&marker<=0xd7)return false;
-    if(pos+2>b.length)return false;const len=(b[pos]<<8)|b[pos+1];if(len<2||pos+len>b.length)return false;
-    if(marker>=0xe1&&marker<=0xef||marker===0xfe)return false; // EXIF, XMP, IPTC, comments and other metadata.
-    if(marker===0xc0||marker===0xc2){if(len<7)return false;const h=(b[pos+3]<<8)|b[pos+4],w=(b[pos+5]<<8)|b[pos+6];if(!w||!h||w>8000||h>8000||w*h>20_000_000)return false;dimensions=true;}
-    pos+=len;
-  }
-  return dimensions&&scan;
-}
-function webp(b:Uint8Array){
-  if(b.length<40||new TextDecoder().decode(b.slice(0,4))!=="RIFF"||new TextDecoder().decode(b.slice(8,12))!=="WEBP"||u32(new Uint8Array([b[7],b[6],b[5],b[4]]),0)+8!==b.length)return false;
-  let pos=12,visual=false;
-  while(pos+8<=b.length){const kind=new TextDecoder().decode(b.slice(pos,pos+4)),size=(b[pos+4]|b[pos+5]<<8|b[pos+6]<<16|b[pos+7]<<24)>>>0;pos+=8;if(size>b.length-pos)return false;
-    if(!["VP8 ","VP8L","VP8X","ALPH","ANIM","ANMF"].includes(kind))return false;
-    if(kind==="VP8 "||kind==="VP8L")visual=true;
-    pos+=size+(size%2);
-  }
-  return visual&&pos===b.length;
-}
-function validImage(bytes:Uint8Array,mime:string){return mime==="image/png"?png(bytes):mime==="image/jpeg"?jpeg(bytes):mime==="image/webp"?webp(bytes):false;}
 
-Deno.serve(async request=>{
+
+Deno.serve(operationalHandler("asset-media",async request=>{
   if(request.method==="OPTIONS")return new Response(null,{status:204,headers:cors});
   if(request.method!=="POST")return reply(405,{error:"method_not_allowed"});
   if(Deno.env.get("CONNECT_DELIVERY_MODE")!=="local")return reply(503,{error:"local_only"});
@@ -97,4 +63,4 @@ Deno.serve(async request=>{
     return reply(200,{assetId:result.data.id,version:result.data.version,status:action==="delete"?"deleted":"replaced"});
   }
   return reply(400,{error:"invalid_action"});
-});
+}, {limit: 5300000,mode:Deno.env.get("CONNECT_DELIVERY_MODE")??"local",proxySecret:Deno.env.get("CONNECT_PROXY_SECRET")}));

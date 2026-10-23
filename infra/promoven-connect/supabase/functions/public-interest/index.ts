@@ -1,9 +1,10 @@
+import { operationalHandler } from "../_shared/operations.mjs";
 import {createClient} from "npm:@supabase/supabase-js@2.109.0";
 const origin=Deno.env.get("CONNECT_APP_ORIGIN")??"http://127.0.0.1:5178";
 const headers={"Access-Control-Allow-Origin":origin,"Access-Control-Allow-Headers":"authorization,apikey,content-type,x-client-info,idempotency-key","Access-Control-Allow-Methods":"POST,OPTIONS","Cache-Control":"no-store","Content-Type":"application/json","Referrer-Policy":"no-referrer"};
 const reply=(status:number,value:Record<string,unknown>)=>new Response(JSON.stringify(value),{status,headers});
 const hex=(bytes:Uint8Array)=>Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
-Deno.serve(async request=>{
+Deno.serve(operationalHandler("public-interest",async request=>{
   if(request.method==="OPTIONS")return new Response(null,{status:204,headers});
   if(request.method!=="POST")return reply(405,{error:"method_not_allowed"});
   if(Deno.env.get("CONNECT_DELIVERY_MODE")!=="local")return reply(503,{error:"local_only"});
@@ -13,6 +14,7 @@ Deno.serve(async request=>{
   let body:{shareToken?:string;publicSlug?:string;buyerName?:string;contactChannel?:string;contactValue?:string;message?:string;unitCode?:string;privacyNoticeVersion?:string;website?:string};
   try{const raw=await request.text();if(raw.length>4096)return reply(413,{error:"payload_too_large"});body=JSON.parse(raw);}catch{return reply(400,{error:"invalid_body"});}
   if(!body||typeof body!=="object"||Array.isArray(body)||!Object.keys(body).every(key=>["shareToken","publicSlug","buyerName","contactChannel","contactValue","message","unitCode","privacyNoticeVersion","website"].includes(key)))return reply(422,{error:"invalid_body"});
+  if(Object.values(body).some(value=>value!==undefined&&typeof value!=="string"))return reply(422,{error:"invalid_body"});
   if(body.website)return reply(202,{status:"accepted"}); // honeypot; no database write.
   if(Boolean(body.shareToken)===Boolean(body.publicSlug))return reply(422,{error:"invalid_source"});
   if(body.shareToken&&!/^[a-f0-9]{64}$/.test(body.shareToken))return reply(404,{error:"not_found"});
@@ -24,7 +26,7 @@ Deno.serve(async request=>{
      ||(contactChannel==="phone"&&!/^\+?[0-9() -]{8,30}$/.test(contactValue))
      ||(unitCode&&!/^[A-Z0-9][A-Z0-9_-]{0,31}$/.test(unitCode)))return reply(422,{error:"invalid_contact"});
   const encoder=new TextEncoder();const hmac=await crypto.subtle.importKey("raw",encoder.encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
-  const ip=request.headers.get("x-real-ip")??request.headers.get("x-forwarded-for")?.split(",")[0]??"local-unknown";
+  const ip=request.headers.get("x-connect-verified-client")??"local-shared";
   const rateKey=hex(new Uint8Array(await crypto.subtle.sign("HMAC",hmac,encoder.encode(ip))));
   const tokenHash=body.shareToken?hex(new Uint8Array(await crypto.subtle.digest("SHA-256",encoder.encode(body.shareToken)))):null;
   const payload={buyerName,contactChannel,contactValue,message,unitCode,privacyNoticeVersion:"2026-10-23"};
@@ -34,4 +36,4 @@ Deno.serve(async request=>{
   const result=await admin.rpc("connect_submit_interest",{p_token_hash:tokenHash,p_public_slug:body.publicSlug??null,p_payload:payload,p_idempotency_id:id,p_payload_hash:payloadHash});
   if(result.error)return reply(result.error.code==="PT409"?409:result.error.code==="P0002"?404:result.error.code==="22023"?422:503,{error:result.error.code==="PT409"?"conflict":result.error.code==="P0002"?"not_found":"submission_failed"});
   return reply(202,result.data);
-});
+}, {limit: 8192,mode:Deno.env.get("CONNECT_DELIVERY_MODE")??"local",proxySecret:Deno.env.get("CONNECT_PROXY_SECRET")}));

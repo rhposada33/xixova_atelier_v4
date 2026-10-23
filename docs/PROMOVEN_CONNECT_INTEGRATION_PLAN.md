@@ -13,7 +13,7 @@ Um link entre domínios não transporta token. A sessão Connect permanece no do
 
 ## Navegação e identidade visual
 
-Na landing, inserir futuramente uma entrada clara “Acessar Connect” que navegue para `https://connect.promoven.online/login`; a landing continua como entrada institucional e de demonstrações. No Connect, manter “Visão geral”, “Empreendimentos” e “Meu perfil”, com organização ativa no contexto administrativo. Em mobile, a navegação fica horizontal e o seletor de organização permanece visível.
+Na landing, inserir futuramente uma entrada clara “Acessar Connect” que navegue para `https://connect.promoven.online/login`; a landing continua como entrada institucional e de demonstrações. No Connect, manter “Visão geral”, “Empreendimentos” e “Meu perfil”, com organização ativa no contexto administrativo. Em mobile, a navegação usa menu recolhível acessível e o seletor de organização permanece visível.
 
 Compartilhar tokens visuais documentados, sem importar o runtime de Escobar: verde institucional (`#123e31`, `#15553e`), tema claro, DM Sans para interface, Playfair Display em títulos, contraste de foco e padrões de cards e formulários. Um pacote futuro de tokens deve conter apenas CSS/dados estáticos e ser versionado entre apps, sem Auth, cliente Supabase ou lógica 3D compartilhada.
 
@@ -51,3 +51,16 @@ Manter versões imutáveis dos dois deploys e backup do banco Connect anterior �
 - Storage Connect, imagens/plantas 2D, links de corretores, catálogo público e recibos de lead funcionam **somente localmente**. O plano de retenção, compartilhamento e atendimento a direitos do comprador exige aprovação antes de dados reais.
 - GLB e visor 3D seguem futuros e opcionais. O dashboard não carrega Three.js.
 - Validar ambiente remoto, observabilidade, backups, domínio, proxy confiável e controles de privacidade em execução futura autorizada. Nenhuma dessas ações foi realizada aqui.
+
+## Preparação PC-07A: apresentação e entrada de clientes
+
+Especificação para execução posterior, sem modificar a landing nesta etapa:
+
+- Cabeçalho institucional: **Produtos → Promoven Connect** leva a `www.promoven.online/connect` (página futura). **Acessar Connect** leva diretamente a `https://connect.promoven.online/login`.
+- Página de apresentação: título “Sua operação comercial, conectada”; descrição “Publique empreendimentos, autorize corretores e acompanhe cada interesse em um ambiente privado da sua incorporadora”. Seções: inventário e publicação; rede autorizada; links atribuídos; CRM e indicadores. Ilustrações/capturas exclusivamente sintéticas ou autorizadas. Não prometer vendas, integrações ERP ou visor 3D já disponíveis.
+- CTAs: **Já sou cliente — Entrar** para login Connect; **Conhecer o produto** para o canal comercial aprovado da landing, sem mandar compradores para o banco de leads B2B. Sem formulário de cadastro irrestrito.
+- Dentro do produto, entrada **Primeiros passos** e CTA no dashboard levam a `/connect/onboarding`; depois projetos/inventário, corretores, CRM e indicadores. Organização ativa permanece no cabeçalho. Mobile usa menu recolhível acessível (PC-06), com seletor disponível fora do menu.
+- Guia visual: conservar verde, DM Sans/Playfair Display, fundo claro, foco visível, labels e cards. Futuro pacote de tokens pode centralizar CSS puro; não importar runtime, Auth, cenas ou banco Escobar.
+- Fallback: indisponibilidade Connect não impede a landing/demonstrações; login apresenta recuperação e contato operacional aprovado. Não redirecionar usuários para Escobar como alternativa de autenticação.
+
+O [plano de infraestrutura](PROMOVEN_CONNECT_DEPLOYMENT_PLAN.md) detalha DNS por ambiente, redirects, segredos, transporte de e-mail, custos, observabilidade e rollback isolado. A página de marketing e os links entre domínios ainda não foram publicados. 3D permanece opcional, sob demanda, sem Three.js no dashboard e sem consulta ao banco Escobar, conforme contrato acima.

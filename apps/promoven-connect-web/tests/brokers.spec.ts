@@ -11,6 +11,7 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
   await page.getByLabel("E-mail").fill(process.env.CONNECT_E2E_EMAIL!);
   await page.getByLabel("Senha", { exact: true }).fill(process.env.CONNECT_E2E_PASSWORD!);
   await page.getByRole("button", { name: "Entrar no portal" }).click();
+  await page.getByRole("combobox", { name: "Organização ativa" }).selectOption({ label: "Organização piloto" });
   const organizationId = await page.getByRole("combobox", { name: "Organização ativa" }).inputValue();
   const projectId = await page.evaluate(async ({ organizationId, slug }) => {
     const modulePath = "/src/supabase.ts";

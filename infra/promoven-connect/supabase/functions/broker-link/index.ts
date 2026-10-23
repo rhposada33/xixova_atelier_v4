@@ -1,9 +1,10 @@
+import { operationalHandler } from "../_shared/operations.mjs";
 import {createClient} from "npm:@supabase/supabase-js@2.109.0";
 const origin=Deno.env.get("CONNECT_APP_ORIGIN")??"http://127.0.0.1:5178";
 const headers={"Access-Control-Allow-Origin":origin,"Access-Control-Allow-Headers":"authorization,apikey,content-type,x-client-info","Access-Control-Allow-Methods":"POST,OPTIONS","Cache-Control":"no-store","Content-Type":"application/json","Referrer-Policy":"no-referrer"};
 const reply=(status:number,value:Record<string,unknown>)=>new Response(JSON.stringify(value),{status,headers});
 const hex=(bytes:Uint8Array)=>Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
-Deno.serve(async request=>{
+Deno.serve(operationalHandler("broker-link",async request=>{
   if(request.method==="OPTIONS")return new Response(null,{status:204,headers});
   if(request.method!=="POST")return reply(405,{error:"method_not_allowed"});
   if(Deno.env.get("CONNECT_DELIVERY_MODE")!=="local")return reply(503,{error:"local_only"});
@@ -20,4 +21,4 @@ Deno.serve(async request=>{
   const created=await admin.rpc("connect_create_broker_link",{p_broker_user_id:identity.data.user.id,p_project_id:body.projectId,p_unit_id:body.unitId??null,p_token_hash:digest,p_expires_at:expiry});
   if(created.error)return reply(created.error.code==="42501"?403:422,{error:"link_not_allowed"});
   return reply(201,{...created.data,url:`${origin}/s/${token}`});
-});
+}, {limit: 8192,mode:Deno.env.get("CONNECT_DELIVERY_MODE")??"local",proxySecret:Deno.env.get("CONNECT_PROXY_SECRET")}));
