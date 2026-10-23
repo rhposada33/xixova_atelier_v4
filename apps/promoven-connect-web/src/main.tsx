@@ -1,10 +1,9 @@
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./auth";
-import { LoginPage, ForgotPage, ResetPage } from "./pages/AuthPages";
-import { Portal } from "./pages/Portal";
-import { InvitePage } from "./pages/Brokers";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./style.css";
+const PublicCatalog=lazy(()=>import("./pages/PublicCatalog").then(m=>({default:m.PublicCatalog})));
+const PrivateApp=lazy(()=>import("./PrivateApp").then(m=>({default:m.PrivateApp})));
 
 // Capture the fragment before the Auth client inspects and clears callback fragments.
 if (window.location.pathname === "/invite") {
@@ -15,14 +14,10 @@ if (window.location.pathname === "/invite") {
   }
 }
 
-function App() { return <BrowserRouter><AuthProvider><Routes>
-  <Route path="/" element={<Navigate to="/connect" replace />} />
-  <Route path="/login" element={<LoginPage />} />
-  <Route path="/forgot-password" element={<ForgotPage />} />
-  <Route path="/reset-password" element={<ResetPage />} />
-  <Route path="/invite" element={<InvitePage />} />
-  <Route path="/invite/:token" element={<InvitePage />} />
-  <Route path="/connect/*" element={<Portal />} />
-  <Route path="*" element={<main className="state-page"><h1>Página não encontrada</h1><a href="/connect">Voltar ao portal</a></main>} />
-</Routes></AuthProvider></BrowserRouter>; }
+function App() { return <BrowserRouter><Suspense fallback={<main className="state-page" role="status">Carregando…</main>}><Routes>
+  <Route path="/p/:publicSlug" element={<PublicCatalog/>}/>
+  <Route path="/p/:publicSlug/u/:unitCode" element={<PublicCatalog/>}/>
+  <Route path="/s/:shareToken" element={<PublicCatalog/>}/>
+  <Route path="/*" element={<PrivateApp/>}/>
+</Routes></Suspense></BrowserRouter>; }
 createRoot(document.getElementById("root")!).render(<App />);

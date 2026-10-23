@@ -7,7 +7,7 @@ Data: 23/10/2026. Este documento define contratos futuros; não configura DNS, V
 | Origem | Responsabilidade | Dados e autenticação |
 | --- | --- | --- |
 | `www.promoven.online` | Landing, marketing e demonstrações. Ponto de entrada “Acessar Connect” no cabeçalho e CTA de contato autorizado. | Sem sessão Connect e sem chaves privadas. Pode fazer link HTTPS para `connect.promoven.online/login`. |
-| `connect.promoven.online` | Aplicação privada de organizações, projetos e inventário. Catálogo público futuro poderá usar projeção Connect separada. | Supabase Connect próprio, Auth PKCE, RLS multiempresa. Não consulta Escobar nem o Supabase de leads comerciais. |
+| `connect.promoven.online` | Aplicação privada de organizações, projetos e inventário; catálogo público Connect em `/p/*` e `/s/*`. | Supabase Connect próprio, Auth PKCE para rotas privadas, RLS multiempresa e projeções públicas restritas. Não consulta Escobar nem o Supabase de leads comerciais. |
 
 Um link entre domínios não transporta token. A sessão Connect permanece no domínio Connect. `returnTo` aceita somente rotas internas aprovadas em PC-01. Logout ocorre apenas no Connect.
 
@@ -19,7 +19,7 @@ Compartilhar tokens visuais documentados, sem importar o runtime de Escobar: ver
 
 ## Contrato para 3D opcional
 
-O projeto Connect poderá referenciar um asset `3d_model` em `project_assets`, com `organization_id`, `project_id`, `unit_id` opcional, `storage_path`, `visibility`, `mime_type`, `checksum` e versão. O servidor Connect deve resolver autorização antes de entregar um manifesto de mídia. Um manifesto público deve incluir apenas projeto publicado, asset explicitamente autorizado/publicado e URLs de curta duração; nunca o `storage_path` privado ou credenciais de serviço. O visor não consulta o banco Escobar.
+PC-05 implementou o contrato 2D de imagens e plantas em bucket Connect privado, com manifesto sem caminho Storage, publicação explícita e URL de 60 segundos. O projeto Connect poderá referenciar um asset `3d_model` em `project_assets`, com `organization_id`, `project_id`, `unit_id` opcional, `storage_path`, `visibility`, `mime_type`, `checksum` e versão. O servidor Connect deve resolver autorização antes de entregar um manifesto de mídia. Um manifesto público deve incluir apenas projeto publicado, asset explicitamente autorizado/publicado e URLs de curta duração; nunca o `storage_path` privado ou credenciais de serviço. O visor não consulta o banco Escobar.
 
 Interface proposta, sujeita a implementação posterior:
 
@@ -28,7 +28,7 @@ type ProjectMediaManifest = {
   projectId: string;
   revision: number;
   catalog2d: { images: { url: string; alt: string }[]; floorPlans: { url: string; label: string }[] };
-  viewer3d?: { modelUrl: string; mimeType: "model/gltf-binary"; checksum: string; expiresAt: string };
+  viewer3d?: { projectId: string; assetId: string; format: "glb"; version: number; visibility: "public" | "private"; checksum: string; authorizedUrl: string; expiresAt: string };
 };
 ```
 
@@ -36,18 +36,18 @@ O catálogo 2D deve funcionar mesmo quando `viewer3d` está ausente, falha ou ex
 
 ## Preparação de domínio e deploy futuro
 
-1. Criar projeto de hospedagem separado para Connect, com build a partir de `apps/promoven-connect-web` e fallback SPA para `/login`, `/reset-password` e `/connect/*`. A landing mantém projeto e pipeline próprios.
+1. Criar projeto de hospedagem separado para Connect, com build a partir de `apps/promoven-connect-web` e fallback SPA para `/login`, `/reset-password`, `/connect/*`, `/p/*` e `/s/*`. A landing mantém projeto e pipeline próprios. Servir `Referrer-Policy: no-referrer` também como cabeçalho HTTP, além da meta tag atual.
 2. Configurar `connect.promoven.online` por CNAME/registro exigido pelo provedor escolhido após validação de propriedade. Manter `www.promoven.online` no deploy atual. DNS e certificado TLS devem ser testados antes de trocar o CTA público.
-3. Configurar variáveis **por aplicação**: Connect recebe `VITE_CONNECT_SUPABASE_URL`, `VITE_CONNECT_SUPABASE_PUBLISHABLE_KEY` (chave pública) e `VITE_CONNECT_ENV` conforme ambiente. O backend Connect mantém segredos privilegiados fora do bundle. Landing não recebe variáveis Connect nem Escobar; Escobar e leads preservam seus próprios ambientes. Nunca compartilhar `service_role`, sessão, cookie, tabela ou Storage entre sistemas.
+3. Configurar variáveis **por aplicação**: Connect recebe `VITE_CONNECT_SUPABASE_URL`, `VITE_CONNECT_SUPABASE_PUBLISHABLE_KEY` (chave pública) e `VITE_CONNECT_ENV` conforme ambiente. Edge Functions Connect recebem `CONNECT_APP_ORIGIN`, `CONNECT_PUBLIC_SUPABASE_URL`, `CONNECT_DELIVERY_MODE` e `CONNECT_LEAD_RATE_SECRET`, além dos segredos Supabase injetados no backend; o segredo de rate limit deve ter ao menos 32 caracteres. Nenhum deles entra no bundle. Landing não recebe variáveis Connect nem Escobar; Escobar e leads preservam seus próprios ambientes. Nunca compartilhar `service_role`, sessão, cookie, tabela ou Storage entre sistemas.
 4. No Auth Connect, autorizar `https://connect.promoven.online` como site URL e `https://connect.promoven.online/reset-password` como redirect de recuperação. Verificar PKCE e retorno somente para rotas internas. Revisar CORS/origins do projeto Connect sem adicionar origens de Escobar por conveniência.
-5. Implantar Connect isoladamente, aplicar migrações Connect com backup e janela de revisão, rodar smoke tests de login, organização, projeto privado, 409 e projeção pública. Depois, em deploy independente da landing, adicionar o link de entrada. Nenhum passo deve alterar o deploy de Escobar ou leads.
+5. Implantar Connect isoladamente após aprovação da política de privacidade/retenção de leads, origem IP confiável para rate limit, processamento de imagens e backup. Aplicar migrações Connect com backup e janela de revisão; rodar smoke tests de login, organização, projeto privado, 409, Storage, links, revogação, projeção pública e recibo de lead. Depois, em deploy independente da landing, adicionar o link de entrada. Nenhum passo deve alterar o deploy de Escobar ou leads.
 
 ## Rollback
 
 Manter versões imutáveis dos dois deploys e backup do banco Connect anterior à migração remota. Se falhar a aplicação, restaurar o deploy Connect anterior e desativar/retirar apenas o CTA novo da landing, preservando a landing atual. Se falhar migração de dados, bloquear escritas Connect, executar migração compensatória revisada ou restaurar backup Connect em ambiente isolado e validar memberships/auditoria antes de reabrir. Não restaurar Escobar ou leads como parte de rollback Connect. Para este checkpoint local, não há DNS/deploy remoto a reverter.
 
-## Pendências depois de PC-02
+## Estado depois de PC-05
 
-- Definir Storage Connect, upload autorizado, metadados verificáveis, URLs curtas e política de publicação de imagens, plantas e GLB antes do visor opcional.
-- Implementar PC-03 conforme autorização separada; convites/corretores, links e leads seguem os checkpoints previstos.
-- Validar ambiente remoto de Connect, observabilidade, backups e domínio em execução futura autorizada. Nenhuma dessas ações foi realizada aqui.
+- Storage Connect, imagens/plantas 2D, links de corretores, catálogo público e recibos de lead funcionam **somente localmente**. O plano de retenção, compartilhamento e atendimento a direitos do comprador exige aprovação antes de dados reais.
+- GLB e visor 3D seguem futuros e opcionais. O dashboard não carrega Three.js.
+- Validar ambiente remoto, observabilidade, backups, domínio, proxy confiável e controles de privacidade em execução futura autorizada. Nenhuma dessas ações foi realizada aqui.

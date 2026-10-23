@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("convite por Mailpit, aceite, revisão e revogação local", async ({ browser, page }) => {
   test.skip(!process.env.CONNECT_E2E_EMAIL || !process.env.CONNECT_E2E_PASSWORD, "Credenciais locais ausentes.");
-  test.setTimeout(90_000);
+  test.setTimeout(150_000);
   const email = `broker-${Date.now()}@test.local`;
   const slug = `pc03-e2e-${Date.now()}`;
   const baseline = await (await page.request.get("http://127.0.0.1:56324/api/v1/messages")).json() as { messages: { ID: string }[] };
@@ -71,7 +71,7 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
   await page.getByRole("combobox", { name: "Empreendimento" }).last().selectOption(projectId);
   await expect(page.getByText("Corretor E2E")).toBeVisible();
   await page.getByRole("button", { name: "Verificar CRECI" }).click();
-  await expect(page.getByText("Verificado manualmente", { exact: false })).toBeVisible();
+  await expect(page.getByRole("status")).toContainText("verificado manualmente");
   await page.getByRole("button", { name: "Ativar" }).click();
   await page.evaluate(async (id) => {
     const modulePath="/src/supabase.ts";const {connectClient}=await import(/* @vite-ignore */ modulePath);
@@ -124,10 +124,55 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: `test-results/visuals/brokers-${width}.png`, fullPage: true });
   }
+  await brokerPage.goto(`/connect/broker/projects/${projectId}`);
+  await brokerPage.getByRole("link",{name:"Ver detalhes"}).first().click();
+  await brokerPage.getByRole("link",{name:"Criar link desta unidade"}).click();
+  await brokerPage.getByRole("button",{name:"Criar link por 30 dias"}).click();
+  const unitShareUrl=await brokerPage.getByLabel("Novo link comercial").inputValue();
+  const unitBuyer=await browser.newContext();const unitBuyerPage=await unitBuyer.newPage();
+  await unitBuyerPage.goto(unitShareUrl);
+  await expect(unitBuyerPage.getByRole("heading",{name:"Unidade A101",level:2})).toBeVisible();
+  await unitBuyer.close();
+  await brokerPage.goto(`/connect/broker/links?projectId=${projectId}`);
+  await expect(brokerPage.getByRole("heading",{name:"Links comerciais"})).toBeVisible();
+  expect(await brokerPage.evaluate(async id=>{const modulePath="/src/supabase.ts";const {connectClient}=await import(/* @vite-ignore */ modulePath);const result=await connectClient().functions.invoke("broker-link",{body:{projectId:id,brokerId:crypto.randomUUID()}});return !!result.error;},projectId)).toBe(true);
+  for(const width of [390,768,1440]){await brokerPage.setViewportSize({width,height:900});expect(await brokerPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await brokerPage.screenshot({path:`test-results/visuals/broker-links-${width}.png`,fullPage:true});}
+  await brokerPage.getByRole("button",{name:"Criar link por 30 dias"}).click();
+  const shareUrl=await brokerPage.getByLabel("Novo link comercial").inputValue();
+  expect(shareUrl).toMatch(/\/s\/[a-f0-9]{64}$/);
+  const buyer=await browser.newContext();const buyerPage=await buyer.newPage();
+  await buyerPage.goto(shareUrl);
+  await expect(buyerPage.getByRole("heading",{name:"Projeto Corretores E2E"})).toBeVisible();
+  await expect(buyerPage.getByText("Corretor E2E")).toBeVisible();
+  for(const width of [390,768,1440]){await buyerPage.setViewportSize({width,height:900});expect(await buyerPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await buyerPage.screenshot({path:`test-results/visuals/public-share-${width}.png`,fullPage:true});}
+  await buyerPage.goto(`/p/${slug}`);
+  await expect(buyerPage.getByRole("heading",{name:"Projeto Corretores E2E"})).toBeVisible();
+  await expect(buyerPage.getByText("Apresentado por")).toHaveCount(0);
+  await buyerPage.goto(`/p/${slug}/u/A101`);
+  await expect(buyerPage.getByRole("heading",{name:"Unidade A101",level:2})).toBeVisible();
+  await buyerPage.goto(shareUrl);
+  const buyerName=`Comprador PC05 ${Date.now()}`;
+  await buyerPage.getByLabel("Nome completo").fill(buyerName);
+  await buyerPage.getByRole("textbox",{name:"E-mail"}).fill(`buyer-${Date.now()}@test.local`);
+  await buyerPage.getByRole("checkbox").check();
+  await buyerPage.getByRole("button",{name:"Enviar interesse"}).click();
+  await expect(buyerPage.getByRole("status")).toContainText("Protocolo",{timeout:15_000});
+  await page.goto("/connect/leads");
+  await expect(page.getByText(buyerName)).toBeVisible();
+  for(const width of [390,768,1440]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:`test-results/visuals/admin-leads-${width}.png`,fullPage:true});}
+  await brokerPage.goto("/connect/broker/leads");
+  await expect(brokerPage.getByText(buyerName)).toBeVisible();
+  await brokerPage.goto("/connect/broker/links");
+  await brokerPage.getByRole("button",{name:"Revogar"}).first().click();
+  await buyerPage.reload();
+  await expect(buyerPage.getByRole("heading",{name:"Conteúdo indisponível"})).toBeVisible();
+  await buyer.close();
+  await page.goto("/connect/brokers");
+  await page.getByRole("combobox", { name: "Empreendimento" }).last().selectOption(projectId);
   page.once("dialog", dialog => void dialog.accept());
   await page.getByRole("button", { name: "Revogar" }).click();
   await expect(page.getByText("Revogado", { exact: false }).first()).toBeVisible();
-  await brokerPage.reload();
+  await brokerPage.goto("/connect/broker");
   await expect(brokerPage.getByRole("heading", { name: "Nenhum projeto ativo" })).toBeVisible();
   await brokerPage.goto(`/connect/broker/projects/${projectId}`);
   await expect(brokerPage.getByRole("alert")).toContainText("acesso não autorizado");

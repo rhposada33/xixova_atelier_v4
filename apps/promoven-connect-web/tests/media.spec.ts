@@ -1,0 +1,53 @@
+import { expect, test } from "@playwright/test";
+
+test("upload Connect validado, publicação e URL pública curta", async ({page})=>{
+  test.skip(!process.env.CONNECT_E2E_EMAIL||!process.env.CONNECT_E2E_PASSWORD,"Credenciais sintéticas locais ausentes.");
+  test.setTimeout(60_000);
+  await page.goto("/login");
+  await page.getByLabel("E-mail").fill(process.env.CONNECT_E2E_EMAIL!);
+  await page.getByLabel("Senha",{exact:true}).fill(process.env.CONNECT_E2E_PASSWORD!);
+  await page.getByRole("button",{name:"Entrar no portal"}).click();
+  await expect(page.getByRole("heading",{name:"Seu espaço comercial"})).toBeVisible();
+  const result=await page.evaluate(async()=>{
+    const modulePath="/src/supabase.ts";const {connectClient}=await import(/* @vite-ignore */ modulePath);const client=connectClient();
+    const org=(await client.from("organization_members").select("organization_id").eq("user_id",(await client.auth.getUser()).data.user!.id).limit(1)).data![0].organization_id;
+    const slug=`media-e2e-${Date.now()}`;
+    const created=await client.rpc("connect_create_project",{p_data:{organizationId:org,name:"Mídia E2E",slug,publicSlug:slug,city:"São Paulo",state:"SP"}});
+    if(created.error)throw created.error;
+    const projectId=created.data.id as string;
+    const visible=await client.rpc("connect_update_project",{p_id:projectId,p_expected_version:1,p_data:{visibility:{description:false,unitFeatures:false,price:false,images:true,floorPlans:false,availability:false}}});if(visible.error)throw visible.error;
+    const published=await client.rpc("connect_publish_project",{p_id:projectId,p_expected_version:2,p_status:"published"});if(published.error)throw published.error;
+    const canvas=document.createElement("canvas");canvas.width=64;canvas.height=64;const ctx=canvas.getContext("2d")!;const pixels=ctx.createImageData(64,64);crypto.getRandomValues(pixels.data);ctx.putImageData(pixels,0,0);
+    const blob=await new Promise<Blob>(resolve=>canvas.toBlob(value=>resolve(value!),"image/png"));
+    const form=new FormData();form.set("action","upload");form.set("projectId",projectId);form.set("role","cover");form.set("file",new File([blob],"cover.png",{type:"image/png"}));
+    const uploaded=await client.functions.invoke("asset-media",{body:form});
+    if(uploaded.error)throw new Error(`upload failed ${JSON.stringify(uploaded.data)}`);
+    const assetId=uploaded.data.assetId as string,version=uploaded.data.version as number;
+    const publicBefore=await client.rpc("connect_public_media_allowed",{p_asset_id:assetId});
+    const privateAllowed=await client.rpc("connect_private_media_allowed",{p_asset_id:assetId});
+    if(privateAllowed.error||privateAllowed.data!==true)throw new Error(`private policy: ${privateAllowed.error?.code??"false"}`);
+    const privateUrl=await client.functions.invoke("asset-media",{body:(()=>{const f=new FormData();f.set("action","url");f.set("assetId",assetId);return f;})()});
+    if(privateUrl.error){const response=(privateUrl.error as unknown as {context?:Response}).context;throw new Error(`private url failed: ${response?.status} ${response?await response.text():privateUrl.error.message}`);}
+    const pub=await client.rpc("connect_publish_media",{p_asset_id:assetId,p_expected_version:version,p_visible:true});if(pub.error)throw pub.error;
+    const anon=await client.auth.getSession();
+    const guestForm=new FormData();guestForm.set("action","url");guestForm.set("assetId",assetId);
+    const guest=await fetch("http://127.0.0.1:56321/functions/v1/asset-media",{method:"POST",headers:{apikey:client.supabaseKey},body:guestForm});
+    const guestBody=await guest.json();
+    const image=await fetch(guestBody.url as string);
+    const invalid=new FormData();invalid.set("action","upload");invalid.set("projectId",projectId);invalid.set("role","cover");invalid.set("file",new File([new Uint8Array(2048)],"forged.png",{type:"image/png"}));
+    const bad=await client.functions.invoke("asset-media",{body:invalid});
+    return {projectId,assetId,privateBefore:publicBefore.data,privateUrl:!!privateUrl.data?.url,publicStatus:guest.status,urlExpires:guestBody.expiresIn,downloadStatus:image.status,contentType:image.headers.get("content-type"),badStatus:bad.error?422:200,sessionPresent:!!anon.data.session};
+  });
+  expect(result.privateBefore).toBe(false);
+  expect(result.privateUrl).toBe(true);
+  expect(result.publicStatus).toBe(200);
+  expect(result.urlExpires).toBe(60);
+  expect(result.downloadStatus).toBe(200);
+  expect(result.contentType).toContain("image/png");
+  expect(result.badStatus).toBe(422);
+  expect(result.sessionPresent).toBe(true);
+  await page.goto(`/connect/projects/${result.projectId}`);
+  await expect(page.getByRole("heading",{name:"Imagens e plantas Connect"})).toBeVisible();
+  await expect(page.locator(".media-admin-row img")).toBeVisible();
+  await expect(page.getByText(/Publicada/).first()).toBeVisible();
+});
