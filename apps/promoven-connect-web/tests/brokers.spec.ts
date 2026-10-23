@@ -162,6 +162,34 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
   for(const width of [390,768,1440]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:`test-results/visuals/admin-leads-${width}.png`,fullPage:true});}
   await brokerPage.goto("/connect/broker/leads");
   await expect(brokerPage.getByText(buyerName)).toBeVisible();
+  await brokerPage.getByRole("link",{name:buyerName}).click();
+  const crmLeadUrl=brokerPage.url();
+  await expect(brokerPage.getByRole("heading",{name:buyerName})).toBeVisible();
+  for(const stage of ["contacted","qualified","proposal"]){
+    await brokerPage.getByLabel("Status comercial").selectOption(stage);
+    await Promise.all([brokerPage.waitForResponse(r=>r.url().includes("/rpc/connect_crm_lead")&&r.ok()),brokerPage.getByRole("button",{name:"Salvar estágio"}).click()]);
+    await expect(brokerPage.getByLabel("Status comercial")).toHaveValue(stage);
+    await expect(brokerPage.getByRole("button",{name:"Salvar estágio"})).toBeDisabled();
+  }
+  await brokerPage.getByLabel("Observação",{exact:true}).fill("Atendimento sintético PC06");
+  await brokerPage.getByRole("button",{name:"Registrar observação"}).click();
+  await expect(brokerPage.getByText("Atendimento sintético PC06",{exact:true})).toBeVisible();
+  await brokerPage.getByLabel("Próxima ação",{exact:true}).fill("Retornar contato");
+  await brokerPage.getByLabel("Data e hora do acompanhamento").fill("2026-10-24T10:00");
+  await brokerPage.getByRole("button",{name:"Agendar acompanhamento"}).click();
+  await expect(brokerPage.getByRole("button",{name:"Concluir acompanhamento"})).toBeVisible();
+  await brokerPage.getByRole("button",{name:"Concluir acompanhamento"}).click();
+  await expect(brokerPage.getByRole("button",{name:"Concluir acompanhamento"})).toHaveCount(0);
+  await brokerPage.getByLabel("Status comercial").selectOption("won");
+  await brokerPage.getByLabel("Motivo de encerramento ou reabertura").fill("Encerramento sintético");
+  await Promise.all([brokerPage.waitForResponse(r=>r.url().includes("/rpc/connect_crm_lead")&&r.ok()),brokerPage.getByRole("button",{name:"Salvar estágio"}).click()]);
+  await expect(brokerPage.getByText("Encerramento sintético",{exact:true})).toBeVisible();
+  for(const width of [390,768,1440]){await brokerPage.setViewportSize({width,height:900});expect(await brokerPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await brokerPage.screenshot({path:`test-results/visuals/crm-detail-${width}.png`,fullPage:true});}
+  await brokerPage.goto("/connect/broker/analytics");
+  await expect(brokerPage.getByRole("heading",{name:"Ganhos",exact:true}).or(brokerPage.getByRole("heading",{name:"Ganho",exact:true}))).toBeVisible();
+  for(const width of [390,768,1440]){await brokerPage.setViewportSize({width,height:900});expect(await brokerPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await brokerPage.screenshot({path:`test-results/visuals/crm-analytics-${width}.png`,fullPage:true});}
+
+
   await brokerPage.goto("/connect/broker/links");
   await brokerPage.getByRole("button",{name:"Revogar"}).first().click();
   await buyerPage.reload();
@@ -176,5 +204,8 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
   await expect(brokerPage.getByRole("heading", { name: "Nenhum projeto ativo" })).toBeVisible();
   await brokerPage.goto(`/connect/broker/projects/${projectId}`);
   await expect(brokerPage.getByRole("alert")).toContainText("acesso não autorizado");
+  await brokerPage.goto(crmLeadUrl);
+  await expect(brokerPage.getByRole("alert")).toContainText("Acesso não autorizado");
+
   await broker.close();
 });

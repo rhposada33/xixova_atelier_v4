@@ -1,0 +1,7 @@
+export const crmStages = {new:'Novo',contacted:'Em contato',qualified:'Qualificado',proposal:'Proposta',won:'Ganho',lost:'Perdido'} as const;
+export type CrmStage=keyof typeof crmStages;
+export interface CrmLead {id:string;project_id:string;project_name:string;unit_code:string|null;buyer_name:string;contact_value:string;message:string|null;status:CrmStage;version:number;origin_broker_name:string|null;responsible_name:string|null;next_action:string|null;follow_up_at:string|null;last_activity_at:string;closure_reason:string|null}
+export interface CrmActivity {id:string;activity_type:string;actor_id:string|null;actor_name:string;created_at:string;detail:Record<string,unknown>}
+export interface CrmFilters {organizationId?:string;projectId?:string;brokerId?:string;status?:CrmStage;search?:string;from?:string;to?:string;personal?:boolean}
+export interface CrmMetrics {received:number;pending:number;statuses:Partial<Record<CrmStage,number>>;projects:{id:string;name:string;total:number}[];brokers:{id:string;name:string;total:number}[];units:{id:string;name:string;total:number}[]}
+export function validateCrmFilters(f:CrmFilters):CrmFilters {if(f.search&&f.search.length>160)throw new Error('Pesquisa muito longa.');if(f.status&&!(f.status in crmStages))throw new Error('Estado inválido.');for(const key of ['from','to'] as const)if(f[key]&&!Number.isFinite(Date.parse(f[key]!)))throw new Error('Data inválida.');if(f.from&&f.to&&f.from>=f.to)throw new Error('Intervalo inválido.');return f;}

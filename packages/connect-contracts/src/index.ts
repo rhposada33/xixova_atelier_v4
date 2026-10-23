@@ -5,3 +5,4 @@ export * from "./broker";
 export * from "./brokerCatalog";
 export * from "./media";
 export * from "./share";
+export * from './crm';
