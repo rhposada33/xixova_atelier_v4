@@ -24,22 +24,23 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
     const modulePath = "/src/supabase.ts";
     const { connectClient } = await import(/* @vite-ignore */ modulePath);
     const email = `race-${crypto.randomUUID()}@test.local`;
-    const run = () => connectClient().rpc("connect_create_broker_invitation", { p_project_id: id, p_email: email, p_token_hash: Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, "0")).join(""), p_operation_id: crypto.randomUUID() });
+    const run = () => connectClient().functions.invoke("broker-invite", { body:{action:"create",projectId:id,email},headers:{"Idempotency-Key":crypto.randomUUID()} });
     const responses = await Promise.all([run(), run()]);
     const winner = responses.find(r => !r.error);
     if (winner) await connectClient().rpc("connect_cancel_broker_invitation", { p_id: winner.data.id, p_expected_version: winner.data.version });
-    return { successes: responses.filter(r => !r.error).length, conflicts: responses.filter(r => r.error?.code === "23505").length };
+    return { successes: responses.filter(r => !r.error).length, conflicts: responses.filter(r => r.error?.context?.status === 409).length };
   }, projectId);
   expect(race).toEqual({ successes: 1, conflicts: 1 });
   await page.getByRole("link", { name: "Corretores", exact: true }).click();
   await page.locator("form.broker-invite-form").getByLabel("Empreendimento").selectOption(projectId);
   await page.getByLabel("E-mail profissional").fill(email);
   await page.getByRole("button", { name: "Enviar convite" }).click();
-  await expect(page.getByRole("status")).toContainText("Convite enviado", { timeout: 15_000 });
+  await expect(page.getByRole("status")).toContainText("Convite criado", { timeout: 15_000 });
   await expect.poll(async () => {
     const listing = await (await page.request.get("http://127.0.0.1:56324/api/v1/messages")).json() as { messages: { ID: string; To: { Address: string }[] }[] };
     return listing.messages.filter(m => !seen.has(m.ID) && m.To.some(to => to.Address === email)).length;
-  }).toBe(1);
+  },{timeout:15_000}).toBe(1);
+  await expect(page.locator("article.broker-row").filter({hasText:email}).getByText(/Aceito pelo servidor de e-mail/)).toBeVisible();
   const listing = await (await page.request.get("http://127.0.0.1:56324/api/v1/messages")).json() as { messages: { ID: string; To: { Address: string }[] }[] };
   const mailId = listing.messages.find(m => !seen.has(m.ID) && m.To.some(to => to.Address === email))!.ID;
   const mail = await (await page.request.get(`http://127.0.0.1:56324/api/v1/message/${mailId}`)).json() as { Text: string };
@@ -174,7 +175,7 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
   }
   await brokerPage.getByLabel("Observação",{exact:true}).fill("Atendimento sintético PC06");
   await brokerPage.getByRole("button",{name:"Registrar observação"}).click();
-  await expect(brokerPage.getByText("Atendimento sintético PC06",{exact:true})).toBeVisible();
+  await expect(brokerPage.locator("article").getByText("Atendimento sintético PC06",{exact:true})).toBeVisible();
   await brokerPage.getByLabel("Próxima ação",{exact:true}).fill("Retornar contato");
   await brokerPage.getByLabel("Data e hora do acompanhamento").fill("2026-10-24T10:00");
   await brokerPage.getByRole("button",{name:"Agendar acompanhamento"}).click();

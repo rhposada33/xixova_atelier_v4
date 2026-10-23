@@ -18,3 +18,6 @@ export function parseBrokerProfile(value: unknown): BrokerProfileInput {
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(professionalEmail)||!/^[A-Z0-9./-]{3,30}$/.test(creciNumber)||!/^[A-Z]{2}$/.test(creciState)||professionalPhone.length<8)throw new Error("Dados profissionais inválidos.");
   return {displayName,professionalEmail,professionalPhone,creciNumber,creciState};
 }
+
+export type MailDeliveryState = "pending" | "processing" | "sent" | "retry" | "failed" | "cancelled";
+export interface InvitationDelivery { invitationId: string; state: MailDeliveryState; attempts: number; nextAttemptAt: string; code: string | null; sentAt: string | null; }

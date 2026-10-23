@@ -1,0 +1,13 @@
+*
+!mail-worker/
+mail-worker/*
+!mail-worker/package.json
+!mail-worker/package-lock.json
+!mail-worker/*.mjs
+!supabase/
+supabase/*
+!supabase/functions/
+supabase/functions/*
+!supabase/functions/_shared/
+supabase/functions/_shared/*
+!supabase/functions/_shared/mail-crypto.mjs

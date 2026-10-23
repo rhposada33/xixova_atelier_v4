@@ -25,7 +25,7 @@ secret=settings.setdefault('CONNECT_PROXY_SECRET',secrets.token_hex(32));save(en
 exists=subprocess.run(['docker','container','inspect',edge],capture_output=True).returncode==0
 current=inspect(edge) if exists else None
 current_env=dict(x.split('=',1) for x in current['Config']['Env']) if current else {}
-if current_env.get('CONNECT_PROXY_SECRET')!=secret:
+if any(current_env.get(key)!=value for key,value in settings.items()):
  # CLI owns its generated runtime/main service; preserve that implementation.
  if exists: run('docker','rm','-f',edge,stdout=subprocess.DEVNULL)
  log=open(state/'runtime.log','ab',buffering=0);os.chmod(state/'runtime.log',0o600)

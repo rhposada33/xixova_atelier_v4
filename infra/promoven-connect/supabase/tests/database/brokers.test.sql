@@ -1,6 +1,9 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 select plan(49);
+-- Exercise legacy domain logic only, under transaction-local test grants. Production entry now requires atomic outbox.
+-- New mail_outbox tests separately prove these functions are NOT executable by authenticated users.
+grant execute on function public.connect_create_broker_invitation(uuid,text,text,uuid),public.connect_resend_broker_invitation(uuid,bigint,text,uuid) to authenticated;
 create function pg_temp.state(p_sql text) returns text language plpgsql as $$ begin execute p_sql; return 'ok'; exception when others then return sqlstate; end $$;
 insert into auth.users(id,aud,role,email,email_confirmed_at,created_at,updated_at) values
  ('a3000000-0000-4000-8000-000000000001','authenticated','authenticated','pc03-admin-a@test.local',now(),now(),now()),

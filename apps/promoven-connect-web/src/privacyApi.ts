@@ -1,0 +1,4 @@
+import type {PrivacyCase,PrivacyPlanAction,PrivacyPreview} from '@promoven/connect-contracts';
+import {connectClient} from './supabase';
+async function call<T>(name:string,args:Record<string,unknown>):Promise<T>{const {data,error}=await connectClient().rpc(name,args);if(error)throw new Error(error.code==='42501'?'Acesso negado. Verifique o responsável, a aprovação independente e a retenção legal.':'Não foi possível atualizar a solicitação. Recarregue e revise seu estado.');return data as T;}
+export const privacyApi={list:(organization:string)=>call<PrivacyCase[]>('connect_privacy_cases',{p_organization:organization}),preview:(lead:string)=>call<PrivacyPreview>('connect_privacy_preview',{p_lead:lead}),plan:(lead:string,action:PrivacyPlanAction,ticket:string)=>call<{requestId:string}>('connect_privacy_plan',{p_lead:lead,p_action:action,p_ticket:ticket})};

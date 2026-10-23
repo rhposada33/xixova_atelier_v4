@@ -9,6 +9,16 @@
     "storageHttpRestoreValidated": true,
     "smtpRemoteDeliveryValidated": false,
     "privacyPolicyApproved": false,
-    "mediaStorageFailureInjectionValidated": true
+    "mediaStorageFailureInjectionValidated": true,
+    "outboxLocalValidated": true,
+    "smtpLocalDeliveryValidated": true,
+    "outboxRestoreValidated": true,
+    "mailWebhooksRemoteValidated": false,
+    "privacyScopedSyntheticExecutionValidated": true,
+    "suppressionLedgerRestoreLocalValidated": true,
+    "retentionPolicyApproved": false,
+    "subjectIdentificationProcessApproved": false,
+    "erasureOperationAuthorized": false,
+    "backupTreatmentApproved": false
   }
 }

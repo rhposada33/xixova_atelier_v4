@@ -17,6 +17,9 @@ try:
  run('docker','run','-d','--name',mailpit,'--network',network,inspect('supabase_inbucket_promoven_connect_local')['Config']['Image']);created.append(mailpit)
  config=env('supabase_auth_promoven_connect_local');config.update({'GOTRUE_DB_DATABASE_URL':f'postgres://supabase_auth_admin:synthetic-restore-only@{container}:55432/postgres','GOTRUE_JWT_SECRET':secrets.token_hex(32),'GOTRUE_SMTP_HOST':mailpit,'GOTRUE_SMTP_PORT':'1025','API_EXTERNAL_URL':f'http://{auth}:9999','GOTRUE_SMTP_PASS':'','GOTRUE_SMTP_USER':''})
  config.pop('GOTRUE_JWT_KEYS',None)
+ # Source CLI stores absolute mailer links. Rebind only the disposable Auth copy.
+ for key in list(config):
+  if key.startswith('GOTRUE_MAILER_URLPATHS_'):config[key]=f'http://{auth}:9999/verify'
  config.update({'GOTRUE_JWT_VALID_METHODS':'HS256','GOTRUE_JWT_VALIDMETHODS':'HS256','GOTRUE_JWT_ISSUER':f'http://{auth}:9999'})
  # Only local source configuration; no production secrets. SMTP cannot leave internal network.
  args=['docker','run','-d','--name',auth,'--network',network]
@@ -58,7 +61,16 @@ try:
   category=re.search(r'(login_status_\d+|user_status_\d+|sign_status_\d+|signed_download_\d+|private_object_exposed|empty_object|ECONNREFUSED)',result.stderr)
   print(json.dumps({'probeFailure':category.group(0) if category else 'transport_failure','storageRunning':inspect(storage)['State']['Running']}))
   raise RuntimeError('auth_storage_http_probe_failed')
- data=json.loads(result.stdout);data['seconds']=round(time.monotonic()-started,2);print(json.dumps(data))
+ data=json.loads(result.stdout)
+ if len(sys.argv)>2:
+  import importlib.util
+  spec=importlib.util.spec_from_file_location('recovery_mail','recovery-mail.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+  with open(sys.argv[2]) as f:fixture=json.load(f)
+  data.update(module.validate_mail_restore(container,network,mailpit,auth,jwtsecret,fixture))
+ if True:
+  spec=importlib.util.spec_from_file_location('recovery_privacy','recovery-privacy.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+  data.update(module.validate_privacy_restore(container,network,storage,servicekey,sys.argv[3] if len(sys.argv)>3 else None))
+ data['seconds']=round(time.monotonic()-started,2);print(json.dumps(data))
 
 except Exception:
  print(json.dumps({'httpRestore':'failed','components':[name.rsplit('-',1)[-1] for name in created]}))

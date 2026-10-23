@@ -100,3 +100,43 @@ Custos continuam estimativas PC-07A (base US$45/mês e adicionais), sem contrata
 ## Execução autônoma PC-07B.1.1 / 1.2 / 2
 
 Consultar [registro de execução](PROMOVEN_CONNECT_AUTONOMOUS_RUN.md) e relatórios PC07B11/PC07B12/PC07B2. Worker de mídia agora decodifica/reencodifica antes de Storage; não há fallback para originais. Recuperação local ampliada verifica Auth/Storage por HTTP e usa Mailpit descartável. Preparação de staging inclui matriz de segredos, alertas desabilitados e gate executável que recusa release enquanto persistirem bloqueios. Anonimização integral, integração proxy→Supabase, SMTP remoto e política aprovada continuam pendentes. Nenhuma dessas preparações autoriza publicação ou dados reais.
+
+## PC-07B.3B — outbox e SMTP local efetivos (2026-10-23)
+
+Esta atualização substitui as pendências históricas acima **somente** quanto ao proxy integrado localmente, restore HTTP local e entrega comercial local. Consulte [PC07B3A](PROMOVEN_CONNECT_PC07B3A_STATUS.md), [PC07B3B](PROMOVEN_CONNECT_PC07B3B_STATUS.md) e [readiness](PROMOVEN_CONNECT_RELEASE_READINESS.md). Remote deployment continua bloqueado.
+
+### Ordem de implantação futura, sujeita a autorização
+
+1. Backups separados de DB, Storage e keyring; testar restore isolado. Suspender escritores para consistência e preservar os recibos do provedor usados na reconciliação.
+2. Aplicar migrações aditivas `20261023140000_mail_outbox.sql` e `20261023141000_mail_claim_scope.sql`. Revogação das RPCs antigas faz parte do contrato: publicar Edge e cliente compatíveis com resposta 202 em janela controlada.
+3. Distribuir chave pública/kid à Edge e keyring privado somente aos workers. Segredos de Auth administrativo, SMTP e JWT de worker permanecem no servidor. Banco/outbox não recebem chave privada. Instalar chave nova nos workers antes de trocar a chave pública na Edge; conservar chave antiga enquanto houver mensagens/backups associados.
+4. Preservar proxy HMAC e rede privada PC07B3A; workers sem portas públicas, PostgREST privado, role `connect_mail_worker` limitada a RPCs. Não expor webhook privilegiado pelo simples fato de existir contrato interno.
+5. Configurar provedor autenticado com TLS verificado, timeout, política de reconciliação e idempotência própria quando disponível. O executável atual é **local-only**; não basta mudar host/porta para autorizar SMTP remoto. Validar entregabilidade e callback do fornecedor em etapa autorizada.
+6. Configurar SMTP customizado do Supabase Auth separadamente e testar login, recuperação, verificação, PKCE e redirects exatos; outbox comercial não controla automaticamente mensagens internas do Auth.
+7. Validar fila, retries, concorrência, expiração, cancelamento, falhas/restart e restore com destinatários sintéticos autorizados. Só então atualizar gates remotos mediante evidência e autorização.
+
+### Monitoramento e operação de e-mail
+
+Medir contagens por estado, tentativas/retries e leases vencidos; alertas futuros devem distinguir indisponibilidade Auth/DB/SMTP de confirmação ambígua. Logs não devem conter destinatário, corpo, token, link Auth, payload cifrado, Authorization ou segredo. `sent` significa aceite SMTP, `provider_status` é confirmação externa separada. Não promover automaticamente mensagem ambígua a retry. Cancelamento após despacho não recolhe mensagem externa, mas invalida seu token comercial.
+
+No local: `python3 infra/promoven-connect/ops/start-mail-local.py` reutiliza chaves persistentes, recarrega Edge e inicia dois workers privados. JWT dura 24 h; renovar pelo bootstrap. Keyring/env ignorados com modo 0600; proteger cópia separada do DB. O bootstrap recusa criar chave substituta quando há outbox existente. Recuperação usa Auth/PostgREST/Mailpit descartáveis, URL de confirmação da cópia e uma fixture cifrada pendente; não envia o backlog restaurado da origem.
+
+### Rollback específico
+
+Bloquear novas criações/reenvios e parar os dois workers; preservar outbox, keyring e auditoria. Preferir build compatível/correção compensatória. Não reativar SMTP síncrono ou grants legados com fila pendente. Antes de retomar, reconciliar mensagens despachadas com o provedor; após restore não reenviar backlog cegamente. Testar DB+Storage+keyring em cópia, avaliar perdas e só então propor restauração da origem. Não há alteração remota/DNS neste checkpoint.
+
+### Bloqueios mantidos
+
+SMTP remoto e webhooks externos não configurados/validados. Política de privacidade, retenção de mensagens cifradas/referências e anonimização integral aguardam aprovação/trabalho autorizado. Nenhum comprador real, PC-07B.3C ou release remoto foi autorizado. Não interpretar Mailpit, contrato HMAC de webhook ou interfaces TLS como validação de fornecedor.
+
+## PC-07B.3C — ciclo de vida e supressões locais (2026-10-23)
+
+[Relatório](PROMOVEN_CONNECT_PC07B3C_STATUS.md) e [runbook de privacidade/recuperação](PROMOVEN_CONNECT_PRIVACY_RUNBOOK.md). Execução sintética real validada para lead/histórico/auditoria/atribuição e recursos inventariados, incluindo Storage e outbox. Anonimização integral **continua bloqueada** por cópias sem rastreabilidade e decisões de retenção/identificação/exclusão/backups ainda não aprovadas.
+
+Migrações locais `20261023150000` a `20261023154000` introduzem processo revisado, role restrita, guards e inventário. UI registra/revisa/previsualiza, sem execução irreversível. Não há scheduler ou habilitação de dados reais. Políticas por categoria ficam sem prazo e sem execução automática.
+
+Antes de qualquer implantação futura, planejar armazenamento do journal externo ao snapshot restaurável: SQLite/chain, head autenticado, recibos, chave de correspondência e **chave de âncora exclusiva externa**. Guardar acesso/custódia/versões e proteção contra rollback do host. Não copiar a âncora para DB, frontend ou imagem. Serviço remoto/WORM e aprovação dos backups não estão configurados.
+
+Ordem de recuperação: restaurar cópia isolada → validar journal externo atual e confirmações → reaplicar supressões → verificar dados/objetos/mail e bloqueio de reintrodução → revisar todos os gates → somente depois considerar habilitar escritores/ingressos. Intenção não confirmada, snapshot sem protocolo, identidade divergente ou ledger ausente falham fechados. Nunca sobrepor o journal atual com o do backup.
+
+Rollback: parar executor, preservar ledger e estado de processamento, corrigir/repetir pelo mesmo UUID. Exclusão técnica não tem reversão por rollback de build. Não restaurar PII suprimida, remover triggers/guards ou apagar backups para contornar falhas. Holds e cópias externas exigem revisão independente. Nenhuma publicação, migração remota, DNS ou comprador real foi autorizado.

@@ -1,0 +1,1 @@
+{"name":"connect-mail-worker","private":true,"type":"module","scripts":{"test":"node --test *.test.mjs","start":"node main.mjs"},"dependencies":{"nodemailer":"10.2.1"}}
