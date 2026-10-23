@@ -32,13 +32,14 @@ test("upload Connect validado, publicação e URL pública curta", async ({page}
     const pub=await client.rpc("connect_publish_media",{p_asset_id:assetId,p_expected_version:version,p_visible:true});if(pub.error)throw pub.error;
     const anon=await client.auth.getSession();
     const guestForm=new FormData();guestForm.set("action","url");guestForm.set("assetId",assetId);
-    const guest=await fetch("http://127.0.0.1:56321/functions/v1/asset-media",{method:"POST",headers:{apikey:client.supabaseKey},body:guestForm});
+    const guest=await fetch("http://127.0.0.1:56410/functions/v1/asset-media",{method:"POST",headers:{apikey:client.supabaseKey},body:guestForm});
     const guestBody=await guest.json();
     const image=await fetch(guestBody.url as string);
     const invalid=new FormData();invalid.set("action","upload");invalid.set("projectId",projectId);invalid.set("role","cover");invalid.set("file",new File([new Uint8Array(2048)],"forged.png",{type:"image/png"}));
     const bad=await client.functions.invoke("asset-media",{body:invalid});
-    return {projectId,assetId,privateBefore:publicBefore.data,privateUrl:!!privateUrl.data?.url,publicStatus:guest.status,urlExpires:guestBody.expiresIn,downloadStatus:image.status,contentType:image.headers.get("content-type"),badStatus:bad.error?422:200,sessionPresent:!!anon.data.session};
+    return {normalizedChecksum:uploaded.data.checksum,inputChecksum:Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",await blob.arrayBuffer())),b=>b.toString(16).padStart(2,"0")).join(""),projectId,assetId,privateBefore:publicBefore.data,privateUrl:!!privateUrl.data?.url,publicStatus:guest.status,urlExpires:guestBody.expiresIn,downloadStatus:image.status,contentType:image.headers.get("content-type"),badStatus:bad.error?422:200,sessionPresent:!!anon.data.session};
   },organizationId);
+  expect(result.normalizedChecksum).not.toBe(result.inputChecksum);
   expect(result.privateBefore).toBe(false);
   expect(result.privateUrl).toBe(true);
   expect(result.publicStatus).toBe(200);

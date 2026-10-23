@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!proxy.mjs
+!shared-rate.mjs

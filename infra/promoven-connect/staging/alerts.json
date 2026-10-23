@@ -1,0 +1,8 @@
+{
+  "enabled": false,
+  "evaluationWindowSeconds": 300,
+  "proposedThresholds": {"http5xxRatio": 0.01, "smtpFailures": 3, "storageFailures": 3, "backupAgeHours": 24, "latencyP95Ms": 3000},
+  "labelsAllowed": ["service", "status", "environment"],
+  "labelsForbidden": ["buyer", "email", "token", "url", "authorization", "body"],
+  "notificationTransport": "disabled"
+}

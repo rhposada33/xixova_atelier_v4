@@ -1,4 +1,4 @@
-import { validImage } from "../_shared/media.mjs";
+import { persistNormalized } from "../_shared/media-persistence.mjs";
 import { operationalHandler } from "../_shared/operations.mjs";
 import { createClient } from "npm:@supabase/supabase-js@2.109.0";
 
@@ -38,18 +38,22 @@ Deno.serve(operationalHandler("asset-media",async request=>{
   if(!auth?.startsWith("Bearer "))return reply(401,{error:"unauthorized"});
   const identity=await user.auth.getUser();if(identity.error||!identity.data.user)return reply(401,{error:"unauthorized"});
   if(action==="upload"){
-    const file=body.get("file");if(!(file instanceof File)||file.size<1024||file.size>maxBytes)return reply(422,{error:"invalid_size"});
-    const bytes=new Uint8Array(await file.arrayBuffer());if(!validImage(bytes,file.type))return reply(422,{error:"invalid_content"});
+    const file=body.get("file");if(!(file instanceof File)||file.size<1||file.size>maxBytes)return reply(422,{error:"invalid_size"});
+    const workerUrl=Deno.env.get("CONNECT_MEDIA_WORKER_URL"),workerSecret=Deno.env.get("CONNECT_WORKER_SECRET");
+    if(!workerUrl||!workerSecret)return reply(503,{error:"normalizer_unavailable"});
+    let bytes:Uint8Array;
+    try{const normalized=await fetch(`${workerUrl}/normalize`,{method:"POST",headers:{Authorization:`Bearer ${workerSecret}`,"Content-Type":file.type},body:await file.arrayBuffer(),signal:AbortSignal.timeout(6500)});
+      if(!normalized.ok)return reply(normalized.status===422?422:503,{error:"normalization_failed"});
+      bytes=new Uint8Array(await normalized.arrayBuffer());if(bytes.length>maxBytes||bytes.length<1||normalized.headers.get("Content-Type")!=="image/png")throw Error();
+    }catch{return reply(503,{error:"normalizer_unavailable"});}
     const checksum=hex(new Uint8Array(await crypto.subtle.digest("SHA-256",bytes)));
     const projectId=String(body.get("projectId")??""),unitId=String(body.get("unitId")??"")||null,role=String(body.get("role")??"");
-    const reserved=await user.rpc("connect_reserve_media",{p_project_id:projectId,p_unit_id:unitId,p_role:role,p_mime:file.type,p_size:file.size,p_checksum:checksum});
+    const reserved=await user.rpc("connect_reserve_media",{p_project_id:projectId,p_unit_id:unitId,p_role:role,p_mime:"image/png",p_size:bytes.length,p_checksum:checksum});
     if(reserved.error||!reserved.data)return reply(reserved.error?.code==="42501"?403:422,{error:"upload_not_allowed"});
     const asset=reserved.data;
-    const uploaded=await admin.storage.from(bucket).upload(asset.storage_path,bytes,{contentType:file.type,upsert:false,cacheControl:"60"});
-    if(uploaded.error){await user.rpc("connect_delete_media",{p_asset_id:asset.id,p_expected_version:asset.version});return reply(503,{error:"storage_failed"});}
-    const finished=await user.rpc("connect_finish_media",{p_asset_id:asset.id});
-    if(finished.error){await admin.storage.from(bucket).remove([asset.storage_path]);await user.rpc("connect_delete_media",{p_asset_id:asset.id,p_expected_version:asset.version});return reply(503,{error:"finalize_failed"});}
-    return reply(201,{assetId:asset.id,version:finished.data.version,checksum,sizeBytes:file.size,role});
+    const persisted=await persistNormalized({user,admin,bucket,asset,bytes});
+    if(persisted.error)return reply(503,{error:persisted.error});
+    return reply(201,{assetId:asset.id,version:persisted.version,checksum,sizeBytes:bytes.length,role});
   }
   if(action==="delete"||action==="replace"){
     const assetId=String(body.get("assetId")??""),version=Number(body.get("version"));

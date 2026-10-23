@@ -17,16 +17,16 @@ export async function proxyOrigin(request,bytes,secret,now=Date.now()){
  const sig=Uint8Array.from(signature.match(/../g),s=>parseInt(s,16));
  if(!await crypto.subtle.verify('HMAC',key,sig,new TextEncoder().encode(message)))throw Error('proxy_invalid');return client;
 }
-export function operationalHandler(name,handler,{limit=8192,logger=console.log,mode='local',proxySecret}={}){
+export function operationalHandler(name,handler,{limit=8192,logger=console.log,proxySecret}={}){
  return async request=>{
   const start=performance.now(),id=crypto.randomUUID();let response;
   try{
    const bytes=await boundedBody(request,limit);
    const headers=new Headers(request.headers);headers.delete('x-connect-verified-client');
-   if(mode!=='local'&&request.method!=='OPTIONS')headers.set('x-connect-verified-client',await proxyOrigin(request,bytes,proxySecret));
+   if(request.method!=='OPTIONS')headers.set('x-connect-verified-client',await proxyOrigin(request,bytes,proxySecret));
    const copy=new Request(request.url,{method:request.method,headers,...(!['GET','HEAD'].includes(request.method)?{body:bytes}:{} )});
    response=await handler(copy);
-  }catch(error){const status=error?.message==='body_limit'?413:error?.message?.startsWith('proxy_')?503:500;response=new Response(JSON.stringify({error:status===413?'payload_too_large':'operation_unavailable'}),{status,headers:{'Content-Type':'application/json'}});}
+  }catch(error){const status=error?.message==='body_limit'?413:error?.message==='proxy_invalid'?403:error?.message?.startsWith('proxy_')?503:500;response=new Response(JSON.stringify({error:status===413?'payload_too_large':'operation_unavailable'}),{status,headers:{'Content-Type':'application/json'}});}
   response.headers.set('X-Request-ID',id);response.headers.set('X-Content-Type-Options','nosniff');response.headers.set('Referrer-Policy','no-referrer');response.headers.set('Cache-Control','no-store');
   // Fixed fields only: never log URL, headers, payload, exception message or recipient.
   logger(JSON.stringify({event:'edge.request',service:name,requestId:id,status:response.status,durationMs:Math.round(performance.now()-start)}));return response;

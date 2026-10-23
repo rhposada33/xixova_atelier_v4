@@ -33,5 +33,6 @@ for container in supabase_db_promoven_connect_local "$run"; do
  docker exec "$container" psql "${args[@]}" -U postgres -Atc "select 'projects',count(*) from public.projects union all select 'units',count(*) from public.units union all select 'leads',count(*) from public.leads union all select 'assets',count(*) from storage.objects union all select 'rls',count(*) from pg_class where relrowsecurity" > "$backup/$container-counts.txt"
 done
 diff "$backup/supabase_db_promoven_connect_local-counts.txt" "$backup/$run-counts.txt"
+python3 recovery-http.py "$run" > "$backup/http-result.json"
 printf 'restore_seconds=%s\ncontainer=%s\n' "$((SECONDS-start))" "$run" > "$backup/result.txt"
 cat "$backup/result.txt"

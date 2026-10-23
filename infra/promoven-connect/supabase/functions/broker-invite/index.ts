@@ -19,15 +19,16 @@ async function smtpResponse(conn: Deno.Conn, expected: number) {
 }
 async function sendLocal(email: string, authLink: string, inviteLink: string) {
   const conn = await Deno.connect({ hostname: Deno.env.get("CONNECT_SMTP_HOST") ?? "supabase_inbucket_promoven_connect_local", port: Number(Deno.env.get("CONNECT_SMTP_PORT") ?? "1025") });
+  const timeout = setTimeout(() => { try { conn.close(); } catch { /* already closed */ } }, 8000);
   const write = async (data: string) => { const bytes = new TextEncoder().encode(data); let offset = 0; while (offset < bytes.length) offset += await conn.write(bytes.subarray(offset)); };
   try {
     await smtpResponse(conn, 220); await write("EHLO connect.local\r\n"); await smtpResponse(conn, 250);
     await write("MAIL FROM:<connect@promoven.local>\r\n"); await smtpResponse(conn, 250);
     await write(`RCPT TO:<${email}>\r\n`); await smtpResponse(conn, 250);
     await write("DATA\r\n"); await smtpResponse(conn, 354);
-    await write(`From: Promoven Connect <connect@promoven.local>\r\nTo: <${email}>\r\nSubject: Convite Promoven Connect\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nVoce recebeu um convite para acessar um empreendimento no Promoven Connect.\r\n1. Ative ou acesse sua conta pelo link seguro:\r\n${authLink}\r\n\r\n2. Depois abra o convite e complete seu perfil profissional:\r\n${inviteLink}\r\n\r\nEste convite expira em 48 horas.\r\n.\r\n`);
+    await write(`From: Promoven Connect <connect@promoven.local>\r\nTo: <${email}>\r\nSubject: Convite Promoven Connect\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nVocê recebeu um convite para acessar um empreendimento no Promoven Connect.\r\n1. Ative ou acesse sua conta pelo link seguro:\r\n${authLink}\r\n\r\n2. Depois abra o convite e complete seu perfil profissional:\r\n${inviteLink}\r\n\r\nEste convite expira em 48 horas.\r\n.\r\n`);
     await smtpResponse(conn, 250); await write("QUIT\r\n");
-  } finally { conn.close(); }
+  } finally { clearTimeout(timeout); try { conn.close(); } catch { /* timed out */ } }
 }
 
 Deno.serve(operationalHandler("broker-invite",async (request) => {

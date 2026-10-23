@@ -1,0 +1,16 @@
+services:
+  media-worker:
+    build: .
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 384m
+    cpus: 1
+    pids_limit: 64
+    env_file: .env.local
+    networks: [connect]
+    # No published ports. Only authenticated Edge calls are accepted.
+networks:
+  connect:
+    external: true
+    name: supabase_network_promoven_connect_local

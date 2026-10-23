@@ -1,0 +1,1 @@
+{"name":"connect-media-worker","private":true,"type":"module","scripts":{"test":"node --test *.test.mjs","start":"node server.mjs"},"dependencies":{"sharp":"0.35.5"}}

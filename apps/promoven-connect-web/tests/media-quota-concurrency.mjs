@@ -1,0 +1,15 @@
+import process from 'node:process';
+import pg from 'pg';import {randomUUID} from 'node:crypto';import {setTimeout as delay} from 'node:timers/promises';import assert from 'node:assert/strict';
+const config={host:'127.0.0.1',port:56322,user:'postgres',password:'postgres',database:'postgres'};
+const setup=new pg.Client(config),a=new pg.Client(config),b=new pg.Client(config);const org=randomUUID(),user=randomUUID(),p1=randomUUID(),p2=randomUUID();let seeded=false;
+try{await Promise.all([setup.connect(),a.connect(),b.connect()]);await setup.query('begin');
+await setup.query("insert into auth.users(id,aud,role,email,email_confirmed_at,created_at,updated_at) values($1,'authenticated','authenticated',$2,now(),now(),now())",[user,`quota-${user}@test.local`]);
+await setup.query("insert into public.organizations(id,name,slug) values($1,'Quota Synthetic',$2)",[org,`quota-${org}`]);await setup.query("insert into public.organization_members(organization_id,user_id,role) values($1,$2,'organization_admin')",[org,user]);
+for(const p of [p1,p2])await setup.query("insert into public.projects(id,organization_id,name,slug,public_slug,city,state) values($1,$2,'Quota',$3,$3,'São Paulo','SP')",[p,org,`quota-${p}`]);
+await setup.query("insert into public.project_assets(organization_id,project_id,asset_type,media_role,storage_path,visibility,mime_type,checksum,size_bytes,upload_state,uploaded_by) values($1,$2,'image','gallery',$3,'private','image/png',$4,1073739776,'ready',$5)",[org,p1,`quota/${org}`,'a'.repeat(64),user]);
+await setup.query('commit');seeded=true;
+for(const c of [a,b]){await c.query('begin');await c.query("select set_config('request.jwt.claim.sub',$1,true)",[user]);await c.query('set local role authenticated');}
+await a.query("select public.connect_reserve_media($1,null,'gallery','image/png',2048,$2)",[p2,'b'.repeat(64)]);
+const pending=b.query("select public.connect_reserve_media($1,null,'gallery','image/png',2048,$2)",[p2,'c'.repeat(64)]).then(()=> 'unexpected',e=>e.message);
+let waiting=false;for(let i=0;i<40;i++){const state=await setup.query("select wait_event_type from pg_stat_activity where pid=$1",[b.processID]);if(state.rows[0]?.wait_event_type==='Lock'){waiting=true;break;}await delay(25);}assert.equal(waiting,true);await a.query('commit');assert.equal(await pending,'organization_media_quota_exceeded');await b.query('rollback');process.stdout.write('PASS concurrent media reservations enforce organization quota\n');
+}finally{await a.query('rollback').catch(()=>{});await b.query('rollback').catch(()=>{});if(seeded){await setup.query('begin');for(const table of ['audit_events','project_assets','projects','organization_members'])await setup.query(`delete from public.${table} where organization_id=$1`,[org]);await setup.query('delete from public.organizations where id=$1',[org]);await setup.query('delete from public.profiles where user_id=$1',[user]);await setup.query('delete from auth.users where id=$1',[user]);await setup.query('commit');}await Promise.all([setup.end(),a.end(),b.end()]);}

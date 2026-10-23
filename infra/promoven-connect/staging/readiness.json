@@ -1,0 +1,14 @@
+{
+  "remoteDeploymentAuthorized": false,
+  "realBuyerDataAuthorized": false,
+  "gates": {
+    "imageNormalizationIntegrated": true,
+    "fullAnonymizationValidated": false,
+    "trustedProxyIntegratedWithSupabase": true,
+    "authHttpRestoreValidated": true,
+    "storageHttpRestoreValidated": true,
+    "smtpRemoteDeliveryValidated": false,
+    "privacyPolicyApproved": false,
+    "mediaStorageFailureInjectionValidated": true
+  }
+}

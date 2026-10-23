@@ -43,4 +43,13 @@ select set_config('request.jwt.claim.sub','a5100000-0000-4000-8000-000000000004'
 select is(public.connect_privacy('f6100000-0000-4000-8000-000000000001','approved','TEST-001')->>'decision','approved','independent approval');
 select ok(public.connect_privacy('f6100000-0000-4000-8000-000000000001','export','TEST-001') ? 'activities','authorized export includes history');
 select is(pg_temp.state($$select public.connect_privacy('f6100000-0000-4000-8000-000000000001','erase','TEST-001')$$),'55000','erasure remains fail closed');
+select is(public.connect_privacy_preview('f6100000-0000-4000-8000-000000000001')->>'executionEnabled','false','preview cannot authorize erasure');
+select ok(public.connect_privacy_preview('f6100000-0000-4000-8000-000000000001') ? 'indirectReferences','preview maps indirect identifiers');
+select is(pg_temp.state($$select public.connect_privacy_internal('f6100000-0000-4000-8000-000000000001','request','TEST-002')$$),'42501','internal path inaccessible');
+select ok(public.connect_privacy('f6100000-0000-4000-8000-000000000001','request','HOLD-001') ? 'requestId','hold workflow request');
+reset role;
+select set_config('request.jwt.claim.sub','a5100000-0000-4000-8000-000000000001',true);set local role authenticated;
+select is(public.connect_privacy('f6100000-0000-4000-8000-000000000001','hold','HOLD-001')->>'decision','hold','independent hold recorded');
+select is(public.connect_privacy_preview('f6100000-0000-4000-8000-000000000001')->>'hold','true','hold visible in preview');
+select is(pg_temp.state($$select public.connect_privacy('f6100000-0000-4000-8000-000000000001','export','TEST-001')$$),'42501','hold blocks previously approved request');
 select * from finish();rollback;
