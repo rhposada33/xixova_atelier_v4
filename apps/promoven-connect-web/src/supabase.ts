@@ -1,0 +1,14 @@
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+
+let client: SupabaseClient | null = null;
+export function connectClient(): SupabaseClient {
+  if (client) return client;
+  const url = import.meta.env.VITE_CONNECT_SUPABASE_URL;
+  const key = import.meta.env.VITE_CONNECT_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) throw new Error("Configure o Supabase Connect local para acessar o portal.");
+  if (import.meta.env.VITE_CONNECT_ENV === "local" && url !== "http://127.0.0.1:56321") {
+    throw new Error("O ambiente local deve usar somente o Supabase Connect isolado.");
+  }
+  client = createClient(url, key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "pkce" } });
+  return client;
+}

@@ -1,0 +1,38 @@
+project_id = "promoven_connect_local"
+
+[api]
+enabled = true
+port = 56321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+auto_expose_new_tables = false
+
+[db]
+port = 56322
+shadow_port = 56320
+major_version = 17
+
+[db.migrations]
+enabled = true
+
+[db.seed]
+enabled = false
+
+[studio]
+enabled = true
+port = 56323
+
+[inbucket]
+enabled = true
+port = 56324
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:5178"
+additional_redirect_urls = ["http://127.0.0.1:5178/reset-password", "http://localhost:5178/reset-password", "http://127.0.0.1:5178/invite/**"]
+enable_signup = false
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
