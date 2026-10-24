@@ -1,5 +1,7 @@
 # Promoven Connect — plano de infraestrutura e operação
 
+> **Atualização vigente PC-07C.1 (23/10/2026):** os planos/custos históricos abaixo foram substituídos para decisões remotas pela [arquitetura remota](PROMOVEN_CONNECT_REMOTE_ARCHITECTURE.md), [matriz de custos](PROMOVEN_CONNECT_COST_MATRIX.md) e [aprovação de staging](PROMOVEN_CONNECT_STAGING_APPROVAL.md). Nenhuma implantação foi autorizada. Supabase Cloud com Edge gerenciada não comprova o isolamento obrigatório de rede do proxy. SMTP/privacidade de produção não são requisitos da demo sintética fechada; TLS, acesso restrito, backup, monitoramento e aprovação continuam obrigatórios.
+
 PC-07A, 23/10/2026. **Plano não executado.** Nenhum recurso remoto, deploy, DNS ou vínculo Supabase foi criado. PC-07B depende de autorização explícita e dos bloqueios abaixo.
 
 ## Topologia e recursos mínimos propostos
@@ -140,3 +142,30 @@ Antes de qualquer implantação futura, planejar armazenamento do journal extern
 Ordem de recuperação: restaurar cópia isolada → validar journal externo atual e confirmações → reaplicar supressões → verificar dados/objetos/mail e bloqueio de reintrodução → revisar todos os gates → somente depois considerar habilitar escritores/ingressos. Intenção não confirmada, snapshot sem protocolo, identidade divergente ou ledger ausente falham fechados. Nunca sobrepor o journal atual com o do backup.
 
 Rollback: parar executor, preservar ledger e estado de processamento, corrigir/repetir pelo mesmo UUID. Exclusão técnica não tem reversão por rollback de build. Não restaurar PII suprimida, remover triggers/guards ou apagar backups para contornar falhas. Holds e cópias externas exigem revisão independente. Nenhuma publicação, migração remota, DNS ou comprador real foi autorizado.
+
+## PC-07C.1 — preflight e decisão de infraestrutura
+
+[Relatório de execução](PROMOVEN_CONNECT_PC07C1_STATUS.md). Recomendação: Supabase self-hosted exclusivo, runtime Edge privado e gateway sem rota de funções; frontend isolado na VM ou Vercel Pro. Alternativa Cloud apenas com funções protegidas em runtime próprio controlado. Não há projeto remoto/quotas confirmados. Estimativas: demo US$53/73 (frontend VM/Vercel), staging US$88–98, produção inicial sem HA US$195–230; não são faturas ou orçamento aprovado.
+
+A configuração atual continua local-only e HTTP no proxy. Preparação futura exige modo staging-synthetic, TLS que preserve origem confiável, restrição de todos os ingressos, CSP/CORS dos hosts finais, bootstrap self-hosted e custódia remota de segredos/journal. Não usar CONNECT_DELIVERY_MODE=local remotamente. Env template permanece disabled. Não há compose remoto pronto para publicar nem promessa de deploy por simples troca de variáveis.
+
+### Procedimento local reproduzível
+
+```bash
+# Informar caminho de CLI já instalada; exemplo do ambiente auditado.
+export CONNECT_SUPABASE_CLI=/home/rafa/.npm/_npx/b96a6bd565c470ce/node_modules/@supabase/cli-linux-x64/bin/supabase
+node infra/promoven-connect/staging/preflight.mjs
+node infra/promoven-connect/staging/validate.mjs
+# Execução explícita: fixtures sintéticas, contêineres descartáveis e restart só Connect.
+node infra/promoven-connect/staging/validate.mjs --execute-local
+node infra/promoven-connect/staging/check-release.mjs staging
+node infra/promoven-connect/staging/check-release.mjs production
+```
+
+Preflight padrão só lê; exit 1 inclui bloqueio esperado de CSP remota/release e evidências ausentes. Validate sem flag só lista plano. A execução explícita fixa DB/HTTP locais, faz SQL/RLS, contratos/unitários, proxy real, outbox, builds por lockfile, navegador, concorrência, demo e restore por último. Não executar com outros escritores Connect. Saídas sanitizadas por check; logs privados/evidências em staging/.local, ignorados. O script legado validate-local.sh continua disponível, mas não emite o índice de evidências v2 e termina com bloqueio de release esperado.
+
+migrations-local.py restaura somente schema da plataforma local em contêiner novo sem rede, elimina schemas/roles Connect **apenas nessa cópia**, aplica 34 migrações e pgTAP; repete em cenário incremental com sentinela preservada. Checksums controlam reexecução operacional: não significa que cada arquivo DDL pode ser executado duas vezes. Não usa db reset/link/push. Baseline Auth/Storage corresponde à imagem local instalada; repetir em versões remotas escolhidas antes de migração autorizada.
+
+Build reproduzível instala cinco lockfiles com npm ci --offline numa cópia descartável e compara os arquivos gerados com build local. Relatórios são vinculados ao digest de todas as fontes Connect (inclui scripts/configuração, exclui somente campos dinâmicos approval/evidence). Mudança de código exige novos testes; docs não entram nesse digest. Aprovação futura exige revisão do HEAD e do digest, alvo explícito, referência da autorização e validade. Nenhum relatório local é promovido a evidência remota.
+
+Rollback deste checkpoint: retirar os novos scripts/atualizações usando revisão de diff, sem reset global; não há migração de aplicação nova nem recurso remoto. Fixtures e artefatos privados podem ser mantidos para demonstração; não remover organizações/volumes por wildcard. Rollback futuro operacional segue a arquitetura/runbook, preservando outbox, keyring, ledger e supressões.

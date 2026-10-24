@@ -20,6 +20,7 @@ npm --prefix apps/promoven-connect-web run test:unit
  set -a
  source .env.e2e.local
  set +a
+ node tests/staging-demo.mjs
  npm run test:e2e
  node tests/link-concurrency.mjs
  node tests/crm-concurrency.mjs

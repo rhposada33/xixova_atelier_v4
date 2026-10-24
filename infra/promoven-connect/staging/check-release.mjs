@@ -1,5 +1,10 @@
-import {readFile} from 'node:fs/promises';
-const state=JSON.parse(await readFile(new URL('./readiness.json',import.meta.url)));
-const blocked=Object.entries(state.gates).filter(([,ok])=>!ok).map(([name])=>name);
-console.log(JSON.stringify({remoteDeploymentAuthorized:state.remoteDeploymentAuthorized,realBuyerDataAuthorized:state.realBuyerDataAuthorized,blocked}));
-if(blocked.length||!state.remoteDeploymentAuthorized)process.exitCode=1;
+import {readFileSync,existsSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {evaluateRelease,sourceDigest,root} from './evidence.mjs';
+const state=JSON.parse(readFileSync(new URL('./readiness.json',import.meta.url)));
+const localIndex=new URL('./.local/evidence-index.json',import.meta.url);
+if(existsSync(localIndex))state.evidence=[...(state.evidence??[]),...JSON.parse(readFileSync(localIndex))];
+const result=evaluateRelease(state,{digest:sourceDigest(),head:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim()});
+console.log(JSON.stringify(result,null,2));
+const environment=process.argv[2]??'staging';
+if(!['staging','production'].includes(environment)||!result.deploymentAllowed[environment])process.exitCode=1;

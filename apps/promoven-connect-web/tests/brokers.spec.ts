@@ -193,7 +193,11 @@ test("convite por Mailpit, aceite, revisão e revogação local", async ({ brows
 
 
   await brokerPage.goto("/connect/broker/links");
-  await brokerPage.getByRole("button",{name:"Revogar"}).first().click();
+  await Promise.all([
+    brokerPage.waitForResponse(r=>r.url().includes("/rpc/connect_revoke_broker_link")&&r.ok()),
+    brokerPage.getByRole("button",{name:"Revogar"}).first().click(),
+  ]);
+  await expect(brokerPage.getByText("Revogado",{exact:true})).toBeVisible();
   await buyerPage.reload();
   await expect(buyerPage.getByRole("heading",{name:"Conteúdo indisponível"})).toBeVisible();
   await buyer.close();

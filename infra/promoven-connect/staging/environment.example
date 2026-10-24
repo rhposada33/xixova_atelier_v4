@@ -1,9 +1,10 @@
+# Self-hosted topology blueprint; managed Supabase private Edge isolation is NOT supported by this template.
 # Template only. No credentials. Do not set local mode remotely to bypass the gate.
 VITE_CONNECT_ENV=staging
-VITE_CONNECT_SUPABASE_URL=https://REPLACE-CONNECT-REF.supabase.co
+VITE_CONNECT_SUPABASE_URL=https://REPLACE-ISOLATED-CONNECT-API-HOST
 VITE_CONNECT_SUPABASE_PUBLISHABLE_KEY=REPLACE_PUBLIC_KEY
 CONNECT_APP_ORIGIN=https://REPLACE-STAGING-HOST
-CONNECT_PUBLIC_SUPABASE_URL=https://REPLACE-CONNECT-REF.supabase.co
+CONNECT_PUBLIC_SUPABASE_URL=https://REPLACE-ISOLATED-CONNECT-API-HOST
 CONNECT_DELIVERY_MODE=disabled
 CONNECT_LEAD_RATE_SECRET=REPLACE_WITH_INDEPENDENT_RANDOM_SECRET
 CONNECT_PROXY_SECRET=REPLACE_WITH_INDEPENDENT_RANDOM_SECRET
@@ -25,6 +26,14 @@ CONNECT_MAIL_WORKER_TOKEN=REPLACE_RESTRICTED_WORKER_JWT
 CONNECT_MAIL_REST_URL=http://PRIVATE-POSTGREST:3000
 CONNECT_MAIL_MAX_ATTEMPTS=5
 # Auth admin key only for worker identity-link generation; never logged.
-CONNECT_AUTH_URL=https://REPLACE-CONNECT-REF.supabase.co
+CONNECT_AUTH_URL=https://REPLACE-ISOLATED-CONNECT-API-HOST
 CONNECT_AUTH_SERVICE_KEY=REPLACE_SERVER_SERVICE_KEY
 # Remote transport contract requires authenticated TLS; disabled until authorized.
+
+# Separate external journal; never inside a DB/Storage snapshot or image.
+CONNECT_PRIVACY_LEDGER_PATH=/run/connect-private-ledger
+# Custody of ledger.key and ledger.anchor.key is separate from DB secrets.
+# Staging SMTP MUST remain a private Mailpit sink; no provider credentials.
+CONNECT_SMTP_HOST=mailpit
+CONNECT_SMTP_PORT=1025
+# No remote application mode enabled by PC07C1; PC07C2 must implement and test it.

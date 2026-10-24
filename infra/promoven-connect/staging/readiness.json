@@ -20,5 +20,16 @@
     "subjectIdentificationProcessApproved": false,
     "erasureOperationAuthorized": false,
     "backupTreatmentApproved": false
-  }
+  },
+  "schemaVersion": 2,
+  "approvedTargets": [],
+  "targets": {
+    "staging": null,
+    "production": null
+  },
+  "approvals": {
+    "staging": null,
+    "production": null
+  },
+  "evidence": []
 }
