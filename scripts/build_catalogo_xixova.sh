@@ -21,6 +21,7 @@ if [[ "$VITE_INVENTORY_PROVIDER" != "supabase" ]]; then
 fi
 
 cd "$WEB_DIR"
+PYTHONPATH="$REPO_ROOT" python3 "$REPO_ROOT/scripts/check_demo_buildings.py"
 npm ci
 npm run build
 
@@ -32,9 +33,6 @@ uv run xixova_cli.py exportar-catalogo \
 
 # El exportador aporta catálogo/inventario; estos modelos mantenidos por la web
 # complementan el artefacto sin duplicarlos dentro del código fuente.
-install -m 0644 "$WEB_DIR/public/building/xixova-building-visual-v2.glb" "$OUTPUT_DIR/building/xixova-building-visual-v2.glb"
-install -m 0644 "$WEB_DIR/public/building/xixova-building-visual-v2-asset-statistics.json" "$OUTPUT_DIR/building/xixova-building-visual-v2-asset-statistics.json"
-
 # Terraza Luz uses the approved, manually art-directed premium master. Keep the
 # generated mobile/standard levels and replace only the premium web candidate.
 install -m 0644 "$REPO_ROOT/proyectos/terraza_luz/web/assets-premium.glb" "$OUTPUT_DIR/projects/terraza_luz/data/assets-premium.glb"

@@ -79,3 +79,89 @@ test('la maqueta deja de dibujar en reposo y despierta al cambiar la luz',async(
   await page.waitForTimeout(500);
   expect(Number(await stage.getAttribute('data-render-count'))).toBe(settled);
 });
+
+test('selector de edificios, enlaces y favoritos separados',async({page})=>{
+  test.setTimeout(90_000);
+  await page.goto('/demo?vista=edificio&unidad=1203');
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1203',{timeout:20_000});
+  await page.locator('.b-v2-card-actions').getByRole('button',{name:'Favoritar',exact:true}).click();
+  await page.getByLabel('Selecionar edifício').first().selectOption('jequitiba');
+  await expect.poll(()=>new URL(page.url()).searchParams.get('edificio')).toBe('jequitiba');
+  await expect.poll(()=>new URL(page.url()).searchParams.get('unidad')).toBe('101');
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 101',{timeout:20_000});
+  await expect(page.locator('.building-stage .building-loading')).toHaveCount(0,{timeout:20_000});
+  await expect(page.getByRole('button',{name:'Interior ainda não disponível'})).toBeDisabled();
+  await page.locator('.building-header-actions').getByRole('button',{name:/Favoritos/}).click();
+  await expect(page.getByRole('dialog')).toContainText('Salve unidades');
+  await page.keyboard.press('Escape');
+  await page.reload();
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 101',{timeout:20_000});
+  await page.getByLabel('Selecionar edifício').first().selectOption('escobar');
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1203',{timeout:20_000});
+  await page.locator('.building-header-actions').getByRole('button',{name:/Favoritos/}).click();
+  await expect(page.getByRole('dialog')).toContainText('Unidade 1203');
+});
+
+test('enlace antiguo y selector móvil de Jequitibá',async({page})=>{
+  test.setTimeout(60_000);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/demo?cliente=jequitiba&vista=edificio&unidad=2003');
+  await expect(page).toHaveURL(/edificio=jequitiba.*unidad=2003/);
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 2003',{timeout:20_000});
+  await expect(page.locator('.building-picker.mobile select')).toBeVisible();
+  await page.locator('.building-mobile-tabs').getByRole('button',{name:'Unidades',exact:true}).click();
+  await expect(page.getByRole('dialog')).toContainText('Andar 20');
+  await page.keyboard.press('Escape');
+  await page.locator('.building-picker.mobile select').selectOption('escobar');
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1203');
+});
+
+test('Canto do Forte: GLB, 64 unidades, enlace compartido y favoritos propios',async({page})=>{
+  test.setTimeout(120_000);
+  const errors:string[]=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  const glb=page.waitForResponse(response=>response.url().endsWith('/building/canto-do-forte.glb')&&response.ok());
+  await page.goto('/demo?edificio=canto-do-forte&unidad=1203');
+  await glb;
+  await expect(page.locator('.building-loading')).toHaveCount(0,{timeout:45_000});
+  await expect(page.locator('.building-error')).toHaveCount(0);
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1203');
+  await expect(page.getByText('64 unidades no edifício')).toBeVisible();
+  await expect(page.getByRole('button',{name:'Interior ainda não disponível'})).toBeDisabled();
+  await page.getByRole('navigation').getByRole('button',{name:'Unidades',exact:true}).click();
+  await expect(page.getByRole('dialog').getByRole('button',{name:/^Unidade \d+,/})).toHaveCount(64);
+  await page.getByRole('button',{name:/^Unidade 1604,/}).click();
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1604');
+  await expect(page).toHaveURL(/edificio=canto-do-forte&unidad=1604/);
+  const shared=page.url();
+  await page.locator('.b-v2-card-actions').getByRole('button',{name:'Favoritar',exact:true}).click();
+  await page.getByLabel('Andar',{exact:true}).selectOption('16');
+  await page.getByLabel('Selecionar edifício').first().selectOption('jequitiba');
+  await expect(page.getByLabel('Andar',{exact:true})).toHaveValue('');
+  await page.locator('.building-header-actions').getByRole('button',{name:/Favoritos/}).click();
+  await expect(page.getByRole('dialog')).toContainText('Salve unidades');
+  await page.keyboard.press('Escape');
+  await page.goto(shared);
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1604');
+  await expect(page.locator('.b-v2-card-actions').getByRole('button',{name:'Favoritada',exact:true})).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('Canto do Forte en móvil: selector, matriz e interior bloqueado',async({page})=>{
+  test.setTimeout(120_000);
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/demo?edificio=canto-do-forte&vista=interior&unidad=1203&maqueta=terraza_luz');
+  await expect(page).toHaveURL(/vista=edificio/);
+  await expect(page.locator('.building-loading')).toHaveCount(0,{timeout:45_000});
+  await expect(page.locator('.building-error')).toHaveCount(0);
+  await expect(page.locator('.building-picker.mobile select')).toHaveValue('canto-do-forte');
+  await page.locator('.building-mobile-tabs').getByRole('button',{name:'Unidades',exact:true}).click();
+  await expect(page.getByRole('dialog')).toContainText('Andar 16');
+  await expect(page.getByRole('dialog')).not.toContainText('Andar 17');
+  await page.getByRole('button',{name:/^Unidade 1603,/}).click();
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1603');
+  await expect(page.locator('.b-card-heading h2')).toBeVisible();
+  await expect(page.getByRole('button',{name:'Interior ainda não disponível'})).toBeDisabled();
+  await page.locator('.building-picker.mobile select').selectOption('escobar');
+  await expect(page.locator('.b-card-heading h2')).toHaveText('Unidade 1203');
+});

@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 
 from .core import load
+from .demo_buildings import validate_demo_buildings
 from .maquette import export as export_maquette, serve
 
 
@@ -42,6 +43,7 @@ def load_catalog_config(filename: Path | None, root: Path) -> dict:
 
 def export_catalog(destination: Path, config_file: Path | None = None, profile: str = "premium") -> dict:
     root = Path(__file__).resolve().parents[1]
+    demo_registry = validate_demo_buildings(root)
     destination = destination.resolve()
     config = load_catalog_config(config_file.resolve() if config_file else None, root)
     web_dist = root / "xixova" / "maquette_web" / "dist"
@@ -79,6 +81,19 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
     building_dir.mkdir(exist_ok=True)
     inventory = build_building_inventory()
     (building_dir / "inventory.json").write_text(json.dumps(inventory, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    public_buildings = []
+    for building in demo_registry["buildings"]:
+        inventory_url = "building/inventory.json" if building["id"] == "escobar" else f"building/{building['id']}-inventory.json"
+        if building["id"] != "escobar":
+            shutil.copy2(root / "xixova" / "data" / building["inventory"], staging / inventory_url)
+        public_buildings.append({
+            "id": building["id"], "name": building["name"],
+            "organizationSlug": building["organizationSlug"], "projectSlug": building["projectSlug"],
+            "defaultUnitCode": building["defaultUnitCode"], "floors": building["floors"],
+            "inventory": inventory_url, "inventoryFormat": building["inventoryFormat"],
+            "inventoryProvider": building["inventoryProvider"], "models": building["models"],
+            **({"environment": building["environment"]} if building.get("environment") else {}),
+        })
     public_url = os.environ.get("ESCOBAR_PUBLIC_URL", "https://www.promoven.online").rstrip("/")
     social_image = f"{public_url}/social/escobar-residences.png"
     for unit in inventory:
@@ -104,7 +119,8 @@ def export_catalog(destination: Path, config_file: Path | None = None, profile: 
         unit_dir = staging / "unidades" / unit["code"]
         unit_dir.mkdir(parents=True, exist_ok=True)
         (unit_dir / "index.html").write_text(page, encoding="utf-8")
-    manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "defaultView": "building", "building": {"organizationSlug": "escobar", "projectSlug": "escobar-residences", "defaultUnitCode": "1203", "model": "building/xixova-building.glb", "inventory": "building/inventory.json", "visualModes": ["neutral_day", "warm_dusk"], "statistics": "building/asset-statistics.json", "residentialFloors": 18, "units": 72, "provisional": True}, "projects": public_projects}
+    default_building = next(item for item in public_buildings if item["id"] == demo_registry["defaultBuilding"])
+    manifest = {"schema": 1, "defaultProject": public_projects[0]["id"], "defaultView": "building", "defaultBuilding": demo_registry["defaultBuilding"], "buildings": public_buildings, "building": {"organizationSlug": default_building["organizationSlug"], "projectSlug": default_building["projectSlug"], "defaultUnitCode": default_building["defaultUnitCode"], "model": default_building["models"]["standard"]["url"], "inventory": default_building["inventory"], "visualModes": ["neutral_day", "warm_dusk"], "statistics": "building/asset-statistics.json", "residentialFloors": default_building["floors"], "units": len(inventory), "provisional": True}, "projects": public_projects}
     (staging / "catalog.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     # `vercel --cwd <destino>` guarda aquí el vínculo del proyecto. Es estado
     # local, no un artefacto de la publicación, y debe sobrevivir al reemplazo

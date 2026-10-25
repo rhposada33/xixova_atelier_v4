@@ -56,6 +56,7 @@ for blocked_ref in "${PRODUCTION_REFS[@]}"; do
 done
 
 cd "$WEB_DIR"
+PYTHONPATH="$REPO_ROOT" python3 "$REPO_ROOT/scripts/check_demo_buildings.py"
 npm ci
 npm run test:unit
 npm run lint

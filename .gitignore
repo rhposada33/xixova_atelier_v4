@@ -58,6 +58,8 @@ xixova/director_web/playwright-report/
 # Modelos y paquetes binarios externos
 *.glb
 !proyectos/terraza_luz/web/assets-premium.glb
+!/xixova/maquette_web/public/building/xixova-building.glb
+!/xixova/maquette_web/public/building/jequitiba-building.glb
 !/xixova/maquette_web/public/environments/
 !/xixova/maquette_web/public/environments/visual-v2/
 !/xixova/maquette_web/public/environments/visual-v2/visual-v2-landscape.glb
@@ -122,3 +124,8 @@ Thumbs.db
 # Premium interactive viewer: isolated Blender master and browser export
 !/xixova/maquette_web/assets/promoven/promoven-premium-materials.blend
 !/xixova/maquette_web/public/building/promoven-premium.glb
+
+# Canto do Forte approved demo assets and reproducible texture sources
+!/xixova/maquette_web/public/building/canto-do-forte.glb
+!/xixova/maquette_web/public/building/canto-assets/*.png
+!/proyectos/canto_do_forte/textures/*.png

@@ -1,9 +1,16 @@
 import {beforeAll,describe,it,expect} from 'vitest';
-import {buildingConfig,defaultFilters,filterUnits,formatBRL,canExplore,canPropose,isMorning,type BuildingUnit} from './inventory';
+import {defaultFilters,filtersForInventory,filterUnits,formatBRL,canExplore,canPropose,isMorning,type BuildingUnit} from './inventory';
+import {getBuilding} from './buildingRegistry';
+const buildingConfig=getBuilding('escobar');
 import {StaticInventoryRepository} from '../infrastructure/inventory/static/StaticInventoryRepository';
 
 let inventory:BuildingUnit[]=[];
 beforeAll(async()=>{inventory=await new StaticInventoryRepository().listPublishedUnits({organizationSlug:buildingConfig.organizationSlug,projectSlug:buildingConfig.projectSlug});});
+
+it('amplía los límites iniciales para un edificio futuro con otros precios y áreas',()=>{
+  const limits=filtersForInventory([{...inventory[0],priceBRL:3_000_000,privateAreaM2:225}]);
+  expect(limits).toMatchObject({minPrice:600000,maxPrice:3_000_000,minArea:50,maxArea:225});
+});
 
 describe('Inventario provisional del edificio',()=>{
   it('contiene 72 unidades, cuatro en cada una de las 18 plantas',()=>{

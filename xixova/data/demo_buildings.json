@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "defaultBuilding": "escobar",
+  "buildings": [
+    {
+      "id": "escobar",
+      "name": "Escobar Residences",
+      "organizationSlug": "escobar",
+      "projectSlug": "escobar-residences",
+      "defaultUnitCode": "1203",
+      "floors": 18,
+      "unitsPerFloor": 4,
+      "inventory": "escobar_inventory.json",
+      "inventoryFormat": "legacy",
+      "inventoryProvider": "supabase",
+      "models": {
+        "standard": {
+          "url": "building/xixova-building.glb",
+          "sha256": "07e390ac4c481d5689f6e078ec1cfd3c8913475e09c7d8f0a2dd837840f6b8a8"
+        },
+        "premium": {
+          "url": "building/promoven-premium.glb",
+          "sha256": "80f816c9b5fc91cf88173780c88ec7f24bbb20a07d286c9f5d69f41a72676926"
+        }
+      },
+      "camera": {
+        "original": {
+          "targetY": 32,
+          "distance": 123,
+          "height": 23
+        },
+        "premium": {
+          "targetY": 32,
+          "distance": 129,
+          "height": 41
+        }
+      },
+      "visualExperience": "v2",
+      "interiorEnabled": true
+    },
+    {
+      "id": "jequitiba",
+      "name": "Jequitibá",
+      "organizationSlug": "jequitiba",
+      "projectSlug": "jequitiba-residences",
+      "defaultUnitCode": "101",
+      "floors": 20,
+      "unitsPerFloor": 3,
+      "inventory": "jequitiba_inventory.json",
+      "inventoryFormat": "property-units",
+      "inventoryProvider": "static",
+      "models": {
+        "standard": {
+          "url": "building/jequitiba-building.glb",
+          "sha256": "84557954c00491ca9834510670f1c44c1b361d3d5307154e1bec54db736b069e"
+        }
+      },
+      "camera": {
+        "original": {
+          "targetY": 38,
+          "distance": 123,
+          "height": 23
+        },
+        "premium": {
+          "targetY": 38,
+          "distance": 165,
+          "height": 46
+        }
+      },
+      "visualExperience": "standard",
+      "interiorEnabled": false
+    },
+    {
+      "id": "canto-do-forte",
+      "name": "Canto do Forte",
+      "organizationSlug": "canto-do-forte",
+      "projectSlug": "canto-do-forte-residences",
+      "defaultUnitCode": "1203",
+      "floors": 16,
+      "unitsPerFloor": 4,
+      "inventory": "canto_do_forte_inventory.json",
+      "inventoryFormat": "property-units",
+      "inventoryProvider": "static",
+      "models": {
+        "standard": {
+          "url": "building/canto-do-forte.glb",
+          "sha256": "4febddb536df13a4d8d46637d95a1753e54915aee8c007b7efe078dc0fd30d37"
+        }
+      },
+      "camera": {
+        "original": {
+          "targetY": 32,
+          "distance": 132,
+          "height": 18
+        },
+        "premium": {
+          "targetY": 32,
+          "distance": 132,
+          "height": 18
+        }
+      },
+      "visualExperience": "coastal",
+      "interiorEnabled": false,
+      "environment": {
+        "url": "building/canto-assets/coastal-panorama.png",
+        "sha256": "1150055e22f25d1169421cfccb10fed9244fe83bd86017bb7e377ccca87a1dbf"
+      }
+    }
+  ]
+}
