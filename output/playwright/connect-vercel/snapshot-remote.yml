@@ -1,0 +1,20 @@
+- main [ref=e3]:
+  - region "Promoven Connect" [ref=e4]:
+    - link "PROMOVEN CONNECT" [ref=e5] [cursor=pointer]:
+      - /url: https://www.promoven.online
+      - generic [aria-hidden] [ref=e6]: P
+      - text: PROMOVEN
+      - generic [ref=e7]: CONNECT
+    - generic [ref=e8]:
+      - paragraph [ref=e9]: ECOSSISTEMA PROMOVEN
+      - heading "Conexões que abrem novas possibilidades." [level=2] [ref=e10]
+      - paragraph [ref=e11]: Um espaço privado para aproximar incorporadoras e corretores.
+  - region [ref=e13]:
+    - generic [ref=e14]:
+      - paragraph [ref=e15]: PRÉVIA PRIVADA
+      - heading "Estamos preparando seu acesso." [level=1] [ref=e16]
+      - paragraph [ref=e17]: O Connect ainda não está disponível neste ambiente. O acesso será liberado após a conclusão das validações.
+      - status [ref=e18]: Nenhum cadastro ou atendimento comercial está disponível nesta página.
+      - link "Visitar a Promoven" [ref=e19] [cursor=pointer]:
+        - /url: https://www.promoven.online
+        - text: Visitar a Promoven ↗

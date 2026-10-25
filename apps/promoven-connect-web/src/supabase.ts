@@ -1,7 +1,9 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { validateLocalEnvironment } from "./deployment-policy";
 
 let client: SupabaseClient | null = null;
 export function connectClient(): SupabaseClient {
+  validateLocalEnvironment(import.meta.env, window.location.hostname);
   if (client) return client;
   const url = import.meta.env.VITE_CONNECT_SUPABASE_URL;
   const key = import.meta.env.VITE_CONNECT_SUPABASE_PUBLISHABLE_KEY;

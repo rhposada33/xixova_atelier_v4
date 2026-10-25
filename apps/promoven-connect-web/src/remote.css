@@ -1,0 +1,9 @@
+.remote-unavailable .auth-card { padding: 16px; }
+.remote-unavailable .notice { line-height: 1.6; }
+@media (max-width: 768px) {
+  .remote-unavailable { grid-template-columns: 1fr; }
+  .remote-unavailable .auth-brand { padding: 30px 28px; }
+  .remote-unavailable .auth-brand > div { padding: 40px 0 20px; }
+  .remote-unavailable .auth-brand h2 { font-size: clamp(32px, 7vw, 44px); }
+  .remote-unavailable .auth-panel { padding: 24px 16px 40px; }
+}

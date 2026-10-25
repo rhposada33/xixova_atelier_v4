@@ -1,0 +1,62 @@
+[
+  {
+    "path": "/",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/connect",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/connect/projects/id",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/p/project/u/101",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/s/test-share",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/invite",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/login",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/reset-password",
+    "status": 200,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/api/test",
+    "status": 404,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/assets/missing.js",
+    "status": 404,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/connectivity",
+    "status": 404,
+    "securityHeaders": "PASS"
+  },
+  {
+    "path": "/unknown",
+    "status": 404,
+    "securityHeaders": "PASS"
+  }
+]

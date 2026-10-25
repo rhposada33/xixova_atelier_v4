@@ -4,6 +4,6 @@ import globals from "globals";
 export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  { files: ["tests/**/*.mjs"], languageOptions: { globals: globals.node } },
+  { files: ["tests/**/*.mjs", "scripts/**/*.mjs"], languageOptions: { globals: globals.node } },
   { files: ["src/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}"], languageOptions: { globals: { ...globals.browser, ...globals.node } }, rules: { "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }] } },
 ];

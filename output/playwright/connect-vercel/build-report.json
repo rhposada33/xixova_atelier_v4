@@ -1,0 +1,153 @@
+{
+  "status": "PASS",
+  "node": "24.21.0",
+  "source": "/home/rafa/RenderCasa/xixova_atelier_v4",
+  "temp": "/tmp/connect-vercel-278QL3",
+  "checks": [
+    {
+      "command": "npm ci --offline --no-audit --no-fund",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/1.log"
+    },
+    {
+      "command": "npm ci --offline --no-audit --no-fund",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/2.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/3.log"
+    },
+    {
+      "command": "npm test",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/4.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/5.log"
+    },
+    {
+      "command": "npm run lint",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/6.log"
+    },
+    {
+      "command": "npm run test:unit",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/7.log"
+    },
+    {
+      "command": "npm run build:vercel",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/8.log"
+    },
+    {
+      "command": "npm ci --offline --no-audit --no-fund",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/9.log"
+    },
+    {
+      "command": "npm ci --offline --no-audit --no-fund",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/10.log"
+    },
+    {
+      "command": "npm run build:vercel",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/11.log"
+    },
+    {
+      "command": "npm run build:vercel",
+      "expected": "success",
+      "log": "/tmp/connect-vercel-278QL3/12.log"
+    },
+    {
+      "command": "npm run build:vercel",
+      "expected": "rejection",
+      "log": "/tmp/connect-vercel-278QL3/13.log"
+    },
+    {
+      "command": "npm run build:vercel",
+      "expected": "rejection",
+      "log": "/tmp/connect-vercel-278QL3/14.log"
+    },
+    {
+      "command": "npm run build",
+      "expected": "rejection",
+      "log": "/tmp/connect-vercel-278QL3/15.log"
+    }
+  ],
+  "artifacts": [
+    {
+      "copy": "a",
+      "target": "preview",
+      "files": [
+        {
+          "file": "assets/index-D-kGynxU.js",
+          "sha256": "b3e230b4a91b5768e58e66f591edcdc5011fb4811e8a9a440793acf2f55359a2"
+        },
+        {
+          "file": "assets/index-sT7ygCMp.css",
+          "sha256": "545b538056e41a990ece5e76cdff13951ded2edf71cd1d7513e40b9498852807"
+        },
+        {
+          "file": "index.html",
+          "sha256": "b2a50c2b0f35d03ac567f31803e4c1f7d0013fd604912bb2ea462babdb4a4b0f"
+        }
+      ]
+    },
+    {
+      "copy": "b",
+      "target": "preview",
+      "files": [
+        {
+          "file": "assets/index-D-kGynxU.js",
+          "sha256": "b3e230b4a91b5768e58e66f591edcdc5011fb4811e8a9a440793acf2f55359a2"
+        },
+        {
+          "file": "assets/index-sT7ygCMp.css",
+          "sha256": "545b538056e41a990ece5e76cdff13951ded2edf71cd1d7513e40b9498852807"
+        },
+        {
+          "file": "index.html",
+          "sha256": "b2a50c2b0f35d03ac567f31803e4c1f7d0013fd604912bb2ea462babdb4a4b0f"
+        }
+      ]
+    },
+    {
+      "copy": "b",
+      "target": "production",
+      "files": [
+        {
+          "file": "assets/index-V-5pRFyq.js",
+          "sha256": "19386e1911cfe49b959de6a69a74adbe06c607198b853ff00fa8c8ac88e698e1"
+        },
+        {
+          "file": "assets/index-sT7ygCMp.css",
+          "sha256": "545b538056e41a990ece5e76cdff13951ded2edf71cd1d7513e40b9498852807"
+        },
+        {
+          "file": "index.html",
+          "sha256": "c072369f15a13a2931db92e534b5ee48e9b8956eaa97c64f4cf7ec49bfeca091"
+        }
+      ]
+    }
+  ],
+  "additionalChecks": {
+    "lintIncludingScripts": "PASS",
+    "contractsTests": 15,
+    "frontendTests": 20,
+    "responsiveWidths": [
+      390,
+      768,
+      1440
+    ],
+    "localPrivateRoute": "redirects to login",
+    "landingBuild": "PASS in isolated copy",
+    "remoteCloudValidation": "NOT_RUN",
+    "head": "9fcdf0a480137cea5deac68f0a9537006e2b9d4c"
+  }
+}
